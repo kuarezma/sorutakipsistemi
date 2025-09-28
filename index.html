@@ -30,7 +30,6 @@
     #tabStudent { background-color: var(--accent1); color: white; }
     #tabTeacher { background-color: var(--accent2); color: white; }
     
-    /* Aktif sekmenin rengini turuncu yapar */
     .tabs button.active{
         background: var(--warn) !important; 
         color: #fff !important;
@@ -262,7 +261,10 @@
     </div>
 
     <div id="teacherStudentDetail" class="list" style="display:none; margin-top:14px">
-      <div class="sectionTitle" id="tsdTitle"></div>
+      <div class="smallRow" style="margin-bottom: 10px; align-items: flex-start;">
+        <div class="sectionTitle" id="tsdTitle" style="margin:0; flex:1;"></div>
+        <button onclick="hideStudentDetail()" class="delBtn">Geri Dön</button>
+      </div>
       <div class="twoCol">
         <div>
           <div class="sectionTitle">Günler</div>
@@ -578,7 +580,7 @@
             activeClassName=name;
             document.querySelectorAll(".classPick").forEach(b=>b.classList.remove("active"));
             pick.classList.add("active");
-            selectClass(name, pick);
+            selectClass(name);
           };
 
           const del=document.createElement("button"); del.className="delFloat"; del.textContent="🗑️ Sil";
@@ -593,9 +595,12 @@
         names.forEach(n=>{const o=document.createElement("option"); o.value=n; o.text=n; sel.add(o);});
         if(names.includes(keep)) sel.value=keep;
 
-        if(activeClassName){
+        if(activeClassName && names.includes(activeClassName)){
           const btn=[...document.querySelectorAll(".classPick")].find(b=>b.parentElement.querySelector(".className").textContent===activeClassName);
-          if(btn){ btn.classList.add("active"); selectClass(activeClassName, btn); }
+          if(btn){ btn.classList.add("active"); selectClass(activeClassName); }
+        } else {
+            activeClassName = null;
+            document.getElementById("classStudents").style.display="none";
         }
       });
     }
@@ -605,17 +610,29 @@
     function selectClass(name){
       const list=document.getElementById("studentsContainer");
       document.getElementById("classStudents").style.display="block";
-      clearChildren(list);
+      list.innerHTML = "Yükleniyor...";
 
-      db.ref("students").orderByChild("sclass").equalTo(name).get().then(snap=>{
-        if(!snap.exists()){ list.innerHTML=`<div class='empty'>${name} sınıfına öğrenci yok.</div>`; return; }
+      db.ref("students").get().then(snap=>{
+        if(!snap.exists()){ list.innerHTML="<div class='empty'>Kayıtlı öğrenci yok.</div>"; return; }
+        
+        const studentsInClass = [];
+        snap.forEach(ch => {
+            const s = ch.val();
+            if(s && s.sclass === name) {
+                studentsInClass.push(s);
+            }
+        });
 
-        const studentsArray = [];
-        snap.forEach(ch=>{ studentsArray.push(ch.val()); });
-        studentsArray.sort((a,b)=> (a.name||"").localeCompare(b.name||""));
+        if(studentsInClass.length === 0) {
+            list.innerHTML=`<div class='empty'>'${name}' sınıfında öğrenci bulunamadı.</div>`;
+            return;
+        }
+
+        clearChildren(list);
+        studentsInClass.sort((a,b)=> (a.name||"").localeCompare(b.name||""));
         
         const frag=document.createDocumentFragment();
-        studentsArray.forEach(s=>{
+        studentsInClass.forEach(s=>{
           if(!s.num) return;
           const row=document.createElement("div"); row.className="studentItem"; row.id="stu-row-"+s.num;
 
@@ -697,6 +714,33 @@
       `).join("");
     }
     
+    function showTeacherSection(sec){
+      const classesSection = document.getElementById('classesSection');
+      const favoritesSection = document.getElementById('favoritesSection');
+      const detailSection = document.getElementById('teacherStudentDetail');
+      const tabClasses = document.getElementById('tabClasses');
+      const tabFavorites = document.getElementById('tabFavorites');
+
+      hideStudentDetail();
+
+      if(sec==='classes'){
+        classesSection.style.display='block';
+        favoritesSection.style.display='none';
+        tabClasses.classList.add('active');
+        tabFavorites.classList.remove('active');
+      } else { // favorites
+        classesSection.style.display='none';
+        favoritesSection.style.display='block';
+        tabClasses.classList.remove('active');
+        tabFavorites.classList.add('active');
+      }
+    }
+
+    function hideStudentDetail() {
+        document.getElementById('teacherStudentDetail').style.display = 'none';
+        currentDetailNum = null;
+    }
+
     function teacherShowStudent(num){
       currentDetailNum=num;
       document.getElementById("teacherStudentDetail").style.display="block";
@@ -729,7 +773,7 @@
     }
     function renderTotalsTable(totals,targetId){
       let html="<table><tr><th>Ders</th><th>Toplam Soru</th></tr>";
-      const ks=Object.keys(totals);
+      const ks=Object.keys(totals).sort();
       if(!ks.length) html+=`<tr><td colspan="2">Veri yok</td></tr>`;
       else ks.forEach(l=>{ html+=`<tr><td>${l}</td><td>${totals[l]}</td></tr>`; });
       html+="</table>";
@@ -745,7 +789,7 @@
             }
         }
         let html="<table><tr><th>Ders</th><th>O Gün Çözülen</th></tr>";
-        const ks=Object.keys(perLesson);
+        const ks=Object.keys(perLesson).sort();
         if(!ks.length) html+=`<tr><td colspan="2">Bu gün için veri yok</td></tr>`;
         else ks.forEach(l=>{ html+=`<tr><td>${l}</td><td>${perLesson[l]}</td></tr>`; });
         html+="</table>";
@@ -794,7 +838,8 @@
     function selectWeek(weekKey){
       selectedWeekKey=weekKey;
       document.querySelectorAll("#weekList button").forEach(b => {
-        b.style.background = (b.textContent.includes(formatTR(currentWeeks.find(w => w.key === weekKey).start))) ? 'var(--accent1)' : 'var(--muted)';
+        const weekData = currentWeeks.find(w => w.key === weekKey);
+        b.style.background = weekData && b.textContent.includes(formatTR(weekData.start)) ? 'var(--accent1)' : 'var(--muted)';
       });
       document.getElementById("btnExportPDF").disabled=false;
       drawWeek(currentDetailLessons, currentWeeks.find(w=>w.key===weekKey));
