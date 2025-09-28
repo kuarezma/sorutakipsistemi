@@ -30,8 +30,9 @@
     #tabStudent { background-color: var(--accent1); color: white; }
     #tabTeacher { background-color: var(--accent2); color: white; }
     
+    /* Aktif sekmenin rengini turuncu yapar */
     .tabs button.active{
-        background: var(--muted) !important; 
+        background: var(--warn) !important; 
         color: #fff !important;
     }
 
@@ -153,7 +154,6 @@
       z-index:100;
     }
     
-    /* --- HAFTANIN YILDIZI STİLİ --- */
     .sotwContainer {
         background: linear-gradient(90deg, #f59e0b, #f97316);
         color: white;
@@ -374,7 +374,7 @@
           document.getElementById("studentPanel").style.display="block";
           document.getElementById("lPass").value="";
           loadStudentData();
-          calculateAndDisplaySOTW(); // Haftanın yıldızını hesapla
+          calculateAndDisplaySOTW();
         }else setAlert("Numara veya şifre hatalı.");
       });
     }
@@ -396,13 +396,13 @@
       const timeStr=now.toLocaleDateString("tr-TR")+" "+now.toLocaleTimeString("tr-TR");
       for(const lesson in map){
         let v=parseInt(document.getElementById(map[lesson]).value);
-        if(isNaN(v) || v <= 0) continue; // Sadece 0'dan büyük değerleri ekle
+        if(isNaN(v) || v <= 0) continue;
         db.ref("students/"+currentStudent+"/lessons/"+lesson).push({count:v,time:timeStr});
       }
       setAlert("Kayıt eklendi!");
       document.getElementById("lessonForm").reset();
       loadStudentData();
-      calculateAndDisplaySOTW(); // Ekleme sonrası yıldızı tekrar hesapla
+      calculateAndDisplaySOTW();
     }
     function loadStudentData(){
       const box=document.getElementById("studentRecords");
@@ -410,7 +410,7 @@
       db.ref("students/"+currentStudent+"/lessons").get().then(snap=>{
         if(!snap.exists()){ box.innerHTML="<div class='empty'>Henüz veri yok.</div>"; return; }
         const data=snap.val();
-        const grouped={}; // gün -> ders -> entries
+        const grouped={};
         for(const lesson in data){
           for(const key in data[lesson]){
             const e=data[lesson][key];
@@ -473,13 +473,9 @@
 
       listenClasses();
       listenFavorites();
-      calculateAndDisplaySOTW(); // Haftanın yıldızını hesapla
+      calculateAndDisplaySOTW();
     }
-
-    // ... Diğer fonksiyonlar (Sınıflar, Favoriler vb.) buraya gelecek ...
-    // KODUN DEVAMI...
     
-    /* ===== HAFTANIN YILDIZI HESAPLAMA FONKSİYONU ===== */
     async function calculateAndDisplaySOTW() {
         const teacherBox = document.getElementById('sotwContainerTeacher');
         const studentBox = document.getElementById('sotwContainerStudent');
@@ -547,8 +543,6 @@
         }
     }
 
-
-    /* ============ Sınıflar (ortak) ============ */
     function addClass(){
       const cls=document.getElementById("newClass").value.trim();
       if(!cls){ setAlert("Sınıf adı girin (örn: 8/A)."); return; }
@@ -646,7 +640,6 @@
       });
     }
 
-    /* ============ Favoriler (öğretmene özel, tekilleştirme) ============ */
     function favPath(){ return currentTeacherId ? "teacherData/"+currentTeacherId+"/favorites" : null; }
     function listenFavorites(){
       const path=favPath(); if(!path) return;
@@ -704,7 +697,6 @@
       `).join("");
     }
     
-    /* ============ Öğrenci Detay + Haftalık ============ */
     function teacherShowStudent(num){
       currentDetailNum=num;
       document.getElementById("teacherStudentDetail").style.display="block";
@@ -760,7 +752,6 @@
         document.getElementById("tsdDayTable").innerHTML=html;
     }
 
-    /* ===== Haftalık çizgi grafiği + PDF ===== */
     function parseTRDateStr(dstr){ const parts = dstr.split('.'); if(parts.length < 3) return new Date('invalid'); const [dd,mm,yy]=parts.map(x=>parseInt(x,10)); return new Date(yy, mm-1, dd); }
     function formatTR(d){ return d.toLocaleDateString("tr-TR"); }
     function mondayOf(date){ const d=new Date(date.getFullYear(),date.getMonth(),date.getDate()); const day=d.getDay(); const diff=(day===0?-6:1-day); d.setDate(d.getDate()+diff); d.setHours(0,0,0,0); return d; }
@@ -779,7 +770,7 @@
       }
       if(!minDate) return [];
       let curStart=mondayOf(minDate);
-      const lastStart=mondayOf(new Date()); // Her zaman bugüne kadar olan haftaları göster
+      const lastStart=mondayOf(new Date());
       const out=[];
       while(curStart<=lastStart){
         const curEnd=addDays(curStart,6);
@@ -793,7 +784,7 @@
       const wrap=document.getElementById("weekList");
       if(!weeks.length){ wrap.innerHTML="<span class='empty'>Haftalık veri yok.</span>"; document.getElementById("btnExportPDF").disabled=true; return; }
       wrap.innerHTML="";
-      weeks.slice().reverse().forEach(w=>{ // Haftaları en yeniden eskiye sırala
+      weeks.slice().reverse().forEach(w=>{
         const b=document.createElement("button");
         b.type="button"; b.className="weekBtn"; b.textContent=w.label;
         b.onclick=()=>selectWeek(w.key);
@@ -802,7 +793,9 @@
     }
     function selectWeek(weekKey){
       selectedWeekKey=weekKey;
-      document.querySelectorAll("#weekList button").forEach(b => b.style.background = b.textContent.includes(weekKey.slice(5).replace('-', '.')) ? 'var(--accent1)' : 'var(--muted)');
+      document.querySelectorAll("#weekList button").forEach(b => {
+        b.style.background = (b.textContent.includes(formatTR(currentWeeks.find(w => w.key === weekKey).start))) ? 'var(--accent1)' : 'var(--muted)';
+      });
       document.getElementById("btnExportPDF").disabled=false;
       drawWeek(currentDetailLessons, currentWeeks.find(w=>w.key===weekKey));
     }
@@ -857,7 +850,7 @@
     function buildMatrixTableHTML(perLessonPerDay, dayLabels){
       let html = `<div class="sectionTitle" style="margin:0 0 6px">Ders × Gün Matrisi</div>`;
       html += `<table><tr><th>Ders</th>${dayLabels.map(d=>`<th>${d}</th>`).join("")}</tr>`;
-      Object.keys(perLessonPerDay).sort().forEach(lesson=>{ // Dersleri alfabetik sırala
+      Object.keys(perLessonPerDay).sort().forEach(lesson=>{
         const row=perLessonPerDay[lesson];
         html += `<tr><td>${lesson}</td>${row.map(v=>`<td>${v||0}</td>`).join("")}</tr>`;
       });
@@ -866,7 +859,6 @@
     }
     function destroyWeekChart(){ if(weekChart){ weekChart.destroy(); weekChart=null; } }
 
-    /* ======= PDF EXPORT ======= */
     function prepareExportDOM(week, dayLabels, daily, perLessonPerDay){
       const title=document.getElementById("tsdTitle").textContent;
       document.getElementById("exportStudent").textContent = title;
@@ -898,7 +890,6 @@
       pdf.save(`${safeName} - ${document.getElementById("exportRange").textContent}.pdf`);
     }
 
-    /* ============ Kayıt sekmesi: sınıfları canlı dinle ============ */
     db.ref("classes").on("value",snap=>{
       const names=[]; snap.forEach(ch=>{const v=ch.val(); if(v&&v.name) names.push(v.name);});
       const sel=document.getElementById("rClass"); const keep=sel.value;
