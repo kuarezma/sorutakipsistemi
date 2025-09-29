@@ -172,29 +172,40 @@
         font-size: 18px;
         margin: 0 6px;
     }
-    /* --- YENİ İSTATİSTİK KARTI STİLİ --- */
     .studentStats {
-      display: flex;
-      gap: 10px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
       margin-bottom: 20px;
     }
-    .statCard {
-      flex: 1;
+    .statBox {
       background: var(--card);
       padding: 12px;
       border-radius: 10px;
-      text-align: center;
       border: 1px solid var(--cardBorder);
     }
-    .statCard .label {
-      font-size: 14px;
-      opacity: 0.8;
-      margin-bottom: 4px;
+    .statBox .label {
+      font-size: 16px;
+      font-weight: 800;
+      opacity: 0.9;
+      margin-bottom: 8px;
+      text-align: center;
+      color: var(--accent1);
     }
-    .statCard .value {
-      font-size: 24px;
-      font-weight: 900;
-      color: var(--accent2);
+    .statBox table{
+        margin:0;
+    }
+    .statBox th{
+        display:none;
+    }
+    .statBox td{
+        border: 1px solid var(--muted);
+        padding: 6px 8px;
+        font-size: 14px;
+    }
+    .statBox td:first-child{
+        text-align: left;
+        font-weight: 700;
     }
   </style>
 </head>
@@ -382,18 +393,49 @@
         .replace(/[^a-z0-9]+/g,'-')
         .replace(/^-+|-+$/g,'');
     }
+    function capitalizeName(name) {
+        if(!name) return "";
+        return name.toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+    }
 
     /* ============ Öğrenci kayıt & giriş ============ */
-    function studentRegister(){
-      const name=document.getElementById("rName").value.trim();
+    async function studentRegister(){
+      const nameInput = document.getElementById("rName").value.trim();
       const sclass=document.getElementById("rClass").value;
       const num=document.getElementById("rNumber").value.trim();
       const pass=document.getElementById("rPass").value;
-      if(!name||!sclass||!num||!pass){setAlert("Tüm alanları doldurun.");return;}
-      db.ref("students/"+num).set({name,sclass,num,pass})
-        .then(()=>{setAlert("Kayıt başarılı!");showTab("studentLogin");})
-        .catch(e=>setAlert("Hata: "+e.message));
+
+      if(!nameInput||!sclass||!num||!pass){setAlert("Tüm alanları doldurun.");return;}
+
+      const name = capitalizeName(nameInput);
+      
+      try {
+        const snap = await db.ref("students").get();
+        if (snap.exists()) {
+            const students = snap.val();
+            let numExists = false;
+            let nameExists = false;
+            for(const key in students) {
+                if(students[key].num === num) numExists = true;
+                if(students[key].name.toLowerCase() === name.toLowerCase()) nameExists = true;
+            }
+            if(numExists) {
+                setAlert("Bu okul numarası zaten kayıtlı. Lütfen farklı bir numara girin.");
+                return;
+            }
+            if(nameExists) {
+                setAlert("Bu isimde bir öğrenci zaten mevcut. Lütfen isminizi kontrol edin.");
+                return;
+            }
+        }
+        await db.ref("students/"+num).set({name,sclass,num,pass});
+        setAlert("Kayıt başarılı! Giriş yapabilirsiniz.");
+        showTab("studentLogin");
+      } catch(e) {
+        setAlert("Hata: "+e.message)
+      }
     }
+
     function studentLogin(){
       const num=document.getElementById("lNumber").value.trim();
       const pass=document.getElementById("lPass").value;
@@ -449,18 +491,20 @@
 
       const map={"Türkçe":"Turkce","Sosyal Bilgiler":"Sosyal","Din Kültürü":"Din","İngilizce":"Ingilizce","Matematik":"Matematik","Fen Bilimleri":"Fen"};
       let totalAdded = 0;
+      let hasData = false;
       for(const lesson in map){
         let v=parseInt(document.getElementById(map[lesson]).value);
         if(!isNaN(v) && v > 0) {
+            hasData = true;
             db.ref(`students/${currentStudent}/lessons/${lesson}`).push({count:v,time:timeStr});
             totalAdded += v;
         }
       }
       
-      if(totalAdded > 0) {
+      if(hasData) {
         setAlert("Kayıt eklendi!");
         document.getElementById("lessonForm").reset();
-        setupDatePicker(); // Tarih seçiciyi bugüne sıfırla
+        setupDatePicker();
         loadStudentData();
         calculateAndDisplaySOTW();
         calculateAndDisplayStudentStats();
@@ -473,7 +517,7 @@
         const container = document.getElementById('studentStatsContainer');
         if (!currentStudent || !container) return;
         
-        container.innerHTML = `<div class="statCard"><div class="label">Hesaplanıyor...</div></div><div class="statCard"><div class="label">Hesaplanıyor...</div></div>`;
+        container.innerHTML = "İstatistikler hesaplanıyor...";
 
         const now = new Date();
         const startOfWeek = mondayOf(now);
@@ -484,36 +528,46 @@
         const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
         endOfMonth.setHours(23, 59, 59, 999);
 
-        let weeklyTotal = 0;
-        let monthlyTotal = 0;
+        const weeklyTotals = {}, monthlyTotals = {};
+        const allLessons = ["Türkçe","Sosyal Bilgiler","Din Kültürü","İngilizce","Matematik","Fen Bilimleri"];
+        allLessons.forEach(l => { weeklyTotals[l] = 0; monthlyTotals[l] = 0; });
 
         const snap = await db.ref(`students/${currentStudent}/lessons`).get();
         if (snap.exists()) {
-            const lessons = snap.val();
-            for (const lesson in lessons) {
-                for (const key in lessons[lesson]) {
-                    const entry = lessons[lesson][key];
+            const lessonsData = snap.val();
+            for (const lesson in lessonsData) {
+                for (const key in lessonsData[lesson]) {
+                    const entry = lessonsData[lesson][key];
                     const entryDate = parseTRDateStr((entry.time || "").split(" ")[0]);
                     if (isNaN(entryDate)) continue;
 
+                    const count = Number(entry.count) || 0;
                     if (entryDate >= startOfWeek && entryDate <= endOfWeek) {
-                        weeklyTotal += Number(entry.count) || 0;
+                        weeklyTotals[lesson] = (weeklyTotals[lesson] || 0) + count;
                     }
                     if (entryDate >= startOfMonth && entryDate <= endOfMonth) {
-                        monthlyTotal += Number(entry.count) || 0;
+                        monthlyTotals[lesson] = (monthlyTotals[lesson] || 0) + count;
                     }
                 }
             }
         }
+        
+        const buildTableHTML = (totals) => {
+            let table = '<table><tbody>';
+            allLessons.forEach(l => {
+                if(totals[l] > 0) table += `<tr><td>${l}</td><td>${totals[l]}</td></tr>`;
+            });
+            return table + '</tbody></table>';
+        };
 
         container.innerHTML = `
-            <div class="statCard">
-                <div class="label">Bu Hafta Toplam</div>
-                <div class="value">${weeklyTotal}</div>
+            <div class="statBox">
+                <div class="label">Bu Hafta</div>
+                ${buildTableHTML(weeklyTotals)}
             </div>
-            <div class="statCard">
-                <div class="label">Bu Ay Toplam</div>
-                <div class="value">${monthlyTotal}</div>
+            <div class="statBox">
+                <div class="label">Bu Ay</div>
+                ${buildTableHTML(monthlyTotals)}
             </div>
         `;
     }
@@ -531,7 +585,7 @@
             const day=(e.time||"").split(" ")[0]||"Bilinmeyen";
             if(!grouped[day]) grouped[day]={};
             if(!grouped[day][lesson]) grouped[day][lesson]=[];
-            grouped[day][lesson].push({count:e.count,key});
+            grouped[day][lesson].push({count:e.count, key});
           }
         }
         box.innerHTML="";
@@ -543,39 +597,72 @@
         window._grouped=grouped;
       });
     }
+
     function showDay(day){
       const details=window._grouped[day];
-      let html="<table><tr><th>Ders</th><th>Soru Sayısı</th><th>İşlem</th></tr>";
+      let html="<table><tr><th>Ders</th><th>Toplam Soru</th><th>İşlem</th></tr>";
       for(const lesson in details){
-        details[lesson].forEach(item=>{
-          html+=`<tr>
+        const totalCount = details[lesson].reduce((sum, item) => sum + (item.count || 0), 0);
+        html+=`<tr>
             <td>${lesson}</td>
-            <td>${item.count}</td>
-            <td><button type="button" class="editBtn" onclick="editEntry('${lesson}','${item.key}',${item.count})">Düzenle</button></td>
+            <td>${totalCount}</td>
+            <td><button type="button" class="editBtn" onclick="editDailyTotal('${lesson}','${day}', ${totalCount})">Düzenle</button></td>
           </tr>`;
-        });
       }
       html+="</table>";
       const el=document.getElementById("day-"+day);
       el.innerHTML=html;
       el.style.display = (el.style.display==="none"||!el.style.display) ? "block" : "none";
     }
-    function editEntry(lesson,key,oldVal){
-      let nv=prompt("Yeni değeri girin:", oldVal);
-      if(nv===null) return;
-      nv=parseInt(nv);
-      if(isNaN(nv)){ setAlert("Geçersiz sayı."); return; }
-      db.ref(`students/${currentStudent}/lessons/${lesson}/${key}`).update({count:nv})
-        .then(()=>{ setAlert("Güncellendi."); loadStudentData(); calculateAndDisplayStudentStats(); calculateAndDisplaySOTW(); })
-        .catch(e=>setAlert("Hata: "+e.message));
+    
+    async function editDailyTotal(lesson, day, oldTotal) {
+        let newTotal = prompt(`'${day}' tarihindeki '${lesson}' dersi için yeni toplam soru sayısını girin:`, oldTotal);
+        if (newTotal === null) return;
+        newTotal = parseInt(newTotal);
+        if(isNaN(newTotal) || newTotal < 0) {
+            setAlert("Lütfen geçerli bir sayı girin.");
+            return;
+        }
+
+        try {
+            const lessonRef = db.ref(`students/${currentStudent}/lessons/${lesson}`);
+            const snap = await lessonRef.get();
+            const updates = {};
+            let entriesForDay = [];
+            if (snap.exists()) {
+                snap.forEach(childSnap => {
+                    const entry = childSnap.val();
+                    const entryDay = (entry.time || "").split(" ")[0];
+                    if (entryDay === day) {
+                        updates[childSnap.key] = null; // Mark for deletion
+                    }
+                });
+            }
+            
+            await lessonRef.update(updates);
+            
+            if (newTotal > 0) {
+                const timeStr = `${day} ${new Date().toLocaleTimeString('tr-TR')}`;
+                await lessonRef.push({ count: newTotal, time: timeStr });
+            }
+            
+            setAlert("Güncelleme başarılı!");
+            loadStudentData();
+            calculateAndDisplaySOTW();
+            calculateAndDisplayStudentStats();
+        } catch(e) {
+            setAlert("Güncelleme sırasında hata oluştu: " + e.message);
+        }
     }
 
     /* ============ Öğretmen Paneli Fonksiyonları (Düzeltilmiş ve Tam) ============ */
     function teacherLogin(){
-      const name=document.getElementById("tName").value.trim();
+      const nameInput = document.getElementById("tName").value.trim();
+      const name = capitalizeName(nameInput);
       const code=document.getElementById("tCode").value;
       if(!name || !code){ setAlert("Ad Soyad ve kod gerekli."); return; }
       if(code!=="703504"){ setAlert("Kod hatalı."); return; }
+      
       currentTeacherName = name;
       currentTeacherId = normalizeId(name);
       if(!currentTeacherId){ setAlert("Geçerli bir ad giriniz."); return; }
@@ -666,6 +753,10 @@
       }).then(()=>{ document.getElementById("newClass").value=""; });
     }
     function deleteClassByName(name){
+      if(currentTeacherName !== "Uğur Yaşayan"){
+          setAlert("Sadece yetkili öğretmenler sınıf silebilir.");
+          return;
+      }
       const classId = classesMap[name];
       if(!classId){ setAlert("Sınıf id bulunamadı."); return; }
       if(!confirm(`"${name}" sınıfını silmek istiyor musunuz?`)) return;
@@ -695,10 +786,14 @@
             selectClass(name);
           };
 
-          const del=document.createElement("button"); del.className="delFloat"; del.textContent="🗑️ Sil";
-          del.onclick=(e)=>{ e.stopPropagation(); deleteClassByName(name); };
-
-          card.appendChild(title); card.appendChild(del); card.appendChild(pick);
+          if(currentTeacherName === 'Uğur Yaşayan'){
+            const del=document.createElement("button"); del.className="delFloat"; del.textContent="🗑️ Sil";
+            del.onclick=(e)=>{ e.stopPropagation(); deleteClassByName(name); };
+            card.appendChild(del);
+          }
+          
+          card.appendChild(title);
+          card.appendChild(pick);
           grid.appendChild(card);
         });
 
@@ -749,7 +844,7 @@
           const row=document.createElement("div"); row.className="studentItem"; row.id="stu-row-"+s.num;
 
           const left=document.createElement("div"); left.className="leftGroup";
-          const nameBtn=document.createElement("button"); nameBtn.className="studentNameBtn"; nameBtn.textContent=`${s.name} (${s.num})`; nameBtn.onclick=()=>teacherShowStudent(s.num);
+          const nameBtn=document.createElement("button"); nameBtn.className="studentNameBtn"; nameBtn.textContent=`${s.num} - ${s.name}`; nameBtn.onclick=()=>teacherShowStudent(s.num);
 
           const star=document.createElement("button");
           const isFav=!!favoritesCache[s.num];
@@ -818,7 +913,7 @@
       box.innerHTML = items.map(s=>`
         <div class="studentItem" id="fav-row-${s.num}">
           <div class="leftGroup">
-            <button class="studentNameBtn" title="Detay panelinde aç" onclick="teacherShowStudent('${s.num}')">${s.name} (${s.num}) – <span style="opacity:.8">${s.sclass||''}</span></button>
+            <button class="studentNameBtn" title="Detay panelinde aç" onclick="teacherShowStudent('${s.num}')">${s.num} - ${s.name} (${s.sclass||''})</button>
             <button class="starBtn" title="Favoriden çıkar" data-role="fav" data-num="${s.num}" data-name="${s.name}" data-sclass="${s.sclass}">★</button>
           </div>
           <button class="editBtn" style="min-width:100px" onclick="teacherShowStudent('${s.num}')">Detay Gör</button>
@@ -859,7 +954,7 @@
       db.ref("students/"+num).get().then(snap=>{
         if(!snap.exists()){ setAlert("Öğrenci bulunamadı."); return; }
         const s=snap.val();
-        document.getElementById("tsdTitle").textContent = `${s.name} (${s.num}) – ${s.sclass}`;
+        document.getElementById("tsdTitle").textContent = `${s.num} - ${s.name} (${s.sclass})`;
         const lessons=s.lessons||{};
         currentDetailLessons = lessons;
 
