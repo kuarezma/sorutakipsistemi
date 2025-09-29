@@ -172,6 +172,30 @@
         font-size: 18px;
         margin: 0 6px;
     }
+    /* --- YENİ İSTATİSTİK KARTI STİLİ --- */
+    .studentStats {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .statCard {
+      flex: 1;
+      background: var(--card);
+      padding: 12px;
+      border-radius: 10px;
+      text-align: center;
+      border: 1px solid var(--cardBorder);
+    }
+    .statCard .label {
+      font-size: 14px;
+      opacity: 0.8;
+      margin-bottom: 4px;
+    }
+    .statCard .value {
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--accent2);
+    }
   </style>
 </head>
 <body>
@@ -216,7 +240,11 @@
   <div class="container" id="studentPanel" style="display:none">
     <h3>Öğrenci Paneli</h3>
     <div id="sotwContainerStudent" class="sotwContainer"></div>
+    <div id="studentStatsContainer" class="studentStats"></div>
     <form id="lessonForm">
+      <div class="sectionTitle">Soru Girişi</div>
+      <label for="entryDate" style="opacity: 0.8; font-size: 14px;">Giriş yapılacak tarih (Sadece bu hafta içinde bir gün seçilebilir):</label>
+      <input type="date" id="entryDate">
       <table>
         <tr><th>Ders</th><th>Çözülen Soru</th></tr>
         <tr><td>Türkçe</td><td><input type="number" id="Turkce" inputmode="numeric"></td></tr>
@@ -377,6 +405,8 @@
           document.getElementById("lPass").value="";
           loadStudentData();
           calculateAndDisplaySOTW();
+          setupDatePicker();
+          calculateAndDisplayStudentStats();
         }else setAlert("Numara veya şifre hatalı.");
       });
     }
@@ -391,21 +421,103 @@
     }
 
     /* ============ Öğrenci Paneli ============ */
+    function setupDatePicker() {
+        const datePicker = document.getElementById('entryDate');
+        const today = new Date();
+        const startOfWeek = mondayOf(today);
+
+        const formatDate = (d) => d.toISOString().split('T')[0];
+
+        datePicker.min = formatDate(startOfWeek);
+        datePicker.max = formatDate(today);
+        datePicker.value = formatDate(today);
+    }
+
     function addAll(){
       if(!currentStudent){ setAlert("Oturum bulunamadı."); return; }
+      
+      const datePicker = document.getElementById('entryDate');
+      if(!datePicker.value) {
+          setAlert("Lütfen geçerli bir tarih seçin.");
+          return;
+      }
+      const selectedDate = new Date(datePicker.value);
+      const userTimezoneOffset = selectedDate.getTimezoneOffset() * 60000;
+      const correctedDate = new Date(selectedDate.getTime() + userTimezoneOffset);
+
+      const timeStr = correctedDate.toLocaleDateString("tr-TR") + " " + new Date().toLocaleTimeString("tr-TR");
+
       const map={"Türkçe":"Turkce","Sosyal Bilgiler":"Sosyal","Din Kültürü":"Din","İngilizce":"Ingilizce","Matematik":"Matematik","Fen Bilimleri":"Fen"};
-      const now=new Date();
-      const timeStr=now.toLocaleDateString("tr-TR")+" "+now.toLocaleTimeString("tr-TR");
+      let totalAdded = 0;
       for(const lesson in map){
         let v=parseInt(document.getElementById(map[lesson]).value);
-        if(isNaN(v) || v <= 0) continue;
-        db.ref("students/"+currentStudent+"/lessons/"+lesson).push({count:v,time:timeStr});
+        if(!isNaN(v) && v > 0) {
+            db.ref(`students/${currentStudent}/lessons/${lesson}`).push({count:v,time:timeStr});
+            totalAdded += v;
+        }
       }
-      setAlert("Kayıt eklendi!");
-      document.getElementById("lessonForm").reset();
-      loadStudentData();
-      calculateAndDisplaySOTW();
+      
+      if(totalAdded > 0) {
+        setAlert("Kayıt eklendi!");
+        document.getElementById("lessonForm").reset();
+        setupDatePicker(); // Tarih seçiciyi bugüne sıfırla
+        loadStudentData();
+        calculateAndDisplaySOTW();
+        calculateAndDisplayStudentStats();
+      } else {
+        setAlert("Lütfen en az bir derse çözülen soru sayısını girin.");
+      }
     }
+    
+    async function calculateAndDisplayStudentStats() {
+        const container = document.getElementById('studentStatsContainer');
+        if (!currentStudent || !container) return;
+        
+        container.innerHTML = `<div class="statCard"><div class="label">Hesaplanıyor...</div></div><div class="statCard"><div class="label">Hesaplanıyor...</div></div>`;
+
+        const now = new Date();
+        const startOfWeek = mondayOf(now);
+        const endOfWeek = addDays(new Date(startOfWeek), 6);
+        endOfWeek.setHours(23, 59, 59, 999);
+
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        endOfMonth.setHours(23, 59, 59, 999);
+
+        let weeklyTotal = 0;
+        let monthlyTotal = 0;
+
+        const snap = await db.ref(`students/${currentStudent}/lessons`).get();
+        if (snap.exists()) {
+            const lessons = snap.val();
+            for (const lesson in lessons) {
+                for (const key in lessons[lesson]) {
+                    const entry = lessons[lesson][key];
+                    const entryDate = parseTRDateStr((entry.time || "").split(" ")[0]);
+                    if (isNaN(entryDate)) continue;
+
+                    if (entryDate >= startOfWeek && entryDate <= endOfWeek) {
+                        weeklyTotal += Number(entry.count) || 0;
+                    }
+                    if (entryDate >= startOfMonth && entryDate <= endOfMonth) {
+                        monthlyTotal += Number(entry.count) || 0;
+                    }
+                }
+            }
+        }
+
+        container.innerHTML = `
+            <div class="statCard">
+                <div class="label">Bu Hafta Toplam</div>
+                <div class="value">${weeklyTotal}</div>
+            </div>
+            <div class="statCard">
+                <div class="label">Bu Ay Toplam</div>
+                <div class="value">${monthlyTotal}</div>
+            </div>
+        `;
+    }
+
     function loadStudentData(){
       const box=document.getElementById("studentRecords");
       box.innerHTML="Yükleniyor...";
@@ -453,12 +565,12 @@
       if(nv===null) return;
       nv=parseInt(nv);
       if(isNaN(nv)){ setAlert("Geçersiz sayı."); return; }
-      db.ref("students/"+currentStudent+"/lessons/"+lesson+"/"+key).update({count:nv})
-        .then(()=>{ setAlert("Güncellendi."); loadStudentData(); })
+      db.ref(`students/${currentStudent}/lessons/${lesson}/${key}`).update({count:nv})
+        .then(()=>{ setAlert("Güncellendi."); loadStudentData(); calculateAndDisplayStudentStats(); calculateAndDisplaySOTW(); })
         .catch(e=>setAlert("Hata: "+e.message));
     }
 
-    /* ============ Öğretmen Giriş ============ */
+    /* ============ Öğretmen Paneli Fonksiyonları (Düzeltilmiş ve Tam) ============ */
     function teacherLogin(){
       const name=document.getElementById("tName").value.trim();
       const code=document.getElementById("tCode").value;
@@ -690,7 +802,7 @@
       if(!confirm(`"${name} (${num})" öğrencisini silmek istiyor musunuz?`)) return;
       const updates={}; updates["students/"+num]=null;
       db.ref("teacherData").get().then(snap=>{
-        if(snap.exists()){ snap.forEach(t=>{ updates["teacherData/"+t.key+"/favorites/"+num]=null; }); }
+        if(snap.exists()){ snap.forEach(t=>{ updates[`teacherData/${t.key}/favorites/${num}`]=null; }); }
         return db.ref().update(updates);
       }).then(()=>{
         setAlert("Öğrenci silindi.");
@@ -717,7 +829,6 @@
     function showTeacherSection(sec){
       const classesSection = document.getElementById('classesSection');
       const favoritesSection = document.getElementById('favoritesSection');
-      const detailSection = document.getElementById('teacherStudentDetail');
       const tabClasses = document.getElementById('tabClasses');
       const tabFavorites = document.getElementById('tabFavorites');
 
@@ -802,14 +913,13 @@
     function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
 
     function buildWeeksFromLessons(lessons){
-      let minDate=null, maxDate=null;
+      let minDate=null;
       for(const l in lessons){
         for(const k in lessons[l]){
           const e=lessons[l][k];
           const d=parseTRDateStr((e.time||"").split(" ")[0]||"");
           if(isNaN(d)) continue;
           if(!minDate||d<minDate) minDate=d;
-          if(!maxDate||d>maxDate) maxDate=d;
         }
       }
       if(!minDate) return [];
