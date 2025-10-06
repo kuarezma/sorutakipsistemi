@@ -470,7 +470,6 @@
     }
   }
 
-
     .teacherTopbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:6px 0 8px;}
     button.exitSmall{border:0;border-radius:10px;padding:6px 10px;min-height:32px;background:#ef4444;color:#fff;font-weight:800;cursor:pointer}
     button.exitSmall:hover{background:#dc2626}
@@ -1039,7 +1038,10 @@ body[data-role="parent"] #studentTab-entry .student-toolbar { margin-bottom: 8px
 <div class="sectionTitle" style="margin-top:10px">Aylık Toplam (Ders Bazlı)</div>
 <div class="exportCard" id="stuMonthTotals"></div>
 </div>
-<button class="action logout" onclick="logout()" type="button">Çıkış Yap</button>
+<div class="smallRow" style="margin-top:16px; justify-content:center; gap: 12px;">
+    <button type="button" class="pill exit" onclick="backToRoleChoice()">Geri</button>
+    <button type="button" class="action logout" style="width: auto; padding: 10px 20px;" onclick="logout()">Çıkış Yap</button>
+</div>
 </div>
 <!-- ÖĞRETMEN PANELİ -->
 <div class="container" id="teacherPanel" style="display:none">
@@ -1068,8 +1070,11 @@ body[data-role="parent"] #studentTab-entry .student-toolbar { margin-bottom: 8px
 </div>
 <div class="classGrid" id="classGrid"></div>
 <div class="list" id="classStudents" style="display:none">
-<div class="sectionTitle">Öğrenciler</div>
-<div id="studentsContainer"></div>
+    <div class="sectionTitle" style="display:flex; justify-content:space-between; align-items:center;">
+        <span>Öğrenciler</span>
+        <button class="pill exit" style="font-size: 12px; padding: 6px 10px;" onclick="backToClasses()">Sınıflara Geri Dön</button>
+    </div>
+    <div id="studentsContainer"></div>
 </div>
 </div>
 <!-- Favoriler -->
@@ -1140,14 +1145,14 @@ body[data-role="parent"] #studentTab-entry .student-toolbar { margin-bottom: 8px
 <div id="goalsPage" style="display:none">
 <div class="gp-header">
 <div class="gp-left">
-<button class="pill gp-btn gp-back" onclick="backFromGoalsPage()" title="Öğrenci Paneline Dön" type="button">
+<button class="pill gp-btn gp-back" onclick="backFromGoalsPage()" title="Geri Dön" type="button">
 <span aria-hidden="true" class="icon">
 <!-- back -->
 <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24"><path d="M15 18l-6-6 6-6"></path><path d="M21 12H9"></path></svg>
 </span>
         Geri
       </button>
-<div class="gp-title">🎯 Ders Soru sayısı Hedefleri</div>
+<div class="gp-title">🎯 Ders Soru Sayısı Hedefleri</div>
 </div>
 <div class="gp-actions">
 <button class="pill gp-btn gp-clear" onclick="resetGoalsInputs()" type="button">
@@ -1213,7 +1218,7 @@ body[data-role="parent"] #studentTab-entry .student-toolbar { margin-bottom: 8px
 
     /* ============ Global Durum ============ */
     let currentStudent=null;
-    let currentStudentName=null; // Öğrenci adı (hoşgeldin için)
+    let currentStudentName=null; 
     let currentTeacherId=null, currentTeacherName=null;
     let stuWeekChart=null, stuMonthChart=null, _stuWeeks=[], _stuMonths=[];
     let favoritesCache={}, classesMap={}, activeClassName=null, currentDetailNum=null;
@@ -1225,11 +1230,8 @@ body[data-role="parent"] #studentTab-entry .student-toolbar { margin-bottom: 8px
     window._MAIN_PANELS = ['teacherPanel','studentPanel','loginPanel','goalsPage'];
     window.activeRole = 'student';
 
-    /* ===== Silme ikonu (çöp tenekesi SVG) ===== */
     const TRASH_ICON = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBmaWxsPSIjZWY0NDQ0Ij4KICA8cGF0aCBkPSJNOSAyaDZ2Mmg1djJINFY0aDVWMnptLTMgNmgxMmwtMSAxMmEyIDIgMCAwIDEtMiAySDlhMiAyIDAgMCAxLTItMkw2IDh6bTQgM3Y3aDJ2LTdoLTJ6bTQgMHY3aDJ2LTdoLTJ6Ii8+Cjwvc3ZnPg==";
-
-    /* ===== Veli paneli yönlendirme adresi (gerekirse değiştirin) ===== */
-    const PARENT_PORTAL_URL = "veli.html"; // Örn: "veli-panel.html" veya tam URL
+    const PARENT_PORTAL_URL = "veli.html"; 
     
     /* ============ YARDIMCI FONKSİYONLAR ============ */
     function setAlert(msg){
@@ -1365,19 +1367,7 @@ body[data-role="parent"] #studentTab-entry .student-toolbar { margin-bottom: 8px
     }
     
     function exitToHome(){
-      try {
-        if (typeof currentStudent !== 'undefined') currentStudent = null;
-        ['lNumber','lPass','rName','rNumber','rPass','rPass2'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
-        const sel=document.getElementById('rClass'); if (sel) sel.selectedIndex = 0;
-        const lf=document.getElementById('lessonForm'); if (lf) lf.reset();
-        const sr=document.getElementById('studentRecords'); if (sr) sr.innerHTML='';
-        const rc=document.getElementById('roleChoice'); if(rc) rc.style.display='none';
-        ['studentPanel','teacherStudentDetail', 'goalsPage'].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display='none'; });
-        const lp=document.getElementById('loginPanel'); if(lp) lp.style.display='block';
-        try{ var b=document.getElementById('studentWelcome'); if(b){ b.style.display='none'; b.textContent=''; } }catch(_){ }
-        try{ setStudentTargetInfo(null); }catch(_){ }
-        if (typeof showTab==='function') showTab('studentLogin');
-      } catch(e){}
+      logout();
     }
 
     /* ============ ROL SEÇİMİ (ÖĞRENCİ/VELİ) ============ */
@@ -1424,6 +1414,17 @@ body[data-role="parent"] #studentTab-entry .student-toolbar { margin-bottom: 8px
       try{ window.showStudentTab('entry'); }catch(_){}
       try{ window.loadStudentData(); }catch(_){}
       applyRoleUi();
+    }
+    
+    function backToRoleChoice() {
+        document.getElementById("studentPanel").style.display = "none";
+        db.ref("students/"+currentStudent).get().then(snap=>{
+            if(snap.exists()){
+                showRoleChoice(snap.val());
+            } else {
+                logout(); 
+            }
+        });
     }
     
     function setWelcomeStudentBanner(){
@@ -1750,6 +1751,12 @@ body[data-role="parent"] #studentTab-entry .student-toolbar { margin-bottom: 8px
           if(btn){ btn.classList.add("active"); selectClass(activeClassName); }
         }
       });
+    }
+    
+    function backToClasses() {
+        document.getElementById("classStudents").style.display = "none";
+        document.querySelectorAll(".classPick").forEach(b => b.classList.remove("active"));
+        activeClassName = null;
     }
 
     function selectClass(name){
