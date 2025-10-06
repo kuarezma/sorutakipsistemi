@@ -1,15 +1,12 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="utf-8"/>
+<meta charset="utf-t"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
 <title>ÖĞRENCİ TAKİP PROGRAMI</title>
-<!-- Firebase compat SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-database-compat.js"></script>
-<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<!-- html2canvas & jsPDF for PDF export -->
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <style>
@@ -206,8 +203,6 @@
     }
     .teacherWelcome{opacity:.8;margin:0 0 10px}
     .favBlock{background:#0b1427;border-radius:12px;padding:10px;margin-top:8px}
-  
-    
 
     input:focus,
     select:focus,
@@ -311,51 +306,51 @@
     .roleCard.parent .roleIcon{ color:#34d399; background:linear-gradient(135deg, rgba(52,211,153,.12), rgba(6,182,212,.12)); }
     .roleTitle{ font-weight:900; letter-spacing:.2px; }
 
-/* ==== Farklı Hesap ve Çıkış Butonları ==== */
-.smallRow {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-}
-.smallRow .pill {
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-weight: 600;
-}
-.smallRow .pill.account {
-  background: #facc15; /* sarı */
-  border: none;
-  color: #111;
-}
-.smallRow .pill.account:hover {
-  background: #eab308;
-}
-.smallRow .pill.exit {
-  background: #ef4444; /* kırmızı */
-  border: none;
-  color: #fff;
-}
-.smallRow .pill.exit:hover {
-  background: #dc2626;
-}
+    /* ==== Farklı Hesap ve Çıkış Butonları ==== */
+    .smallRow {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+    .smallRow .pill {
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 600;
+    }
+    .smallRow .pill.account {
+      background: #facc15; /* sarı */
+      border: none;
+      color: #111;
+    }
+    .smallRow .pill.account:hover {
+      background: #eab308;
+    }
+    .smallRow .pill.exit {
+      background: #ef4444; /* kırmızı */
+      border: none;
+      color: #fff;
+    }
+    .smallRow .pill.exit:hover {
+      background: #dc2626;
+    }
 
 
-/* ==== Mobil Optimizasyon: Giriş Türü Seçimi ==== */
-@media (max-width: 768px) {
-  .roleGrid { grid-template-columns: 1fr; gap: 12px; }
-  .roleCard { padding: 18px 14px; }
-  .roleIcon { width: 60px; height: 60px; }
-  .roleIcon svg { width: 30px; height: 30px; }
-  .roleTitle { font-size: 18px; }
-  .smallRow { justify-content: center; }
-  .smallRow .pill { width: 100%; max-width: 240px; }
-}
-@media (max-width: 480px) {
-  .roleCard { padding: 16px 12px; }
-  .roleIcon { width: 54px; height: 54px; }
-  .roleIcon svg { width: 28px; height: 28px; }
-  .roleTitle { font-size: 17px; }
-}
+    /* ==== Mobil Optimizasyon: Giriş Türü Seçimi ==== */
+    @media (max-width: 768px) {
+      .roleGrid { grid-template-columns: 1fr; gap: 12px; }
+      .roleCard { padding: 18px 14px; }
+      .roleIcon { width: 60px; height: 60px; }
+      .roleIcon svg { width: 30px; height: 30px; }
+      .roleTitle { font-size: 18px; }
+      .smallRow { justify-content: center; }
+      .smallRow .pill { width: 100%; max-width: 240px; }
+    }
+    @media (max-width: 480px) {
+      .roleCard { padding: 16px 12px; }
+      .roleIcon { width: 54px; height: 54px; }
+      .roleIcon svg { width: 28px; height: 28px; }
+      .roleTitle { font-size: 17px; }
+    }
 
 
     /* ========= MODERN TAKVİM (Eklendi) ========= */
@@ -426,135 +421,155 @@
     }
 
 
-  
-  /* ==== Liste Görünümü V5.4: Soru Sayısı & Hedef Bölgesi Renkli ==== */
-  .student-toolbar{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin:12px 0 6px; }
-  .densityToggle{
-    background: var(--card); color: var(--text); border: 1px solid var(--cardBorder);
-    border-radius: 10px; padding: 8px 12px; cursor:pointer;
-  }
-  .chip{
-    display:inline-flex; align-items:center; gap:6px;
-    border-radius:999px; padding:6px 10px; font-weight:800; font-size:12px;
-    background:var(--card); border:1px solid var(--cardBorder);
-  }
-  .chip .dot{ width:10px; height:10px; border-radius:999px; }
-  .chip.turkce .dot{ background:#fb923c; }
-  .chip.sosyal .dot{ background:#6366f1; }
-  .chip.din .dot{ background:#22c55e; }
-  .chip.ing .dot{ background:#0ea5e9; }
-  .chip.mat .dot{ background:#f43f5e; }
-  .chip.fen .dot{ background:#14b8a6; }
-
-  .lessonList.dense{ display:flex; flex-direction:column; gap:8px; margin:10px 0; }
-  
-  .lessonRow.dense {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 12px;
-    background: var(--card);
-    border: 1px solid var(--cardBorder);
-    border-radius: 12px;
-    padding: 12px;
-    transition: border-color .15s ease, box-shadow .15s ease;
-  }
-  .lessonRow.dense:hover { border-color:#3b4b6a; box-shadow:0 8px 18px rgba(0,0,0,.22); }
-
-
-  .lessonControls{ 
-    display:flex; 
-    align-items:center; 
-    gap:12px; 
-    margin-left:auto;
-    flex-wrap: wrap;
-  }
-  .lessonControls input[type=number]{
-    width:100px; min-height:34px; font-size:14px;
-    background:var(--bg); color:var(--text); border:0; border-radius:10px; padding:8px 10px;
-  }
-  .lessonControls input[type=number]::-webkit-outer-spin-button,
-  .lessonControls input[type=number]::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
-  .lessonControls input[type=number]{ -moz-appearance:textfield; }
-  .numBtn{
-    width:34px; height:34px; display:grid; place-items:center; border:0; border-radius:10px;
-    background:#334155; color:#fff; font-weight:900; font-size:15px; cursor:pointer;
-    transition: transform .08s ease, filter .12s ease;
-  }
-  .numBtn:hover{ filter:brightness(1.06); }
-  .numBtn:active{ transform: translateY(1px); }
-
-  /* === Renkli bölgeler === */
-  /* Soru sayısı bölgesi: indigo ton */
-  .countWrap{
-    display:inline-flex; align-items:center; gap:6px;
-    padding:4px 6px; border-radius:999px;
-    background: rgba(99,102,241,.10);           /* indigo-500 @10% */
-    border:1px solid rgba(99,102,241,.35);
-    box-shadow: inset 0 0 0 1px rgba(99,102,241,.12);
-  }
-  .countWrap:focus-within{ box-shadow: 0 0 0 3px rgba(99,102,241,.25); }
-  .countWrap .numBtn{ background:#4f46e5; }     /* indigo-600 */
-  .countWrap input[type=number]{ background:transparent; }
-
-  /* Hedef bölgesi: sky ton */
-  .goalWrap{
-    display:inline-flex; align-items:center; gap:6px;
-    padding:4px 6px; border-radius:999px;
-    background: rgba(14,165,233,.10);           /* sky-500 @10% */
-    border:1px solid rgba(14,165,233,.35);
-    box-shadow: inset 0 0 0 1px rgba(14,165,233,.12);
-  }
-  .goalWrap:focus-within{ box-shadow: 0 0 0 3px rgba(14,165,233,.25); }
-  .goalIcon{ font-size:16px; line-height:1; width:18px; height:18px; display:grid; place-items:center;
-  cursor: pointer;}
-  .goalInput{
-    width:64px; min-height:30px; font-size:14px; border:0; outline:none;
-    background:transparent; color:var(--text); text-align:center;
-  }
-
-  .sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
-
-  /* Footer: progress + % badge sağda */
-  .rowFooter{ 
-    display:flex; 
-    align-items:center; 
-    gap:12px; 
-    width:100%; 
-    flex-basis: 100%;
-    padding-top:8px; 
-  }
-  .progressWrap{ position:relative; flex:1 1 auto; min-width:0; height:6px; background:var(--cardBorder);
-    border-radius:999px; overflow:hidden; }
-  .progressBar{ position:absolute; top:0; left:0; height:100%; width:0%;
-    background:linear-gradient(90deg,#22c55e,#0ea5e9); transition: width .15s ease; }
-  .pctBadge{
-    min-width: 50px;
-    height: 26px;
-    display:grid; place-items:center;
-    padding:0 12px;
-    border-radius:999px; font-weight:900;
-    font-size:13px;
-    background:#0b9444; color:#fff; margin-left:auto;
-    flex-shrink: 0; /* Prevent shrinking */
-  }
-  .pctBadge.low{ background:#eab308; }
-  .pctBadge.zero{ background:#6b7280; }
-
-  .totalBar{ display:flex; align-items:center; justify-content:flex-end; gap:8px; margin-top:8px; font-weight:800; }
-  .totalBadge{ min-width:56px; text-align:center; background:#0ea5e9; color:white; border-radius:10px; padding:8px 10px; }
-
-  @media (max-width: 560px){
-    .lessonControls{ 
-      margin-left: 0;
-      width: 100%;
-      justify-content: space-between;
+    /* ==== Liste Görünümü V5.4: Soru Sayısı & Hedef Bölgesi Renkli (DÜZENLENDİ) ==== */
+    .student-toolbar{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin:12px 0 6px; }
+    .densityToggle{
+      background: var(--card); color: var(--text); border: 1px solid var(--cardBorder);
+      border-radius: 10px; padding: 8px 12px; cursor:pointer;
     }
-    .countWrap, .goalWrap {
-      flex-grow: 1;
-      justify-content: space-between;
+    .chip{
+      display:inline-flex; align-items:center; gap:6px;
+      border-radius:999px; padding:6px 10px; font-weight:800; font-size:12px;
+      background:var(--card); border:1px solid var(--cardBorder);
     }
-  }
+    .chip .dot{ width:10px; height:10px; border-radius:999px; }
+    .chip.turkce .dot{ background:#fb923c; }
+    .chip.sosyal .dot{ background:#6366f1; }
+    .chip.din .dot{ background:#22c55e; }
+    .chip.ing .dot{ background:#0ea5e9; }
+    .chip.mat .dot{ background:#f43f5e; }
+    .chip.fen .dot{ background:#14b8a6; }
+
+    .lessonList.dense{ display:flex; flex-direction:column; gap:8px; margin:10px 0; }
+    
+    /* === DÜZENLEME: Burası daha sağlam bir yapı için Grid'e çevrildi === */
+    .lessonRow.dense {
+        display: grid;
+        grid-template-columns: auto 1fr; /* Ders adı (chip) ve kontroller için iki sütun */
+        grid-template-areas:
+            "chip controls"
+            "footer footer"; /* İlerleme çubuğu altta tam genişlikte */
+        align-items: center;
+        gap: 12px 16px; /* Satır ve sütun boşlukları */
+        background: var(--card);
+        border: 1px solid var(--cardBorder);
+        border-radius: 14px; /* Daha modern bir köşe yuvarlaklığı */
+        padding: 16px; /* İç boşluğu artırıldı */
+        transition: border-color .15s ease, box-shadow .15s ease;
+    }
+    .lessonRow.dense:hover { border-color:#3b4b6a; box-shadow:0 8px 18px rgba(0,0,0,.22); }
+    
+    /* Grid alanlarına atama yapılıyor */
+    .lessonRow.dense > .chip {
+        grid-area: chip; /* Ders adı sol üstte */
+    }
+    .lessonRow.dense > .lessonControls {
+        grid-area: controls; /* Kontroller (sayı ve hedef) sağ üstte */
+        display: flex;
+        align-items: center;
+        justify-content: flex-end; /* Kontrolleri kendi alanının sağına yasla */
+        gap: 12px;
+        flex-wrap: wrap; /* Çok küçük ekranlar için sarmayı etkinleştir */
+    }
+    .lessonRow.dense > .rowFooter {
+        grid-area: footer; /* Footer en altta ve tam genişlikte */
+    }
+
+
+    /* === Kontrollerin iç yapısı aynı kalıyor === */
+    .lessonControls input[type=number]{
+      width:100px; min-height:34px; font-size:14px;
+      background:var(--bg); color:var(--text); border:0; border-radius:10px; padding:8px 10px;
+    }
+    .lessonControls input[type=number]::-webkit-outer-spin-button,
+    .lessonControls input[type=number]::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+    .lessonControls input[type=number]{ -moz-appearance:textfield; }
+    .numBtn{
+      width:34px; height:34px; display:grid; place-items:center; border:0; border-radius:10px;
+      background:#334155; color:#fff; font-weight:900; font-size:15px; cursor:pointer;
+      transition: transform .08s ease, filter .12s ease;
+    }
+    .numBtn:hover{ filter:brightness(1.06); }
+    .numBtn:active{ transform: translateY(1px); }
+
+    /* === Renkli bölgeler === */
+    .countWrap{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:4px 6px; border-radius:999px;
+      background: rgba(99,102,241,.10);
+      border:1px solid rgba(99,102,241,.35);
+      box-shadow: inset 0 0 0 1px rgba(99,102,241,.12);
+    }
+    .countWrap:focus-within{ box-shadow: 0 0 0 3px rgba(99,102,241,.25); }
+    .countWrap .numBtn{ background:#4f46e5; }
+    .countWrap input[type=number]{ background:transparent; }
+
+    .goalWrap{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:4px 6px; border-radius:999px;
+      background: rgba(14,165,233,.10);
+      border:1px solid rgba(14,165,233,.35);
+      box-shadow: inset 0 0 0 1px rgba(14,165,233,.12);
+    }
+    .goalWrap:focus-within{ box-shadow: 0 0 0 3px rgba(14,165,233,.25); }
+    .goalIcon{ font-size:16px; line-height:1; width:18px; height:18px; display:grid; place-items:center;
+    cursor: pointer;}
+    .goalInput{
+      width:64px; min-height:30px; font-size:14px; border:0; outline:none;
+      background:transparent; color:var(--text); text-align:center;
+    }
+
+    .sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+
+    /* === DÜZENLEME: Footer ve yüzde göstergesi genişletildi === */
+    .rowFooter{
+      display:flex;
+      align-items:center;
+      gap:16px; /* Boşluk artırıldı */
+      width:100%;
+      padding-top:12px; /* Üst boşluk artırıldı */
+    }
+    .progressWrap{ position:relative; flex:1 1 auto; min-width:0; height:8px; background:var(--cardBorder);
+      border-radius:999px; overflow:hidden; }
+    .progressBar{ position:absolute; top:0; left:0; height:100%; width:0%;
+      background:linear-gradient(90deg,#22c55e,#0ea5e9); transition: width .15s ease; }
+    .pctBadge{
+      min-width: 60px; /* Genişletildi */
+      height: 30px; /* Yükseltildi */
+      display:grid; place-items:center;
+      padding:0 14px;
+      border-radius:999px;
+      font-weight:900;
+      font-size:14px; /* Yazı büyütüldü */
+      background:#0b9444; color:#fff;
+      margin-left:auto;
+      flex-shrink: 0; /* Küçülmesi engellendi */
+    }
+    .pctBadge.low{ background:#eab308; }
+    .pctBadge.zero{ background:#6b7280; }
+
+    .totalBar{ display:flex; align-items:center; justify-content:flex-end; gap:8px; margin-top:8px; font-weight:800; }
+    .totalBadge{ min-width:56px; text-align:center; background:#0ea5e9; color:white; border-radius:10px; padding:8px 10px; }
+
+    /* === DÜZENLEME: Mobil cihazlar için Grid yapısı ayarlandı === */
+    @media (max-width: 600px){
+        .lessonRow.dense {
+            grid-template-columns: 1fr; /* Tek sütuna düşür */
+            grid-template-areas: /* Alanları yeniden düzenle */
+                "chip"
+                "controls"
+                "footer";
+            gap: 12px;
+        }
+        .lessonRow.dense > .lessonControls {
+            justify-content: space-between; /* Kontrolleri mobil ekranda yay */
+            width: 100%;
+        }
+        .countWrap, .goalWrap {
+            flex-grow: 1; /* Kontrollerin esnek büyümesini sağla */
+            justify-content: space-between;
+        }
+    }
 
 
     /* === Öğretmen Üst Çubuğu ve Küçük Çıkış Düğmesi === */
@@ -563,140 +578,140 @@
     button.exitSmall:hover{background:#dc2626}
     button.exitSmall:focus{outline:3px solid rgba(16,185,129,.55);outline-offset:2px;}
 
-/* === Update: Larger Exit Button + Icon === */
-button.exitSmall{padding:8px 12px;min-height:38px;font-size:14px;display:inline-flex;align-items:center;gap:8px}
-button.exitSmall .icon{width:16px;height:16px;line-height:0;display:inline-flex}
-button.exitSmall .icon svg{display:block}
-button.exitSmall .label{line-height:1}
+    /* === Update: Larger Exit Button + Icon === */
+    button.exitSmall{padding:8px 12px;min-height:38px;font-size:14px;display:inline-flex;align-items:center;gap:8px}
+    button.exitSmall .icon{width:16px;height:16px;line-height:0;display:inline-flex}
+    button.exitSmall .icon svg{display:block}
+    button.exitSmall .label{line-height:1}
 
-/* ====== Günlük Rapor Tasarımı (Calendar + Table) — 2025-10-03 ====== */
-/* Kapsamı yalnızca Günlük sekmesine uygula */
-#repTab-daily .calendarWrap{
-  background: linear-gradient(180deg, rgba(11,18,32,.92), rgba(11,18,32,.92));
-  border: 1px solid var(--cardBorder, #1e293b);
-  border-radius: 16px;
-  box-shadow: 0 20px 50px rgba(0,0,0,.45);
-  padding: 16px;
-}
+    /* ====== Günlük Rapor Tasarımı (Calendar + Table) — 2025-10-03 ====== */
+    /* Kapsamı yalnızca Günlük sekmesine uygula */
+    #repTab-daily .calendarWrap{
+      background: linear-gradient(180deg, rgba(11,18,32,.92), rgba(11,18,32,.92));
+      border: 1px solid var(--cardBorder, #1e293b);
+      border-radius: 16px;
+      box-shadow: 0 20px 50px rgba(0,0,0,.45);
+      padding: 16px;
+    }
 
-/* Başlık çubuğu */
-#repTab-daily .calHeader{
-  display:flex; align-items:center; justify-content:space-between;
-  margin-bottom: 12px;
-}
-#repTab-daily .calTitle{ font-weight:800; letter-spacing:.2px; }
-#repTab-daily .calNav .calBtn{
-  border:1px solid rgba(148,163,184,.25);
-  background: rgba(148,163,184,.06);
-  border-radius:10px; padding:6px 8px; min-height:32px;
-  cursor:pointer; transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
-}
-#repTab-daily .calNav .calBtn:hover{ transform: translateY(-1px); box-shadow:0 8px 18px rgba(0,0,0,.25); }
-#repTab-daily .calBtnToday{
-  background: linear-gradient(180deg, #22c55e, #16a34a);
-  color:#fff; font-weight:900; border:0;
-  border-radius:12px; padding:6px 12px; min-height:32px;
-}
+    /* Başlık çubuğu */
+    #repTab-daily .calHeader{
+      display:flex; align-items:center; justify-content:space-between;
+      margin-bottom: 12px;
+    }
+    #repTab-daily .calTitle{ font-weight:800; letter-spacing:.2px; }
+    #repTab-daily .calNav .calBtn{
+      border:1px solid rgba(148,163,184,.25);
+      background: rgba(148,163,184,.06);
+      border-radius:10px; padding:6px 8px; min-height:32px;
+      cursor:pointer; transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+    }
+    #repTab-daily .calNav .calBtn:hover{ transform: translateY(-1px); box-shadow:0 8px 18px rgba(0,0,0,.25); }
+    #repTab-daily .calBtnToday{
+      background: linear-gradient(180deg, #22c55e, #16a34a);
+      color:#fff; font-weight:900; border:0;
+      border-radius:12px; padding:6px 12px; min-height:32px;
+    }
 
-/* Takvim ızgarası */
-#repTab-daily .calGrid{ gap: 10px; }
-#repTab-daily .calWd{ opacity:.9; font-weight:700; }
-#repTab-daily .calCell{
-  position:relative;
-  min-height:56px;
-  border:1px solid #23324a;
-  border-radius:14px;
-  background:#0f1a31;
-  display:flex; align-items:flex-start; justify-content:flex-end;
-  padding:10px;
-  transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
-}
-#repTab-daily .calCell:hover{ transform:translateY(-1px); box-shadow:0 8px 18px rgba(0,0,0,.25); border-color:#3b4b6a; }
-#repTab-daily .calCell.today{ outline:2px dashed rgba(59,130,246,.6); outline-offset:2px; }
-#repTab-daily .calCell.selected{
-  outline: 2px dashed rgba(16,185,129,.55);
-  outline-offset: -4px;
-  box-shadow: 0 0 0 3px rgba(16,185,129,.25) inset;
-  border-color:#16a34a;
-}
-#repTab-daily .calDay{ font-weight:800; opacity:.95; }
-#repTab-daily .calDot{
-  position:absolute; left:10px; top:10px;
-  width:7px; height:7px; border-radius:9999px; background:#ef4444; box-shadow:0 0 0 2px rgba(239,68,68,.15);
-}
+    /* Takvim ızgarası */
+    #repTab-daily .calGrid{ gap: 10px; }
+    #repTab-daily .calWd{ opacity:.9; font-weight:700; }
+    #repTab-daily .calCell{
+      position:relative;
+      min-height:56px;
+      border:1px solid #23324a;
+      border-radius:14px;
+      background:#0f1a31;
+      display:flex; align-items:flex-start; justify-content:flex-end;
+      padding:10px;
+      transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+    }
+    #repTab-daily .calCell:hover{ transform:translateY(-1px); box-shadow:0 8px 18px rgba(0,0,0,.25); border-color:#3b4b6a; }
+    #repTab-daily .calCell.today{ outline:2px dashed rgba(59,130,246,.6); outline-offset:2px; }
+    #repTab-daily .calCell.selected{
+      outline: 2px dashed rgba(16,185,129,.55);
+      outline-offset: -4px;
+      box-shadow: 0 0 0 3px rgba(16,185,129,.25) inset;
+      border-color:#16a34a;
+    }
+    #repTab-daily .calDay{ font-weight:800; opacity:.95; }
+    #repTab-daily .calDot{
+      position:absolute; left:10px; top:10px;
+      width:7px; height:7px; border-radius:9999px; background:#ef4444; box-shadow:0 0 0 2px rgba(239,68,68,.15);
+    }
 
-/* Seçilen gün tablosu kartı */
-#repTab-daily #selDayBlock{
-  margin-top:14px;
-  background: linear-gradient(180deg, rgba(11,18,32,.92), rgba(11,18,32,.92));
-  border:1px solid var(--cardBorder,#1e293b);
-  border-radius:14px;
-  box-shadow: 0 20px 50px rgba(0,0,0,.45);
-  padding: 16px;
-}
-#repTab-daily #selDayBlock .sectionTitle{
-  font-weight:800; margin-bottom:10px;
-}
+    /* Seçilen gün tablosu kartı */
+    #repTab-daily #selDayBlock{
+      margin-top:14px;
+      background: linear-gradient(180deg, rgba(11,18,32,.92), rgba(11,18,32,.92));
+      border:1px solid var(--cardBorder,#1e293b);
+      border-radius:14px;
+      box-shadow: 0 20px 50px rgba(0,0,0,.45);
+      padding: 16px;
+    }
+    #repTab-daily #selDayBlock .sectionTitle{
+      font-weight:800; margin-bottom:10px;
+    }
 
-/* Tablo görünümü */
-#repTab-daily #stuDayTable, #repTab-daily #tsdDayTable table{ width:100%; border-collapse:separate; border-spacing:0; }
-#repTab-daily #stuDayTable, #repTab-daily #tsdDayTable th,
-#repTab-daily #stuDayTable, #repTab-daily #tsdDayTable td{
-  padding:12px 14px;
-  border-bottom:1px solid #23324a;
-}
-#repTab-daily #stuDayTable, #repTab-daily #tsdDayTable thead th{
-  text-align:left; font-weight:700; background:#0d1628;
-}
-#repTab-daily #stuDayTable, #repTab-daily #tsdDayTable tr:last-child td{ border-bottom:0; }
+    /* Tablo görünümü */
+    #repTab-daily #stuDayTable, #repTab-daily #tsdDayTable table{ width:100%; border-collapse:separate; border-spacing:0; }
+    #repTab-daily #stuDayTable, #repTab-daily #tsdDayTable th,
+    #repTab-daily #stuDayTable, #repTab-daily #tsdDayTable td{
+      padding:12px 14px;
+      border-bottom:1px solid #23324a;
+    }
+    #repTab-daily #stuDayTable, #repTab-daily #tsdDayTable thead th{
+      text-align:left; font-weight:700; background:#0d1628;
+    }
+    #repTab-daily #stuDayTable, #repTab-daily #tsdDayTable tr:last-child td{ border-bottom:0; }
 
-/* Düzenle düğmesi */
-#repTab-daily #stuDayTable, #repTab-daily #tsdDayTable .editBtn{
-  border:0; border-radius:10px; padding:6px 12px; min-height:32px;
-  background: linear-gradient(180deg, #3b82f6, #06b6d4);
-  color:#fff; font-weight:800; cursor:pointer;
-  transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
-}
-#repTab-daily #stuDayTable, #repTab-daily #tsdDayTable .editBtn:hover{ transform:translateY(-1px); box-shadow:0 10px 22px rgba(0,0,0,.25); filter:saturate(1.05); }
-#repTab-daily #stuDayTable, #repTab-daily #tsdDayTable .editBtn:focus{ outline:3px solid rgba(16,185,129,.45); outline-offset:2px; }
+    /* Düzenle düğmesi */
+    #repTab-daily #stuDayTable, #repTab-daily #tsdDayTable .editBtn{
+      border:0; border-radius:10px; padding:6px 12px; min-height:32px;
+      background: linear-gradient(180deg, #3b82f6, #06b6d4);
+      color:#fff; font-weight:800; cursor:pointer;
+      transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+    }
+    #repTab-daily #stuDayTable, #repTab-daily #tsdDayTable .editBtn:hover{ transform:translateY(-1px); box-shadow:0 10px 22px rgba(0,0,0,.25); filter:saturate(1.05); }
+    #repTab-daily #stuDayTable, #repTab-daily #tsdDayTable .editBtn:focus{ outline:3px solid rgba(16,185,129,.45); outline-offset:2px; }
 
-/* Küçük ekran ayarı */
-@media (max-width: 560px){
-  #repTab-daily .calGrid{ gap:8px; }
-  #repTab-daily .calCell{ min-height:44px; padding:8px; }
-  #repTab-daily #selDayBlock{ padding:12px; }
-  #repTab-daily #stuDayTable, #repTab-daily #tsdDayTable th, #repTab-daily #stuDayTable, #repTab-daily #tsdDayTable td{ padding:10px 12px; }
-}
-/* ====== /Günlük Rapor Tasarımı ====== */
+    /* Küçük ekran ayarı */
+    @media (max-width: 560px){
+      #repTab-daily .calGrid{ gap:8px; }
+      #repTab-daily .calCell{ min-height:44px; padding:8px; }
+      #repTab-daily #selDayBlock{ padding:12px; }
+      #repTab-daily #stuDayTable, #repTab-daily #tsdDayTable th, #repTab-daily #stuDayTable, #repTab-daily #tsdDayTable td{ padding:10px 12px; }
+    }
+    /* ====== /Günlük Rapor Tasarımı ====== */
 
 
-/* === Haftalık Sekme: Açılır Hafta Listesi (Dropdown) === */
-#repTab-weekly #weekControls{ display:flex; align-items:center; gap:12px; }
-#repTab-weekly .weekDropdown{ position:relative; display:inline-block; }
-#repTab-weekly .wdToggle{
-  border:0; border-radius:12px; padding:8px 12px; min-height:36px;
-  background: linear-gradient(180deg, #3b82f6, #06b6d4);
-  color:#fff; font-weight:900; cursor:pointer;
-  display:flex; align-items:center; gap:10px;
-}
-#repTab-weekly .wdToggle .chev{ font-weight:900; opacity:.9; }
-#repTab-weekly .wdMenu{
-  position:absolute; top:calc(100% + 6px); left:0; z-index:50;
-  background:#0f1a31; border:1px solid #23324a; border-radius:12px; padding:8px;
-  box-shadow:0 20px 50px rgba(0,0,0,.45); min-width:320px; max-height:280px; overflow:auto;
-  display:none;
-}
-#repTab-weekly .wdMenu.open{ display:block; }
-#repTab-weekly .wdItem{
-  display:block; width:100%; text-align:left; border:0; background:transparent; color:inherit;
-  padding:8px 10px; border-radius:8px; cursor:pointer;
-}
-#repTab-weekly .wdItem:hover{ background:rgba(148,163,184,.08); }
-#repTab-weekly .wdItem.active{ background:rgba(34,197,94,.15); outline:1px dashed rgba(16,185,129,.45); }
-@media (max-width:560px){
-  #repTab-weekly .wdMenu{ min-width:260px; }
-}
-/* === /Dropdown CSS === */
+    /* === Haftalık Sekme: Açılır Hafta Listesi (Dropdown) === */
+    #repTab-weekly #weekControls{ display:flex; align-items:center; gap:12px; }
+    #repTab-weekly .weekDropdown{ position:relative; display:inline-block; }
+    #repTab-weekly .wdToggle{
+      border:0; border-radius:12px; padding:8px 12px; min-height:36px;
+      background: linear-gradient(180deg, #3b82f6, #06b6d4);
+      color:#fff; font-weight:900; cursor:pointer;
+      display:flex; align-items:center; gap:10px;
+    }
+    #repTab-weekly .wdToggle .chev{ font-weight:900; opacity:.9; }
+    #repTab-weekly .wdMenu{
+      position:absolute; top:calc(100% + 6px); left:0; z-index:50;
+      background:#0f1a31; border:1px solid #23324a; border-radius:12px; padding:8px;
+      box-shadow:0 20px 50px rgba(0,0,0,.45); min-width:320px; max-height:280px; overflow:auto;
+      display:none;
+    }
+    #repTab-weekly .wdMenu.open{ display:block; }
+    #repTab-weekly .wdItem{
+      display:block; width:100%; text-align:left; border:0; background:transparent; color:inherit;
+      padding:8px 10px; border-radius:8px; cursor:pointer;
+    }
+    #repTab-weekly .wdItem:hover{ background:rgba(148,163,184,.08); }
+    #repTab-weekly .wdItem.active{ background:rgba(34,197,94,.15); outline:1px dashed rgba(16,185,129,.45); }
+    @media (max-width:560px){
+      #repTab-weekly .wdMenu{ min-width:260px; }
+    }
+    /* === /Dropdown CSS === */
 
     /* === Öğrenci Hoşgeldin Bannerı === */
     .studentWelcomeBanner{
@@ -711,271 +726,258 @@ button.exitSmall .label{line-height:1}
       box-shadow: 0 10px 26px rgba(0,0,0,.25), inset 0 0 0 1px rgba(34,197,94,.15);
     }
 
-/* === Hedef (daily target) === */
-.targetBtn{
-  border:none;background:transparent;cursor:pointer;font-size:20px;line-height:1;
-  filter: drop-shadow(0 1px 1px rgba(0,0,0,.4));
-}
-.targetBtn:hover{ transform: scale(1.05); }
-.targetInfo{
-  margin:6px 0 10px; padding:8px 10px; border-radius:10px;
-  background: rgba(16,185,129,.08); border:1px solid rgba(16,185,129,.25);
-  font-weight:600; display:flex; gap:8px; align-items:center; justify-content:space-between;
-}
-.targetInfo small{opacity:.9}
+    /* === Hedef (daily target) === */
+    .targetBtn{
+      border:none;background:transparent;cursor:pointer;font-size:20px;line-height:1;
+      filter: drop-shadow(0 1px 1px rgba(0,0,0,.4));
+    }
+    .targetBtn:hover{ transform: scale(1.05); }
+    .targetInfo{
+      margin:6px 0 10px; padding:8px 10px; border-radius:10px;
+      background: rgba(16,185,129,.08); border:1px solid rgba(16,185,129,.25);
+      font-weight:600; display:flex; gap:8px; align-items:center; justify-content:space-between;
+    }
+    .targetInfo small{opacity:.9}
 
 
-/* Float target button next to trash */
-.targetFloat{
-  position:absolute; top:8px; right:52px; /* 8px (gap) + 36px (trash width) => sit left of trash */
-  display:grid; place-items:center;
-  width:36px; height:36px; padding:0;
-  border:0; border-radius:999px;
-  background:transparent;
-  cursor:pointer;
-  transition:transform .12s ease, opacity .12s ease;
-  z-index:2;
-}
-.targetFloat:hover{ transform:translateY(-1px); }
-
+    /* Float target button next to trash */
+    .targetFloat{
+      position:absolute; top:8px; right:52px; /* 8px (gap) + 36px (trash width) => sit left of trash */
+      display:grid; place-items:center;
+      width:36px; height:36px; padding:0;
+      border:0; border-radius:999px;
+      background:transparent;
+      cursor:pointer;
+      transition:transform .12s ease, opacity .12s ease;
+      z-index:2;
+    }
+    .targetFloat:hover{ transform:translateY(-1px); }
 </style>
 <style>
-/* --- Açılır Pencere (Rapor Modal) --- */
-#reportOverlay{position:fixed;inset:0;display:none;background:rgba(0,0,0,.45);z-index:9998;}
-#teacherStudentDetail.asModal{position:fixed;inset:auto auto 5% 50%;transform:translateX(-50%);width:min(920px,92vw);max-height:88vh;overflow:auto;
-  background:var(--card,#0b1427);border:1px solid var(--cardBorder,#1e293b);border-radius:14px;box-shadow:0 20px 50px rgba(0,0,0,.45);padding:16px;z-index:9999;}
-.modalHead{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-bottom:8px;position:sticky;top:0;background:inherit;padding-bottom:8px;}
-.modalTabs{display:flex;gap:8px;align-items:center;}
-.modalTabs .pill{cursor:pointer;}
-.modalClose{margin-left:auto}
-#repTab-daily,#repTab-weekly,#repTab-monthly{display:none;}
-#repTab-daily.active,#repTab-weekly.active,#repTab-monthly.active{display:block;}
-@media (max-width:720px){
-  #teacherStudentDetail.asModal{inset:auto auto 2% 50%; width:96vw; }
-}
+    /* --- Açılır Pencere (Rapor Modal) --- */
+    #reportOverlay{position:fixed;inset:0;display:none;background:rgba(0,0,0,.45);z-index:9998;}
+    #teacherStudentDetail.asModal{position:fixed;inset:auto auto 5% 50%;transform:translateX(-50%);width:min(920px,92vw);max-height:88vh;overflow:auto;
+      background:var(--card,#0b1427);border:1px solid var(--cardBorder,#1e293b);border-radius:14px;box-shadow:0 20px 50px rgba(0,0,0,.45);padding:16px;z-index:9999;}
+    .modalHead{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-bottom:8px;position:sticky;top:0;background:inherit;padding-bottom:8px;}
+    .modalTabs{display:flex;gap:8px;align-items:center;}
+    .modalTabs .pill{cursor:pointer;}
+    .modalClose{margin-left:auto}
+    #repTab-daily,#repTab-weekly,#repTab-monthly{display:none;}
+    #repTab-daily.active,#repTab-weekly.active,#repTab-monthly.active{display:block;}
+    @media (max-width:720px){
+      #teacherStudentDetail.asModal{inset:auto auto 2% 50%; width:96vw; }
+    }
 </style>
 
-<!-- === GOALS TITLE UNDER MAIN SUBHEADER (MOBILE) === -->
 <style>
-@media (max-width: 600px){
-  /* Goals başlığını header altına taşıdığımızda gp-header içindekini gizle */
-  #goalsPage .gp-title{ display: none !important; }
+    @media (max-width: 600px){
+      /* Goals başlığını header altına taşıdığımızda gp-header içindekini gizle */
+      #goalsPage .gp-title{ display: none !important; }
 
-  /* Header altında yeni başlık görünümü */
-  .header .header-goals-title{
-    display: block;
-    margin-top: 6px;
-    font-weight: 800;
-    font-size: clamp(18px, 5vw, 22px);
-    line-height: 1.15;
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-}
-</style>
-<script>
-(function(){
-  function ensureGoalsTitle(){
-    try{
-      var header = document.querySelector('.header');
-      var sub = header && header.querySelector('.subtitle');
-      var srcTitle = document.querySelector('#goalsPage .gp-title');
-      if(!header || !sub || !srcTitle) return;
-
-      var txt = srcTitle.textContent.trim();
-      var el = header.querySelector('.header-goals-title');
-      if(!el){
-        el = document.createElement('div');
-        el.className = 'header-goals-title';
-        sub.insertAdjacentElement('afterend', el);
+      /* Header altında yeni başlık görünümü */
+      .header .header-goals-title{
+        display: block;
+        margin-top: 6px;
+        font-weight: 800;
+        font-size: clamp(18px, 5vw, 22px);
+        line-height: 1.15;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
       }
-      if(el.textContent.trim() !== txt){ el.textContent = txt; }
-
-      // Görünürlüğü sadece goals sayfası görünürken aç
-      var gp = document.getElementById('goalsPage');
-      var isVisible = gp && gp.offsetParent !== null && window.getComputedStyle(gp).display !== 'none';
-      el.style.display = (isVisible ? '' : 'none');
-    }catch(e){}
-  }
-
-  document.addEventListener('DOMContentLoaded', function(){
-    setTimeout(ensureGoalsTitle, 50);
-  });
-
-  var mo = new MutationObserver(function(){ setTimeout(ensureGoalsTitle, 50); });
-  mo.observe(document.documentElement, {subtree:true, attributes:true, childList:true, attributeFilter:['style','class']});
-
-  window.addEventListener('resize', function(){ setTimeout(ensureGoalsTitle, 100); }, {passive:true});
-  window.addEventListener('orientationchange', function(){ setTimeout(ensureGoalsTitle, 200); }, {passive:true});
-})();
-</script>
-<!-- === /GOALS TITLE UNDER MAIN SUBHEADER (MOBILE) === -->
-
-
-<!-- === TEACHER: REMOVE MONTHLY TAB === -->
-<style>
-/* Hide the Monthly tab button and its content in the teacher modal */
-#teacherStudentDetail #repTabMonthlyBtn,
-#teacherStudentDetail #repTab-monthly{ display:none !important; }
+    }
 </style>
 <script>
-(function(){
-  // Force default to weekly when opening the teacher report modal
-  if (typeof openReportModal === 'function'){
-    const __origOpen = openReportModal;
-    window.openReportModal = function(){
-      var ov = document.getElementById('reportOverlay');
-      var box = document.getElementById('teacherStudentDetail');
-      if(ov) ov.style.display='block';
-      if(box){ box.style.display='block'; }
-      try{ showReportTab('weekly'); }catch(_){}
-    };
-  }
+    (function(){
+      function ensureGoalsTitle(){
+        try{
+          var header = document.querySelector('.header');
+          var sub = header && header.querySelector('.subtitle');
+          var srcTitle = document.querySelector('#goalsPage .gp-title');
+          if(!header || !sub || !srcTitle) return;
 
-  // Remove Monthly tab elements entirely (defensive)
-  document.addEventListener('DOMContentLoaded', function(){
-    try{
-      var btn = document.getElementById('repTabMonthlyBtn'); if(btn) btn.remove();
-      var pane = document.getElementById('repTab-monthly'); if(pane) pane.remove();
-    }catch(e){}
-  });
-})();
-</script>
-<!-- === /TEACHER: REMOVE MONTHLY TAB === -->
+          var txt = srcTitle.textContent.trim();
+          var el = header.querySelector('.header-goals-title');
+          if(!el){
+            el = document.createElement('div');
+            el.className = 'header-goals-title';
+            sub.insertAdjacentElement('afterend', el);
+          }
+          if(el.textContent.trim() !== txt){ el.textContent = txt; }
 
-<!-- === GOALS TITLE UNDER MAIN SUBHEADER (ALL SIZES) === -->
-<style>
-/* Goals başlığını her boyutta header altına taşı: gp-header içindeki başlık gizlenir */
-#goalsPage .gp-title{ display: none !important; }
-/* Header altına eklenecek başlığın görünümü */
-.header .header-goals-title{
-  display: block;
-  margin-top: 6px;
-  font-weight: 800;
-  font-size: clamp(18px, 2.2vw, 24px);
-  line-height: 1.15;
-  text-align: center;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-</style>
-<script>
-(function(){
-  function ensureGoalsTitle(){
-    try{
-      var header = document.querySelector('.header');
-      var sub = header && header.querySelector('.subtitle');
-      var srcTitle = document.querySelector('#goalsPage .gp-title');
-      if(!header || !sub || !srcTitle) return;
-
-      var txt = (srcTitle.textContent || '').trim();
-      var el = header.querySelector('.header-goals-title');
-      if(!el){
-        el = document.createElement('div');
-        el.className = 'header-goals-title';
-        sub.insertAdjacentElement('afterend', el);
+          // Görünürlüğü sadece goals sayfası görünürken aç
+          var gp = document.getElementById('goalsPage');
+          var isVisible = gp && gp.offsetParent !== null && window.getComputedStyle(gp).display !== 'none';
+          el.style.display = (isVisible ? '' : 'none');
+        }catch(e){}
       }
-      if((el.textContent || '').trim() !== txt){ el.textContent = txt; }
 
-      // Sadece Goals sayfası görünürken göster
-      var gp = document.getElementById('goalsPage');
-      var gpVisible = gp && window.getComputedStyle(gp).display !== 'none';
-      el.style.display = gpVisible ? '' : 'none';
-    }catch(e){/* no-op */}
-  }
+      document.addEventListener('DOMContentLoaded', function(){
+        setTimeout(ensureGoalsTitle, 50);
+      });
 
-  document.addEventListener('DOMContentLoaded', function(){ setTimeout(ensureGoalsTitle, 50); });
-  var mo = new MutationObserver(function(){ setTimeout(ensureGoalsTitle, 50); });
-  mo.observe(document.documentElement, {subtree:true, childList:true, attributes:true, attributeFilter:['style','class']});
-  window.addEventListener('resize', function(){ setTimeout(ensureGoalsTitle, 100); }, {passive:true});
-  window.addEventListener('orientationchange', function(){ setTimeout(ensureGoalsTitle, 200); }, {passive:true});
-})();
+      var mo = new MutationObserver(function(){ setTimeout(ensureGoalsTitle, 50); });
+      mo.observe(document.documentElement, {subtree:true, attributes:true, childList:true, attributeFilter:['style','class']});
+
+      window.addEventListener('resize', function(){ setTimeout(ensureGoalsTitle, 100); }, {passive:true});
+      window.addEventListener('orientationchange', function(){ setTimeout(ensureGoalsTitle, 200); }, {passive:true});
+    })();
 </script>
-<!-- === /GOALS TITLE UNDER MAIN SUBHEADER (ALL SIZES) === -->
-
-<!-- === HIDE 'GÖSTER' BUTTON IN FAVORITES === -->
 <style>
-/* Öğretmen paneli > Favoriler bölümündeki 'Göster' butonlarını kaldır */
-#favoritesSection .editBtn{ display: none !important; }
+    /* Hide the Monthly tab button and its content in the teacher modal */
+    #teacherStudentDetail #repTabMonthlyBtn,
+    #teacherStudentDetail #repTab-monthly{ display:none !important; }
 </style>
-<!-- === /HIDE 'GÖSTER' BUTTON IN FAVORITES === -->
+<script>
+    (function(){
+      // Force default to weekly when opening the teacher report modal
+      if (typeof openReportModal === 'function'){
+        const __origOpen = openReportModal;
+        window.openReportModal = function(){
+          var ov = document.getElementById('reportOverlay');
+          var box = document.getElementById('teacherStudentDetail');
+          if(ov) ov.style.display='block';
+          if(box){ box.style.display='block'; }
+          try{ showReportTab('weekly'); }catch(_){}
+        };
+      }
+
+      // Remove Monthly tab elements entirely (defensive)
+      document.addEventListener('DOMContentLoaded', function(){
+        try{
+          var btn = document.getElementById('repTabMonthlyBtn'); if(btn) btn.remove();
+          var pane = document.getElementById('repTab-monthly'); if(pane) pane.remove();
+        }catch(e){}
+      });
+    })();
+</script>
+<style>
+    /* Goals başlığını her boyutta header altına taşı: gp-header içindeki başlık gizlenir */
+    #goalsPage .gp-title{ display: none !important; }
+    /* Header altına eklenecek başlığın görünümü */
+    .header .header-goals-title{
+      display: block;
+      margin-top: 6px;
+      font-weight: 800;
+      font-size: clamp(18px, 2.2vw, 24px);
+      line-height: 1.15;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+</style>
+<script>
+    (function(){
+      function ensureGoalsTitle(){
+        try{
+          var header = document.querySelector('.header');
+          var sub = header && header.querySelector('.subtitle');
+          var srcTitle = document.querySelector('#goalsPage .gp-title');
+          if(!header || !sub || !srcTitle) return;
+
+          var txt = (srcTitle.textContent || '').trim();
+          var el = header.querySelector('.header-goals-title');
+          if(!el){
+            el = document.createElement('div');
+            el.className = 'header-goals-title';
+            sub.insertAdjacentElement('afterend', el);
+          }
+          if((el.textContent || '').trim() !== txt){ el.textContent = txt; }
+
+          // Sadece Goals sayfası görünürken göster
+          var gp = document.getElementById('goalsPage');
+          var gpVisible = gp && window.getComputedStyle(gp).display !== 'none';
+          el.style.display = gpVisible ? '' : 'none';
+        }catch(e){/* no-op */}
+      }
+
+      document.addEventListener('DOMContentLoaded', function(){ setTimeout(ensureGoalsTitle, 50); });
+      var mo = new MutationObserver(function(){ setTimeout(ensureGoalsTitle, 50); });
+      mo.observe(document.documentElement, {subtree:true, childList:true, attributes:true, attributeFilter:['style','class']});
+      window.addEventListener('resize', function(){ setTimeout(ensureGoalsTitle, 100); }, {passive:true});
+      window.addEventListener('orientationchange', function(){ setTimeout(ensureGoalsTitle, 200); }, {passive:true});
+    })();
+</script>
+<style>
+    /* Öğretmen paneli > Favoriler bölümündeki 'Göster' butonlarını kaldır */
+    #favoritesSection .editBtn{ display: none !important; }
+</style>
 </head>
 <style>
-/* ===== Ders Hedefleri (Goals Page) — Modern görünüm ===== */
-#goalsPage{
-  padding: 8px 12px 20px;
-}
-#goalsPage .gp-header{
-  position: sticky; top: 0; z-index: 30;
-  display:flex; align-items:center; justify-content:space-between; gap:10px;
-  padding:10px 0;
-  background: linear-gradient(180deg, rgba(11,20,39,.92), rgba(11,20,39,.86));
-  border-bottom: 1px solid var(--cardBorder);
-  backdrop-filter: saturate(1.1) blur(6px);
-}
-#goalsPage .gp-left{ display:flex; align-items:center; gap:10px; }
-#goalsPage .gp-title{ font-weight:900; letter-spacing:.2px; display:flex; align-items:center; gap:8px; }
-#goalsPage .gp-actions{ display:flex; align-items:center; gap:8px; }
+    /* ===== Ders Hedefleri (Goals Page) — Modern görünüm ===== */
+    #goalsPage{
+      padding: 8px 12px 20px;
+    }
+    #goalsPage .gp-header{
+      position: sticky; top: 0; z-index: 30;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      padding:10px 0;
+      background: linear-gradient(180deg, rgba(11,20,39,.92), rgba(11,20,39,.86));
+      border-bottom: 1px solid var(--cardBorder);
+      backdrop-filter: saturate(1.1) blur(6px);
+    }
+    #goalsPage .gp-left{ display:flex; align-items:center; gap:10px; }
+    #goalsPage .gp-title{ font-weight:900; letter-spacing:.2px; display:flex; align-items:center; gap:8px; }
+    #goalsPage .gp-actions{ display:flex; align-items:center; gap:8px; }
 
-/* Buton ikon düzeni — mevcut .pill ve .action renklerini kullan */
-.gp-btn{ display:inline-flex; align-items:center; gap:8px; }
-.gp-btn .icon{ width:16px; height:16px; line-height:0; display:inline-flex; }
-.gp-btn .icon svg{ width:16px; height:16px; display:block; }
+    /* Buton ikon düzeni — mevcut .pill ve .action renklerini kullan */
+    .gp-btn{ display:inline-flex; align-items:center; gap:8px; }
+    .gp-btn .icon{ width:16px; height:16px; line-height:0; display:inline-flex; }
+    .gp-btn .icon svg{ width:16px; height:16px; display:block; }
 
-/* “Tablo” kutusu — satır ızgarası */
-.gp-table{
-  max-width: 760px; margin: 0 auto;
-  background: var(--card);
-  border: 1px solid var(--cardBorder);
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 16px 40px rgba(0,0,0,.35);
-}
-.gp-row{
-  display: grid; grid-template-columns: 1fr 140px;
-  align-items: center; gap: 12px;
-  padding: 12px 14px;
-  border-top: 1px solid var(--cardBorder);
-}
-.gp-row:first-child{ border-top:0; }
-.gp-row:nth-child(odd){ background: rgba(148,163,184,.05); }
+    /* “Tablo” kutusu — satır ızgarası */
+    .gp-table{
+      max-width: 760px; margin: 0 auto;
+      background: var(--card);
+      border: 1px solid var(--cardBorder);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 16px 40px rgba(0,0,0,.35);
+    }
+    .gp-row{
+      display: grid; grid-template-columns: 1fr 140px;
+      align-items: center; gap: 12px;
+      padding: 12px 14px;
+      border-top: 1px solid var(--cardBorder);
+    }
+    .gp-row:first-child{ border-top:0; }
+    .gp-row:nth-child(odd){ background: rgba(148,163,184,.05); }
 
-.gp-label{
-  display:flex; align-items:center; gap:10px; font-weight:800;
-}
-.gp-label .dot{ width:10px; height:10px; border-radius:999px; }
-.gp-label.turkce   .dot{ background:#fb923c; }
-.gp-label.sosyal   .dot{ background:#6366f1; }
-.gp-label.din      .dot{ background:#22c55e; }
-.gp-label.ing      .dot{ background:#0ea5e9; }
-.gp-label.matematik .dot{ background:#f43f5e; }
-.gp-label.fen      .dot{ background:#14b8a6; }
+    .gp-label{
+      display:flex; align-items:center; gap:10px; font-weight:800;
+    }
+    .gp-label .dot{ width:10px; height:10px; border-radius:999px; }
+    .gp-label.turkce   .dot{ background:#fb923c; }
+    .gp-label.sosyal   .dot{ background:#6366f1; }
+    .gp-label.din      .dot{ background:#22c55e; }
+    .gp-label.ing      .dot{ background:#0ea5e9; }
+    .gp-label.matematik .dot{ background:#f43f5e; }
+    .gp-label.fen      .dot{ background:#14b8a6; }
 
-.gp-input{
-  width:100%;
-  min-height:42px; font-size:16px; text-align:center; font-weight:700;
-  background: var(--bg);
-  color: var(--text);
-  border: 1px solid var(--cardBorder);
-  border-radius: 12px;
-  padding: 10px 12px;
-}
-.gp-input::-webkit-outer-spin-button,
-.gp-input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
-.gp-input{ -moz-appearance: textfield; }
+    .gp-input{
+      width:100%;
+      min-height:42px; font-size:16px; text-align:center; font-weight:700;
+      background: var(--bg);
+      color: var(--text);
+      border: 1px solid var(--cardBorder);
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
+    .gp-input::-webkit-outer-spin-button,
+    .gp-input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+    .gp-input{ -moz-appearance: textfield; }
 
-#goalsPage .gp-note{
-  max-width:760px; margin:8px auto 0; opacity:.8;
-}
+    #goalsPage .gp-note{
+      max-width:760px; margin:8px auto 0; opacity:.8;
+    }
 
-/* Mobil ayar */
-@media (max-width: 560px){
-  .gp-row{ grid-template-columns: 1fr 110px; padding: 10px 12px; }
-  .gp-input{ min-height:38px; font-size:15px; }
-}
+    /* Mobil ayar */
+    @media (max-width: 560px){
+      .gp-row{ grid-template-columns: 1fr 110px; padding: 10px 12px; }
+      .gp-input{ min-height:38px; font-size:15px; }
+    }
 </style>
 <body>
 <div id="reportOverlay" onclick="closeReportModal()"></div>
@@ -984,40 +986,34 @@ button.exitSmall .label{line-height:1}
   <div class="subtitle">Alparslan Ortaokulu</div>
 </div>
 <div id="alert"></div>
-<!-- Giriş Alanı -->
 <div id="loginPanel">
 <div class="tabs">
 <button class="active" id="tabRegister" onclick="showTab('register')" type="button">Öğrenci Kayıt</button>
 <button id="tabStudent" onclick="showTab('studentLogin')" type="button">Öğrenci-Veli Giriş</button>
 <button id="tabTeacher" onclick="showTab('teacherLogin')" type="button">Öğretmen Giriş</button>
 </div>
-<!-- Öğrenci Kayıt -->
 <div class="container" id="register">
 <h3>Öğrenci Kayıt</h3>
 <input autocomplete="off" id="rName" placeholder="Ad Soyad" type="text"/>
 <select id="rClass"><option value="">Sınıf Seçin</option></select>
 <input autocomplete="off" id="rNumber" placeholder="Okul Numarası" type="text"/>
 <input autocomplete="new-password" id="rPass" placeholder="Şifre" type="password"/>
-<!-- YENİ: Şifre Tekrar -->
 <input autocomplete="new-password" id="rPass2" placeholder="Şifre (Tekrar)" type="password"/>
 <small id="passMismatchError" style="display:none;color:#ef4444;font-weight:600;">Şifreler eşleşmiyor</small>
 <button class="action" id="registerBtn" onclick="studentRegister()" type="button">Kayıt</button>
 </div>
-<!-- Öğrenci-Veli Giriş -->
 <div class="container" id="studentLogin" style="display:none">
 <h3>Öğrenci-Veli Giriş</h3>
 <input autocomplete="off" id="lNumber" placeholder="Okul Numarası" type="text"/>
 <input autocomplete="current-password" id="lPass" placeholder="Şifre" type="password"/>
 <button class="action" onclick="studentLogin()" type="button">Giriş Yap</button>
 </div>
-<!-- Giriş Türü Seçimi -->
 <div class="container" id="roleChoice" style="display:none">
 <h3>Giriş Türünü Seçin</h3>
 <div class="teacherWelcome" id="roleChoiceHello"></div>
 <div class="roleGrid">
 <button aria-label="Öğrenci Girişi" class="roleCard" onclick="enterAsStudent()" type="button">
 <div aria-hidden="true" class="roleIcon">
-<!-- Tek kişi ikonu -->
 <svg fill="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
 <path d="M12 12c2.761 0 5-2.686 5-6s-2.239-6-5-6-5 2.686-5 6 2.239 6 5 6Zm0 2c-4.418 0-8 2.686-8 6v2h16v-2c0-3.314-3.582-6-8-6Z"></path>
 </svg>
@@ -1026,7 +1022,6 @@ button.exitSmall .label{line-height:1}
 </button>
 <button aria-label="Veli Girişi" class="roleCard parent" onclick="enterAsParent()" type="button">
 <div aria-hidden="true" class="roleIcon">
-<!-- İki kişi ikonu -->
 <svg fill="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
 <path d="M16 11c2.209 0 4-2.239 4-5s-1.791-5-4-5-4 2.239-4 5 1.791 5 4 5Zm-8 0c2.209 0 4-2.239 4-5S10.209 1 8 1 4 3.239 4 6s1.791 5 4 5Zm8 2c-2.761 0-5.2.937-6.64 2.378C7.409 14.855 5.132 14 3 14c-1.657 0-3 1.567-3 3.5V21h10v-2c0-1.252.467-2.393 1.256-3.33C12.466 14.646 14.066 14 16 14c3.866 0 7 2.015 7 4.5V21h-8v-1.5c0-2.485-1.79-4.5-4-4.5Z"></path>
 </svg>
@@ -1038,7 +1033,6 @@ button.exitSmall .label{line-height:1}
 <button aria-label="Geri" class="pill exit" onclick="exitToHome()" type="button"><span aria-hidden="true" class="backIcon">←</span> Geri</button>
 </div>
 </div>
-<!-- Öğretmen Giriş -->
 <div class="container" id="teacherLogin" style="display:none">
 <h3>Öğretmen Giriş</h3>
 <input autocomplete="name" id="tName" placeholder="Ad Soyad" type="text"/>
@@ -1046,7 +1040,6 @@ button.exitSmall .label{line-height:1}
 <button class="action" onclick="teacherLogin()" type="button">Giriş Yap</button>
 </div>
 </div>
-<!-- ÖĞRENCİ PANELİ -->
 <div class="container" id="studentPanel" style="display:none">
 <h3 id="studentPanelTitle">Öğrenci Paneli</h3>
 <div class="studentWelcomeBanner" id="studentWelcome" style="display:none"></div>
@@ -1195,9 +1188,7 @@ button.exitSmall .label{line-height:1}
 <button class="action addBtn" onclick="addAll()" type="button">Ekle</button>
 </form>
 <div class="list" id="studentRecords"></div>
-</div> <!-- /studentTab-entry -->
-<!-- === STUDENT WEEKLY REPORT TAB === -->
-<div id="studentTab-week" style="display:none">
+</div> <div id="studentTab-week" style="display:none">
 <div class="sectionTitle">Hafta Seç</div>
 <select id="stuWeekSelect" onchange="selectStuWeek(this.value)" style="width:100%;max-width:420px;"></select>
 <div id="stuWeekChartWrap" style="background:#0b1427;border-radius:12px;padding:12px;margin-top:10px">
@@ -1205,7 +1196,6 @@ button.exitSmall .label{line-height:1}
 </div>
 <div class="exportCard" id="stuWeekMatrix" style="margin-top:10px"></div>
 </div>
-<!-- === STUDENT MONTHLY REPORT TAB === -->
 <div id="studentTab-month" style="display:none">
 <div class="sectionTitle">Ay Seç</div>
 <select id="stuMonthSelect" onchange="selectStuMonth(this.value)" style="width:100%;max-width:420px;"></select>
@@ -1217,14 +1207,12 @@ button.exitSmall .label{line-height:1}
 </div>
 <button class="action logout" onclick="logout()" type="button">Çıkış Yap</button>
 </div>
-<!-- ÖĞRETMEN PANELİ -->
 <div class="container" id="teacherPanel" style="display:none">
 <p class="teacherWelcome" id="teacherWelcome"></p>
 <div class="teacherTopbar">
 <h3 style="margin:0">Öğretmen Paneli</h3>
 <button aria-label="Çıkış" class="exitSmall" onclick="logout()" title="Çıkış" type="button"><span aria-hidden="true" class="icon">
 <svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16">
-<!-- Simple logout icon: arrow left + door -->
 <path d="M14 7V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-2"></path>
 <path d="M9 12h11"></path>
 <path d="M13 8l-4 4l4 4"></path>
@@ -1236,7 +1224,6 @@ button.exitSmall .label{line-height:1}
 <button class="pill active" id="tabClasses" onclick="showTeacherSection('classes')">Sınıflar</button>
 <button class="pill" id="tabFavorites" onclick="showTeacherSection('favorites')">Favorilerim</button>
 </div>
-<!-- Sınıflar -->
 <div id="classesSection">
 <div class="row" style="margin-top:10px; margin-bottom:6px">
 <input autocomplete="off" class="grow" id="newClass" placeholder="örn: 8/A" type="text"/>
@@ -1248,14 +1235,12 @@ button.exitSmall .label{line-height:1}
 <div id="studentsContainer"></div>
 </div>
 </div>
-<!-- Favoriler -->
 <div id="favoritesSection" style="display:none; margin-top:14px">
 <div class="list">
 <div class="sectionTitle">Favori Öğrencilerim</div>
 <div id="favoritesList"></div>
 </div>
 </div>
-<!-- ÖĞRENCİ DETAY + HAFTALIK -->
 <div class="list asModal" id="teacherStudentDetail" style="display:none;">
 <div class="modalHead">
 <div class="modalTabs">
@@ -1267,14 +1252,11 @@ button.exitSmall .label{line-height:1}
 </div>
 <div class="active" id="repTab-daily">
 <div class="sectionTitle" id="tsdTitle"></div>
-<!-- Takvim (tsdDays içinde üretilecek) -->
 <div id="tsdDays"></div>
-<!-- Seçilen Gün Kartı -->
 <div id="selDayBlock" style="margin-top:12px">
 <div class="sectionTitle">Seçilen Gün – Ders Tablosu</div>
 <div id="tsdDayTable"></div>
 </div>
-<!-- Genel Toplam -->
 <div class="sectionTitle" style="margin-top:12px">Genel Toplam (Ders Bazlı)</div>
 <div id="tsdTotals"></div>
 </div><div id="repTab-weekly">
@@ -1299,7 +1281,6 @@ button.exitSmall .label{line-height:1}
 <div class="exportCard" id="tMonthTotals"></div>
 </div>
 </div>
-<!-- PDF için görünmeyen export alanı -->
 <div id="exportArea" style="position:absolute; left:-99999px; top:-99999px">
 <div id="exportHead">
 <h1>Haftalık Gelişim Raporu</h1>
@@ -1315,20 +1296,20 @@ button.exitSmall .label{line-height:1}
 <script>
     // Çıkış: anasayfaya yönlendirir (src'li <script> içinde yazılan inline kod çalışmaz)
     function exitToHome(){
-  try {
-    if (typeof currentStudent !== 'undefined') currentStudent = null;
-    ['lNumber','lPass','rName','rNumber','rPass','rPass2'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
-    const sel=document.getElementById('rClass'); if (sel) sel.selectedIndex = 0;
-    const lf=document.getElementById('lessonForm'); if (lf) lf.reset();
-    const sr=document.getElementById('studentRecords'); if (sr) sr.innerHTML='';
-    const rc=document.getElementById('roleChoice'); if(rc) rc.style.display='none';
-    ['studentPanel','teacherStudentDetail'].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display='none'; });
-    const lp=document.getElementById('loginPanel'); if(lp) lp.style.display='block';
-    try{ var b=document.getElementById('studentWelcome'); if(b){ b.style.display='none'; b.textContent=''; } }catch(_){ }
-    try{ setStudentTargetInfo(null); }catch(_){ }
-    if (typeof showTab==='function') showTab('studentLogin');
-  } catch(e){}
-}
+      try {
+        if (typeof currentStudent !== 'undefined') currentStudent = null;
+        ['lNumber','lPass','rName','rNumber','rPass','rPass2'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+        const sel=document.getElementById('rClass'); if (sel) sel.selectedIndex = 0;
+        const lf=document.getElementById('lessonForm'); if (lf) lf.reset();
+        const sr=document.getElementById('studentRecords'); if (sr) sr.innerHTML='';
+        const rc=document.getElementById('roleChoice'); if(rc) rc.style.display='none';
+        ['studentPanel','teacherStudentDetail'].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display='none'; });
+        const lp=document.getElementById('loginPanel'); if(lp) lp.style.display='block';
+        try{ var b=document.getElementById('studentWelcome'); if(b){ b.style.display='none'; b.textContent=''; } }catch(_){ }
+        try{ setStudentTargetInfo(null); }catch(_){ }
+        if (typeof showTab==='function') showTab('studentLogin');
+      } catch(e){}
+    }
 
     /* ===== Silme ikonu (çöp tenekesi SVG) ===== */
     const TRASH_ICON = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBmaWxsPSIjZWY0NDQ0Ij4KICA8cGF0aCBkPSJNOSAyaDZ2Mmg1djJINFY0aDVWMnptLTMgNmgxMmwtMSAxMmEyIDIgMCAwIDEtMiAySDlhMiAyIDAgMCAxLTItMkw2IDh6bTQgM3Y3aDJ2LTdoLTJ6bTQgMHY3aDJ2LTdoLTJ6Ii8+Cjwvc3ZnPg==";
@@ -1352,61 +1333,61 @@ button.exitSmall .label{line-height:1}
 
     /* ============ Global Durum ============ */
 
-/* === Günlük hedef (student daily target) === */
-let currentTargetEditNum = null;
+    /* === Günlük hedef (student daily target) === */
+    let currentTargetEditNum = null;
 
 
-function openTargetModal(num, name){
-  try{ currentTargetEditNum = String(num||""); }catch(_){}
-  try{ currentStudent = String(num||""); }catch(_){}
-  // Öğrenci sayfasına geç ve Ders Hedefleri sayfasını aç
-  try{ enterAsStudent(); }catch(_){}
-  try{ if(typeof openLessonGoalsPage === 'function') openLessonGoalsPage(); }catch(_){}
-}
-function closeTargetModal(){ try{ /* no-op: legacy */ }catch(_){} }
-function saveTarget(){ try{ /* no-op: legacy */ }catch(_){} }
-function closeTargetModal(){
-  const m = document.getElementById('targetModal');
-  if(m) m.style.display='none';
-}
-function saveTarget(){
-  const input = document.getElementById('targetInput');
-  const val = Number(input && input.value ? input.value : 0);
-  if(!currentTargetEditNum){ setAlert("Öğrenci bulunamadı."); return; }
-  db.ref("students/"+currentTargetEditNum+"/dailyTarget").set(val).then(()=>{
-    setAlert("Hedef güncellendi.");
-    // Eğer güncellediğimiz mevcut öğrenci ise ekranda göster
-    if(currentStudent && String(currentStudent)===String(currentTargetEditNum)){
-      setStudentTargetInfo(val);
+    function openTargetModal(num, name){
+      try{ currentTargetEditNum = String(num||""); }catch(_){}
+      try{ currentStudent = String(num||""); }catch(_){}
+      // Öğrenci sayfasına geç ve Ders Hedefleri sayfasını aç
+      try{ enterAsStudent(); }catch(_){}
+      try{ if(typeof openLessonGoalsPage === 'function') openLessonGoalsPage(); }catch(_){}
     }
-    closeTargetModal();
-  }).catch(e=> setAlert("Kayıt hatası: "+e.message));
-}
-function setStudentTargetInfo(val){
-  const box = document.getElementById('studentTargetInfo');
-  const span = document.getElementById('studentTargetValue');
-  if(!box || !span) return;
-  if(val===null || val===undefined || isNaN(Number(val))){
-    box.style.display='none'; span.textContent='—';
-  }else{
-    span.textContent = String(val);
-    box.style.display='flex';
-  }
-}
-function loadStudentTarget(){
-  if(!currentStudent) { setStudentTargetInfo(null); return; }
-  db.ref("students/"+currentStudent+"/dailyTarget").get().then(snap=>{
-    setStudentTargetInfo(snap.exists()? Number(snap.val())||0 : null);
-  }).catch(()=> setStudentTargetInfo(null));
-}
-function openTargetForCurrent(){
-  if(!currentStudent){ setAlert("Öğrenci oturumu yok."); return; }
-  // get student name for title
-  db.ref("students/"+currentStudent).get().then(s=>{
-    const name=(s.exists() && s.val().name) ? s.val().name : currentStudentName || "";
-    openTargetModal(currentStudent, name);
-  }).catch(()=> openTargetModal(currentStudent, currentStudentName||""));
-}
+    function closeTargetModal(){ try{ /* no-op: legacy */ }catch(_){} }
+    function saveTarget(){ try{ /* no-op: legacy */ }catch(_){} }
+    function closeTargetModal(){
+      const m = document.getElementById('targetModal');
+      if(m) m.style.display='none';
+    }
+    function saveTarget(){
+      const input = document.getElementById('targetInput');
+      const val = Number(input && input.value ? input.value : 0);
+      if(!currentTargetEditNum){ setAlert("Öğrenci bulunamadı."); return; }
+      db.ref("students/"+currentTargetEditNum+"/dailyTarget").set(val).then(()=>{
+        setAlert("Hedef güncellendi.");
+        // Eğer güncellediğimiz mevcut öğrenci ise ekranda göster
+        if(currentStudent && String(currentStudent)===String(currentTargetEditNum)){
+          setStudentTargetInfo(val);
+        }
+        closeTargetModal();
+      }).catch(e=> setAlert("Kayıt hatası: "+e.message));
+    }
+    function setStudentTargetInfo(val){
+      const box = document.getElementById('studentTargetInfo');
+      const span = document.getElementById('studentTargetValue');
+      if(!box || !span) return;
+      if(val===null || val===undefined || isNaN(Number(val))){
+        box.style.display='none'; span.textContent='—';
+      }else{
+        span.textContent = String(val);
+        box.style.display='flex';
+      }
+    }
+    function loadStudentTarget(){
+      if(!currentStudent) { setStudentTargetInfo(null); return; }
+      db.ref("students/"+currentStudent+"/dailyTarget").get().then(snap=>{
+        setStudentTargetInfo(snap.exists()? Number(snap.val())||0 : null);
+      }).catch(()=> setStudentTargetInfo(null));
+    }
+    function openTargetForCurrent(){
+      if(!currentStudent){ setAlert("Öğrenci oturumu yok."); return; }
+      // get student name for title
+      db.ref("students/"+currentStudent).get().then(s=>{
+        const name=(s.exists() && s.val().name) ? s.val().name : currentStudentName || "";
+        openTargetModal(currentStudent, name);
+      }).catch(()=> openTargetModal(currentStudent, currentStudentName||""));
+    }
 
 
     function setWelcomeStudentBanner(){
@@ -1580,7 +1561,7 @@ function openTargetForCurrent(){
       document.getElementById("studentPanel").style.display="block";
       setWelcomeStudentBanner();
       loadStudentTarget();
-  try{ loadLessonGoals(); }catch(_){}
+      try{ loadLessonGoals(); }catch(_){}
 
       showStudentTab('entry');
       loadStudentData();
@@ -1676,9 +1657,9 @@ function openTargetForCurrent(){
         if(grouped[dayStr]) showDay(dayStr);
         else document.getElementById("stuDayTable").innerHTML = "<div class='empty'>Henüz veri yok.</div>";
 
-      // Öğrenci haftalık/aylık rapor verilerini hazırla
-      window._studentLessons = snap.exists() ? (snap.val() || {}) : {};
-      prepareStudentReports(window._studentLessons);
+        // Öğrenci haftalık/aylık rapor verilerini hazırla
+        window._studentLessons = snap.exists() ? (snap.val() || {}) : {};
+        prepareStudentReports(window._studentLessons);
 
       });
     }
@@ -1713,7 +1694,7 @@ function openTargetForCurrent(){
       if(isNaN(nv)){ setAlert("Geçersiz sayı."); return; }
 
       const infoAgg = (window._calCtx.grouped && window._calCtx.grouped[day] && window._calCtx.grouped[day].keysPerLesson && window._calCtx.grouped[day].keysPerLesson[lesson])
-                      ? window._calCtx.grouped[day].keysPerLesson[lesson] : [];
+                            ? window._calCtx.grouped[day].keysPerLesson[lesson] : [];
       const updates = {};
       infoAgg.forEach(key=>{
         updates[`students/${currentStudent}/lessons/${lesson}/${key}`] = null;
@@ -1872,9 +1853,7 @@ function openTargetForCurrent(){
                       data-name="${escAttr(prettyName)}"
                       data-sclass="${escAttr(s.sclass||"")}">${isFav ? "★" : "☆"}</button>
             </div>
-            <!-- Yeni: Hedef butonu (çöp kovasının solu) -->
             <button class="targetFloat" title="Hedef belirle" data-role="target" data-num="${escAttr(s.num)}" data-name="${escAttr(prettyName)}">🎯</button>
-            <!-- Yeni: Silme tuşu yerine sağ üstte çöp kovası ikonu -->
             <button class="delStuFloat"
                     title="Öğrenciyi Sil"
                     aria-label="Öğrenciyi Sil"
@@ -1933,7 +1912,7 @@ function openTargetForCurrent(){
       const ref=db.ref(path+"/"+num);
       if(favoritesCache[num]) ref.remove().catch(e=>setAlert("Favoriden çıkarma hatası: "+e.message));
       else ref.set({num,name,sclass,createdAt:firebase.database.ServerValue.TIMESTAMP})
-              .catch(e=>setAlert("Favoriye ekleme hatası: "+e.message));
+            .catch(e=>setAlert("Favoriye ekleme hatası: "+e.message));
     }
     function deleteStudent(num,name){
       if(!confirm(`"${name} (${num})" öğrencisini silmek istiyor musunuz?`)) return;
@@ -2168,7 +2147,7 @@ function openTargetForCurrent(){
 
         html += `
           <div class="calCell ${inMonth?'':'muted'} ${isToday?'today':''} ${isSelected?'selected':''}"
-               onclick="stuSelectDate('${dayStr}')">
+              onclick="stuSelectDate('${dayStr}')">
             <span class="calDay">${d.getDate()}</span>
             ${hasData ? '<span class="calDot" aria-hidden="true"></span>' : ''}
           </div>
@@ -2233,7 +2212,7 @@ function openTargetForCurrent(){
       }, 0);
     })();
 
-function buildWeeksFromLessons(lessons){
+    function buildWeeksFromLessons(lessons){
       let minDate=null, maxDate=null;
       for(const l in lessons){
         for(const k in lessons[l]){
@@ -2258,59 +2237,59 @@ function buildWeeksFromLessons(lessons){
     }
     function renderWeekList(weeks){
 
-const wrap = document.getElementById("weekList");
-if(!wrap){ return; }
-if(!weeks || !weeks.length){
-  wrap.innerHTML = "<span class='empty'>Hafta bulunamadı.</span>";
-  const pdfBtn = document.getElementById("btnExportPDF");
-  if(pdfBtn) pdfBtn.disabled = true;
-  return;
-}
-const sorted = weeks.slice().sort((a,b)=> b.start - a.start);
-wrap.innerHTML = [
-  '<div class="weekDropdown" id="weekDropdown">',
-    '<button type="button" class="wdToggle" id="weekToggle" aria-expanded="false">',
-      '<span class="label">Hafta Seç</span>',
-      '<span class="chev">▾</span>',
-    '</button>',
-    '<div class="wdMenu" id="weekMenu" hidden></div>',
-  '</div>'
-].join("");
-const menu = document.getElementById("weekMenu");
-const toggle = document.getElementById("weekToggle");
-menu.innerHTML = sorted.map(w=>`<button type="button" class="wdItem" data-key="${w.key}">${w.label}</button>`).join("");
-function closeMenu(){
-  if(!menu.classList.contains('open')) return;
-  menu.classList.remove('open'); menu.setAttribute('hidden','');
-  toggle.setAttribute('aria-expanded','false');
-  if(window._wkOutside){ document.removeEventListener('click', window._wkOutside); window._wkOutside = null; }
-}
-function openMenu(){
-  if(menu.classList.contains('open')) return;
-  menu.classList.add('open'); menu.removeAttribute('hidden');
-  toggle.setAttribute('aria-expanded','true');
-  window._wkOutside = function(ev){ if(!wrap.contains(ev.target)){ closeMenu(); } };
-  document.addEventListener('click', window._wkOutside);
-}
-toggle.onclick = ()=>{ (menu.classList.contains('open') ? closeMenu() : openMenu()); };
-menu.addEventListener('click', (ev)=>{
-  const btn = ev.target.closest('.wdItem');
-  if(!btn) return;
-  const key = btn.dataset.key;
-  selectWeek(key);
-  const wk = sorted.find(w=>w.key===key);
-  const lab = toggle.querySelector('.label'); if(lab && wk) lab.textContent = wk.label;
-  menu.querySelectorAll('.wdItem').forEach(x=>x.classList.toggle('active', x===btn));
-  closeMenu();
-});
-const latest = sorted[0];
-if(latest){
-  const lab = toggle.querySelector('.label'); if(lab) lab.textContent = latest.label;
-  const firstBtn = menu.querySelector('.wdItem');
-  if(firstBtn) firstBtn.classList.add('active');
-}
+      const wrap = document.getElementById("weekList");
+      if(!wrap){ return; }
+      if(!weeks || !weeks.length){
+        wrap.innerHTML = "<span class='empty'>Hafta bulunamadı.</span>";
+        const pdfBtn = document.getElementById("btnExportPDF");
+        if(pdfBtn) pdfBtn.disabled = true;
+        return;
+      }
+      const sorted = weeks.slice().sort((a,b)=> b.start - a.start);
+      wrap.innerHTML = [
+        '<div class="weekDropdown" id="weekDropdown">',
+          '<button type="button" class="wdToggle" id="weekToggle" aria-expanded="false">',
+            '<span class="label">Hafta Seç</span>',
+            '<span class="chev">▾</span>',
+          '</button>',
+          '<div class="wdMenu" id="weekMenu" hidden></div>',
+        '</div>'
+      ].join("");
+      const menu = document.getElementById("weekMenu");
+      const toggle = document.getElementById("weekToggle");
+      menu.innerHTML = sorted.map(w=>`<button type="button" class="wdItem" data-key="${w.key}">${w.label}</button>`).join("");
+      function closeMenu(){
+        if(!menu.classList.contains('open')) return;
+        menu.classList.remove('open'); menu.setAttribute('hidden','');
+        toggle.setAttribute('aria-expanded','false');
+        if(window._wkOutside){ document.removeEventListener('click', window._wkOutside); window._wkOutside = null; }
+      }
+      function openMenu(){
+        if(menu.classList.contains('open')) return;
+        menu.classList.add('open'); menu.removeAttribute('hidden');
+        toggle.setAttribute('aria-expanded','true');
+        window._wkOutside = function(ev){ if(!wrap.contains(ev.target)){ closeMenu(); } };
+        document.addEventListener('click', window._wkOutside);
+      }
+      toggle.onclick = ()=>{ (menu.classList.contains('open') ? closeMenu() : openMenu()); };
+      menu.addEventListener('click', (ev)=>{
+        const btn = ev.target.closest('.wdItem');
+        if(!btn) return;
+        const key = btn.dataset.key;
+        selectWeek(key);
+        const wk = sorted.find(w=>w.key===key);
+        const lab = toggle.querySelector('.label'); if(lab && wk) lab.textContent = wk.label;
+        menu.querySelectorAll('.wdItem').forEach(x=>x.classList.toggle('active', x===btn));
+        closeMenu();
+      });
+      const latest = sorted[0];
+      if(latest){
+        const lab = toggle.querySelector('.label'); if(lab) lab.textContent = latest.label;
+        const firstBtn = menu.querySelector('.wdItem');
+        if(firstBtn) firstBtn.classList.add('active');
+      }
 
-}
+    }
 
     function selectWeek(weekKey){
       selectedWeekKey=weekKey;
@@ -2586,7 +2565,7 @@ if(latest){
       if(tgt) tgt.innerHTML = html;
     }
 
-/* ============ Kayıt sekmesi: sınıfları canlı dinle ============ */
+    /* ============ Kayıt sekmesi: sınıfları canlı dinle ============ */
     db.ref("classes").on("value",snap=>{
       const names=[]; snap.forEach(ch=>{const v=ch.val(); if(v&&v.name) names.push(v.name);});
       const sel=document.getElementById("rClass"); const keep=sel.value;
@@ -2594,7 +2573,7 @@ if(latest){
       names.sort().forEach(n=>{const o=document.createElement("option"); o.value=n;o.text=n; sel.add(o);});
       if(names.includes(keep)) sel.value=keep;
     });
-  </script>
+</script>
 <script>
     function getGoalFor(id){
       const el = document.getElementById('goal-' + id);
@@ -2671,7 +2650,7 @@ if(latest){
     })();
 
     document.addEventListener('DOMContentLoaded', updateGlobalAndProgress);
-  </script>
+</script>
 <script>
 (function(){
   function showPassError(show){
@@ -2914,7 +2893,6 @@ function renderTeacherCalendar(){
 /* === /Teacher Modal Takvim === */
 
 </script>
-<!-- Hedef Soru Modalı -->
 <div class="list asModal" id="targetModal" style="display:none; max-width:420px">
 <div class="modalHead">
 <div class="modalTabs">
@@ -2929,13 +2907,11 @@ function renderTeacherCalendar(){
 <button class="action" onclick="saveTarget()" type="button">Kaydet</button>
 </div>
 </div></div>
-<!-- === Goals Full Page (Student/Teacher) — MODERN === -->
 <div id="goalsPage" style="display:none">
 <div class="gp-header">
 <div class="gp-left">
 <button class="pill gp-btn gp-back" onclick="backFromGoalsPage()" title="Öğrenci Paneline Dön" type="button">
 <span aria-hidden="true" class="icon">
-<!-- back -->
 <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24"><path d="M15 18l-6-6 6-6"></path><path d="M21 12H9"></path></svg>
 </span>
         Geri
@@ -2945,21 +2921,18 @@ function renderTeacherCalendar(){
 <div class="gp-actions">
 <button class="pill gp-btn gp-clear" onclick="resetGoalsInputs()" type="button">
 <span aria-hidden="true" class="icon">
-<!-- temizle (broom) -->
 <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24"><path d="M3 20l1-5 11-11 3 3L7 18l-4 2z"></path><path d="M14 6l4 4"></path></svg>
 </span>
         Temizle
       </button>
 <button class="action gp-btn" onclick="saveLessonGoals()" type="button">
 <span aria-hidden="true" class="icon">
-<!-- kaydet (check) -->
 <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg>
 </span>
         Kaydet
       </button>
 </div>
 </div>
-<!-- Tablo kutusu -->
 <div class="gp-table">
 <div class="gp-row">
 <label class="gp-label turkce"><span class="dot"></span>Türkçe</label>
@@ -3084,65 +3057,64 @@ function renderTeacherCalendar(){
 })();
 </script>
 <style>
-/* === Goals Page header buttons: same size + custom colors === */
-#goalsPage .gp-header .gp-btn{
-  min-height: 40px;
-  min-width: 120px;
-  padding: 8px 14px;
-  border-radius: 12px;
-  font-weight: 900;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-#goalsPage .gp-header .gp-btn .icon{ width:16px; height:16px; }
+    /* === Goals Page header buttons: same size + custom colors === */
+    #goalsPage .gp-header .gp-btn{
+      min-height: 40px;
+      min-width: 120px;
+      padding: 8px 14px;
+      border-radius: 12px;
+      font-weight: 900;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    #goalsPage .gp-header .gp-btn .icon{ width:16px; height:16px; }
 
-/* Back = red */
-#goalsPage .gp-header .gp-back{
-  background: linear-gradient(180deg,#ef4444,#dc2626) !important;
-  color:#fff !important;
-  border:1px solid #7f1d1d;
-  box-shadow:0 6px 16px rgba(239,68,68,.25), inset 0 1px 0 rgba(255,255,255,.08);
-}
+    /* Back = red */
+    #goalsPage .gp-header .gp-back{
+      background: linear-gradient(180deg,#ef4444,#dc2626) !important;
+      color:#fff !important;
+      border:1px solid #7f1d1d;
+      box-shadow:0 6px 16px rgba(239,68,68,.25), inset 0 1px 0 rgba(255,255,255,.08);
+    }
 
-/* Clear = green */
-#goalsPage .gp-header .gp-clear{
-  background: linear-gradient(180deg,#10b981,#059669) !important;
-  color:#fff !important;
-  border:1px solid #065f46;
-  box-shadow:0 6px 16px rgba(16,185,129,.25), inset 0 1px 0 rgba(255,255,255,.08);
-}
+    /* Clear = green */
+    #goalsPage .gp-header .gp-clear{
+      background: linear-gradient(180deg,#10b981,#059669) !important;
+      color:#fff !important;
+      border:1px solid #065f46;
+      box-shadow:0 6px 16px rgba(16,185,129,.25), inset 0 1px 0 rgba(255,255,255,.08);
+    }
 </style>
 <style>
-/* Center goals page title */
-#goalsPage .gp-header{ position: relative; }
-#goalsPage .gp-header .gp-title{
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  text-align: center;
-  font-weight: 800;
-}
+    /* Center goals page title */
+    #goalsPage .gp-header{ position: relative; }
+    #goalsPage .gp-header .gp-title{
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      font-weight: 800;
+    }
 </style><style>
-/* Override: goals title left-aligned and larger */
-#goalsPage .gp-header .gp-title{
-  position: static !important;
-  left: auto !important;
-  transform: none !important;
-  text-align: left !important;
-  font-size: 1.5rem !important; /* biraz büyütüldü */
-  line-height: 1.3 !important;
-}
+    /* Override: goals title left-aligned and larger */
+    #goalsPage .gp-header .gp-title{
+      position: static !important;
+      left: auto !important;
+      transform: none !important;
+      text-align: left !important;
+      font-size: 1.5rem !important; /* biraz büyütüldü */
+      line-height: 1.3 !important;
+    }
 </style>
-<!-- === Parent Mode Patch v2: Mirror student panel for parents, keep daily calendar; hide entry form in parent mode === -->
 <style>
-/* Hide only in parent mode */
-body[data-role="parent"] #studentTab-entry #lessonForm { display:none !important; }
-body[data-role="parent"] #studentTab-entry .totalBar { display:none !important; }
-body[data-role="parent"] #studentTab-entry .addBtn { display:none !important; }
-/* Optional: keep layout tidy when form is hidden */
-body[data-role="parent"] #studentTab-entry .student-toolbar { margin-bottom: 8px; }
+    /* Hide only in parent mode */
+    body[data-role="parent"] #studentTab-entry #lessonForm { display:none !important; }
+    body[data-role="parent"] #studentTab-entry .totalBar { display:none !important; }
+    body[data-role="parent"] #studentTab-entry .addBtn { display:none !important; }
+    /* Optional: keep layout tidy when form is hidden */
+    body[data-role="parent"] #studentTab-entry .student-toolbar { margin-bottom: 8px; }
 </style>
 <script>
 (function(){
