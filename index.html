@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>ÖĞRENCİ TAKİP PROGRAMI</title>
-  <!-- Firebase (compat) -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-database-compat.js"></script>
-  <!-- Charts & Export -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>ÖĞRENCİ TAKİP PROGRAMI</title>
+<!-- Firebase compat SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-database-compat.js"></script>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<!-- html2canvas & jsPDF for PDF export -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<style>
     :root{
       --bg:#0f172a; --panel:#1e293b; --muted:#334155; --text:#e2e8f0;
       --accent1:#3b82f6; --accent2:#06b6d4; --warn:#f97316; --ok:#10b981; --danger:#ef4444;
@@ -21,19 +21,25 @@
     }
     *{box-sizing:border-box}
     body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
-    .header{padding:22px;text-align:center;}
-    .main-title{font-size:22px;font-weight:800;color:#93c5fd;text-transform:uppercase}
-    .subtitle{font-size:15px;font-weight:600;color:#a5b4fc;margin-top:4px}
-
+    .header{padding:22px;text-align:center;font-size:22px;font-weight:800;color:#93c5fd;text-transform:uppercase}
+    .subheader{font-size:16px;color:#cbd5e1;margin-top:4px;font-weight:600;}
     .tabs{display:flex;gap:8px;justify-content:center;max-width:1080px;margin:0 auto 12px;padding:8px;background:var(--panel);border-radius:12px;flex-wrap:wrap}
     .tabs button{flex:1;min-width:160px;padding:12px;border:0;border-radius:10px;background:transparent;color:#cbd5e1;font-weight:700;cursor:pointer}
-    
-    #tabRegister { background-color: var(--ok); color: white; }
-    #tabStudent { background-color: var(--accent1); color: white; }
-    #tabTeacher { background-color: var(--accent2); color: white; }
-    
-    .tabs button.active{ background: var(--warn) !important; color: #fff !important; }
-
+    .tabs button.active{background:var(--ok);color:#fff}
+    /* Odak halkalarını yeşil yap */
+    .tabs button:focus,
+    .pill:focus,
+    .classPick:focus,
+    .dayBtn:focus,
+    .weekBtn:focus,
+    .studentNameBtn:focus,
+    .delStuBtn:focus,
+    .delStuFloat:focus,
+    .delFloat:focus,
+    button.action:focus{
+      outline:3px solid rgba(16,185,129,.55);
+      outline-offset:2px;
+    }
     .container{max-width:1080px;margin:16px auto;background:var(--panel);border-radius:16px;padding:22px}
     h3{margin:0 0 14px}
     input,select{width:100%;padding:12px;border:0;border-radius:10px;background:var(--bg);color:#e2e8f0;margin:8px 0}
@@ -43,7 +49,7 @@
     th,td{border:1px solid var(--muted);padding:10px;text-align:center}
     .row{display:flex;gap:10px;align-items:center}
     .row>.grow{flex:1}
-
+    /* ---- Sınıf kartları ---- */
     .classGrid{
       display:grid;
       grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -59,266 +65,695 @@
       transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
     }
     .classCard:hover{ transform:translateY(-2px); box-shadow:0 8px 18px rgba(0,0,0,.25); border-color:#3b4b6a; }
-    .className{
-      font-weight:900;
-      font-size:20px;
-      letter-spacing:.3px;
-      margin-bottom:8px;
-    }
+    .className{ font-weight:900; font-size:20px; letter-spacing:.3px; margin-bottom:8px; }
     .classPick{
       position:absolute; left:14px; right:14px; bottom:14px;
       border:0; border-radius:10px; padding:10px 12px; cursor:pointer;
       color:#fff; font-weight:800;
       background:linear-gradient(90deg,var(--accent1),var(--accent2));
     }
-    .classPick.active{ outline:3px solid #63b3ff44 }
+    .classPick.active{ outline:3px solid rgba(16,185,129,.40) }
+    /* --- Sınıf silme ikonu (zemin üstünde, hover'da flu kırmızı) --- */
     .delFloat{
       position:absolute; top:10px; right:10px;
-      border:0; border-radius:10px; padding:6px 10px; cursor:pointer;
-      color:#fff; font-weight:800; background:linear-gradient(90deg,#fb7185,#f43f5e);
+      display:grid; place-items:center;
+      width:36px; height:36px; padding:0;
+      border:0; border-radius:999px;
+      background:transparent;
+      cursor:pointer;
+      transition:transform .12s ease, opacity .12s ease;
+      z-index:2;
     }
-
-    .pill{padding:10px 16px;border:0;border-radius:999px;background:#334155;color:#e5e7eb;font-weight:800;cursor:pointer;transition:.2s}
-    .pill.active{background:linear-gradient(90deg,var(--accent1),var(--accent2))}
-    .delBtn{padding:8px 10px;border:0;border-radius:10px;background:linear-gradient(90deg,#fb7185,#f43f5e);color:#fff;font-weight:800;cursor:pointer}
-
-    .list{margin-top:14px;background:var(--bg);border-radius:12px;padding:12px}
-    .studentItem{display:flex;align-items:center;gap:8px;justify-content:space-between;padding:10px;background:#0b1427;margin:6px 0;border-radius:10px}
-    .leftGroup{display:flex;align-items:center;gap:8px}
-    .studentNameBtn{border:0;background:transparent;color:#e2e8f0;font-weight:800;cursor:pointer;text-align:left}
-    .starBtn{border:0;background:transparent;font-size:20px;cursor:pointer;color:#f59e0b}
-    .starBtn.off{color:#64748b}
-    .delStuBtn{padding:6px 10px;border:0;border-radius:8px;background:linear-gradient(90deg,#fb7185,#f43f5e);color:#fff;font-weight:800;cursor:pointer}
-    .sectionTitle{margin:12px 0 6px;font-weight:800;opacity:.9}
-    .twoCol{display:grid;grid-template-columns: 300px 1fr; gap:14px}
-    .dayBtn,.weekBtn{display:block;width:100%;text-align:left;padding:10px;border:0;border-radius:10px;background:#334155;color:#fff;cursor:pointer;margin-top:8px;min-height:44px}
-    .empty{opacity:.7;padding:12px;text-align:center}
-    .editBtn{padding:6px 12px;border:0;border-radius:6px;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#fff;font-weight:700;cursor:pointer}
-    .smallRow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-    .ghost{opacity:.6}
-
-    #alert{max-width:1080px;margin:0 auto 8px;padding:10px 14px;border-radius:10px;background:#0b1427;color:#ffd6a5;display:none}
-    #weekChartWrap{background:#0b1427;border-radius:12px;padding:12px;margin-top:10px}
-    #pdfBtns{display:flex;gap:10px;flex-wrap:wrap}
-
-    #exportArea{
-      width:1240px; padding:40px 48px 48px;
-      background:var(--export-bg); color:#e5e7eb; font-family:Arial, Helvetica, sans-serif;
+    .delFloat img.trashIcon{ width:20px; height:20px; display:block; }
+    .delFloat:hover{ transform:translateY(-1px); }
+    .delFloat::before{
+      content:""; position:absolute; inset:0; border-radius:999px;
+      background:rgba(239,68,68,.26);
+      filter:blur(8px);
+      opacity:0; transition:opacity .12s ease;
+      z-index:-1;
     }
-    #exportArea h1{margin:0 0 6px;font-size:28px;color:var(--export-head)}
-    #exportArea h2{margin:0 0 18px;font-size:18px;font-weight:700;color:#c7d2fe}
-    #exportHead{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:10px}
-    .exportCard{background:#0f1a31;border:1px solid #21314f;border-radius:12px;padding:14px}
-    #exportTable table{width:100%;border-collapse:collapse}
-    #exportTable th,#exportTable td{border:1px solid #21314f;padding:10px;text-align:center}
-    #exportLegend{font-size:12px;opacity:.8;margin-top:6px}
-
-    #loginPanel h3{font-size:22px}
-    #loginPanel .tabs button{font-size:16px;padding:14px;min-height:48px}
-    #loginPanel input,#loginPanel select{font-size:16px;min-height:48px}
-    #loginPanel button.action{font-size:16px;min-height:52px}
-    @media (max-width: 768px){
-      .header .main-title{font-size:20px}
-      .header .subtitle{font-size:14px}
-      #loginPanel .container{padding:18px}
-      #loginPanel h3{font-size:24px}
-      #loginPanel .tabs{gap:6px}
-      #loginPanel .tabs button{font-size:17px;padding:14px 12px}
-      #loginPanel input,#loginPanel select{font-size:17px}
-      #loginPanel button.action{font-size:17px}
-      .twoCol{grid-template-columns:1fr}
+    .delFloat:hover::before{ opacity:1; }
+    /* --- Öğrenci silme: tuş yerine zeminde çöp kovası simgesi --- */
+    .studentItem{display:flex;align-items:center;gap:8px;justify-content:space-between;padding:10px;background:#0b1427;margin:6px 0;border-radius:10px; position:relative;}
+    .studentItem.hasDel{ padding-right:48px; } /* sağ üstteki ikon için yer aç */
+    .delStuFloat{
+      position:absolute; top:8px; right:8px;
+      display:grid; place-items:center;
+      width:36px; height:36px; padding:0;
+      border:0; border-radius:999px;
+      background:transparent;
+      cursor:pointer;
+      transition:transform .12s ease, opacity .12s ease;
+      z-index:2;
     }
-    @media (max-width: 480px){
-      .header{padding:18px}
-      .main-title{font-size:18px}
-      .subtitle{font-size:13px}
-      #loginPanel .tabs{padding:6px}
-      #loginPanel .tabs button{font-size:18px;min-width:130px;padding:12px}
-      #loginPanel h3{font-size:22px;margin-bottom:10px}
-      #loginPanel input,#loginPanel select{font-size:18px;padding:14px;min-height:52px}
-      #loginPanel button.action{font-size:18px;padding:14px;min-height:56px}
-      .container{margin:12px}
+    .delStuFloat img.trashIcon{ width:18px; height:18px; display:block; }
+    .delStuFloat:hover{ transform:translateY(-1px); }
+    .delStuFloat::before{
+      content:""; position:absolute; inset:0; border-radius:999px;
+      background:rgba(239,68,68,.26);
+      filter:blur(8px);
+      opacity:0; transition:opacity .12s ease;
+      z-index:-1;
     }
-    .teacherWelcome{opacity:.8;margin:0 0 10px}
-    .footer{
-      position:fixed; bottom:0; right:0;
-      padding:8px 12px; font-size:12px; color:#64748b; z-index:100;
+    .delStuFloat:hover::before{ opacity:1; }
+    /* Yeni: Hedef belirleme ikonu (zemin üstünde, hover'da flu yeşil) */
+    .targetFloat{
+      position:absolute; top:8px; right:48px;
+      display:grid; place-items:center;
+      width:36px; height:36px; padding:0;
+      border:0; border-radius:999px;
+      background:transparent;
+      cursor:pointer;
+      transition:transform .12s ease, opacity .12s ease;
+      z-index:2;
     }
-    .sotwContainer {
-        background: linear-gradient(90deg, #f59e0b, #f97316);
-        color: white; border-radius: 12px; padding: 14px;
-        margin: -10px 0 16px; text-align: center; font-size: 16px; font-weight: 700;
-        min-height: 54px; display:flex; align-items:center; justify-content:center;
+    .targetFloat::before{
+      content:""; position:absolute; inset:0; border-radius:999px;
+      background:rgba(16,185,129,.26);
+      filter:blur(8px);
+      opacity:0; transition:opacity .12s ease;
+      z-index:-1;
     }
-    .sotwContainer span { font-weight:900; font-size:18px; margin:0 6px; }
-    .studentStats { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:20px; }
-    .statBox { background:var(--card); padding:12px; border-radius:10px; border:1px solid var(--cardBorder); }
-    .statBox .label { font-size:16px; font-weight:800; opacity:.9; margin-bottom:8px; text-align:center; color:var(--accent1); }
-    .statBox table{ margin:0; } .statBox th{ display:none; } .statBox td{ border:1px solid var(--muted); padding:6px 8px; font-size:14px; }
-    .statBox td:first-child{ text-align:left; font-weight:700; }
-  </style>
+    .targetFloat:hover{ transform:translateY(-1px); }
+    .targetFloat:hover::before{ opacity:1; }
+    .targetFloat .targetIcon{ font-size:18px; }
+    /* Yeni: Hedef belirleme butonu (öğrenci) */
+    #openTargetBtn{
+      margin-left: auto;
+      display: none;
+    }
+    /* Yeni: "favori ekle / çıkar" yıldız ikonu butonu */
+    .starBtn{
+      font-size: 18px;
+      line-height: 1;
+      padding: 0 6px 2px;
+      color: #eab308;
+    }
+    /* Yeni: Hedef belirleme butonu (yüzen) */
+    .targetBtn{
+      font-size: 16px;
+      line-height: 1;
+      padding: 0 6px 2px;
+      color: var(--ok);
+    }
+    /* Yeni: Sınıf isimleri tablosu hücre stil düzeltmesi (bükülmesin) */
+    .classesTable td:first-child{white-space: nowrap;}
+    .classesTable td:nth-child(2){min-width: 80px;}
+    /* === HIDE 'GÖSTER' BUTTON IN FAVORITES === */
+    /* Öğretmen paneli > Favoriler bölümündeki 'Göster' butonlarını kaldır */
+    #favoritesSection .editBtn{ display: none !important; }
+    /* === /HIDE 'GÖSTER' BUTTON IN FAVORITES === */
+</style>
+<!-- === GOALS TITLE UNDER MAIN SUBHEADER (MOBILE) === -->
+<style>
+@media (max-width: 600px){
+  /* Goals başlığını header altına taşıdığımızda gp-title içindekini gizle */
+  #goalsPage .gp-title{ display: none !important; }
+  /* Header altında yeni başlık görünümü */
+  .header .header-goals-title{
+    display: block;
+    margin-top: 6px;
+    font-weight: 800;
+    font-size: clamp(18px, 5vw, 22px);
+    line-height: 1.15;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+</style>
 </head>
 <body>
-
-  <div class="header">
-    <div class="main-title">ÖĞRENCİ TAKİP PROGRAMI</div>
-    <div class="subtitle">Alparslan Ortaokulu</div>
-  </div>
-  <div id="alert"></div>
-
-  <div id="loginPanel">
-    <div class="tabs">
-      <button type="button" id="tabRegister" class="active" onclick="showTab('register')">Öğrenci Kayıt</button>
-      <button type="button" id="tabStudent" onclick="showTab('studentLogin')">Öğrenci Giriş</button>
-      <button type="button" id="tabTeacher" onclick="showTab('teacherLogin')">Öğretmen Giriş</button>
-    </div>
-
-    <div class="container" id="register">
-      <h3>Öğrenci Kayıt</h3>
-      <input id="rName" type="text" placeholder="Ad Soyad" autocomplete="off">
-      <select id="rClass"><option value="">Sınıf Seçin</option></select>
-      <input id="rNumber" type="text" placeholder="Okul Numarası" autocomplete="off">
-      <input id="rPass" type="password" placeholder="Şifre" autocomplete="new-password">
-      <button type="button" class="action" onclick="studentRegister()">Kayıt Ol</button>
-    </div>
-
-    <div class="container" id="studentLogin" style="display:none">
-      <h3>Öğrenci Giriş</h3>
-      <input id="lNumber" type="text" placeholder="Okul Numarası" autocomplete="off">
-      <input id="lPass" type="password" placeholder="Şifre" autocomplete="current-password">
-      <button type="button" class="action" onclick="studentLogin()">Giriş Yap</button>
-    </div>
-
-    <div class="container" id="teacherLogin" style="display:none">
-      <h3>Öğretmen Giriş</h3>
-      <input id="tName" type="text" placeholder="Ad Soyad" autocomplete="name">
-      <input id="tCode" type="password" placeholder="Kod">
-      <button type="button" class="action" onclick="teacherLogin()">Giriş Yap</button>
-    </div>
-  </div>
-
-  <div class="container" id="studentPanel" style="display:none">
-    <h3>Öğrenci Paneli</h3>
-    <div id="sotwContainerStudent" class="sotwContainer"></div>
-    <div id="studentStatsContainer" class="studentStats"></div>
-    <form id="lessonForm">
-      <div class="sectionTitle">Soru Girişi</div>
-      <label for="entryDate" style="opacity: 0.8; font-size: 14px;">Giriş yapılacak tarih (Sadece bu hafta içinde bir gün seçilebilir):</label>
-      <input type="date" id="entryDate">
-      <table>
-        <tr><th>Ders</th><th>Çözülen Soru</th></tr>
-        <tr><td>Türkçe</td><td><input type="number" id="Turkce" inputmode="numeric"></td></tr>
-        <tr><td>Sosyal Bilgiler</td><td><input type="number" id="Sosyal" inputmode="numeric"></td></tr>
-        <tr><td>Din Kültürü</td><td><input type="number" id="Din" inputmode="numeric"></td></tr>
-        <tr><td>İngilizce</td><td><input type="number" id="Ingilizce" inputmode="numeric"></td></tr>
-        <tr><td>Matematik</td><td><input type="number" id="Matematik" inputmode="numeric"></td></tr>
-        <tr><td>Fen Bilimleri</td><td><input type="number" id="Fen" inputmode="numeric"></td></tr>
-      </table>
-      <button type="button" class="action" onclick="addAll()">Ekle</button>
-    </form>
-    <div id="studentRecords" class="list"></div>
-    <button type="button" class="action logout" onclick="logout()">Çıkış Yap</button>
-  </div>
-
-  <div class="container" id="teacherPanel" style="display:none">
-    <p class="teacherWelcome" id="teacherWelcome"></p>
-    <h3>Öğretmen Paneli</h3>
-    <div id="sotwContainerTeacher" class="sotwContainer"></div>
-    <div class="pillTabs" id="teacherTopTabs">
-      <button class="pill active" id="tabClasses" onclick="showTeacherSection('classes')">Sınıflar</button>
-      <button class="pill" id="tabFavorites" onclick="showTeacherSection('favorites')">Favorilerim</button>
-    </div>
-
-    <div id="classesSection">
-      <div class="row" style="margin-top:10px; margin-bottom:6px">
-        <input id="newClass" class="grow" type="text" placeholder="örn: 8/A" autocomplete="off">
-        <button type="button" class="action" style="max-width:220px" onclick="addClass()">Sınıf Ekle</button>
-      </div>
-      <div id="classGrid" class="classGrid"></div>
-      <div id="classStudents" class="list" style="display:none">
-        <div class="sectionTitle">Öğrenciler</div>
-        <div id="studentsContainer"></div>
-      </div>
-    </div>
-
-    <div id="favoritesSection" style="display:none; margin-top:14px">
-      <div class="list">
-        <div class="sectionTitle">Favori Öğrencilerim</div>
-        <div id="favoritesList"></div>
-      </div>
-    </div>
-
-    <div id="teacherStudentDetail" class="list" style="display:none; margin-top:14px">
-      <div class="smallRow" style="margin-bottom: 10px; align-items: flex-start;">
-        <div class="sectionTitle" id="tsdTitle" style="margin:0; flex:1;"></div>
-        <button onclick="hideStudentDetail()" class="delBtn">Geri Dön</button>
-      </div>
-      <div class="twoCol">
-        <div>
-          <div class="sectionTitle">Günler</div>
-          <div id="tsdDays"></div>
-        </div>
-        <div>
-          <div class="sectionTitle">Seçilen Gün – Ders Tablosu</div>
-          <div id="tsdDayTable"></div>
-          <div class="sectionTitle" style="margin-top:12px">Genel Toplam (Ders Bazlı)</div>
-          <div id="tsdTotals"></div>
-        </div>
-      </div>
-      <div style="margin-top:18px">
-        <div class="sectionTitle">Haftalık Gelişim (Pzt–Paz)</div>
-        <div id="weekControls" class="smallRow">
-          <div id="weekList" class="smallRow"></div>
-          <div id="pdfBtns" style="margin-left:auto">
-            <button class="action" style="max-width:220px" id="btnExportPDF" onclick="exportSelectedWeekPDF()" disabled>PDF Dışa Aktar</button>
+<div id="reportOverlay" onclick="closeReportModal()"></div>
+<div class="header">ÖĞRENCİ TAKİP PROGRAMI
+    <div class="subheader">Alparslan Ortaokulu</div>
+</div>
+<div id="alert"></div>
+<!-- Giriş Alanı -->
+<div id="loginPanel">
+<div class="tabs">
+<button class="active" id="tabRegister" onclick="showTab('register')" type="button">Öğrenci Kayıt</button>
+<button id="tabStudent" onclick="showTab('studentLogin')" type="button">Öğrenci-Veli Giriş</button>
+<button id="tabTeacher" onclick="showTab('teacherLogin')" type="button">Öğretmen Giriş</button>
+</div>
+<!-- Öğrenci Kayıt -->
+<div class="container" id="register">
+<h3>Öğrenci Kayıt</h3>
+<input autocomplete="off" id="rName" placeholder="Ad Soyad" type="text"/>
+<select id="rClass"><option value="">Sınıf Seçin</option></select>
+<input autocomplete="off" id="rNumber" placeholder="Okul Numarası" type="text"/>
+<input autocomplete="new-password" id="rPass" placeholder="Şifre" type="password"/>
+<!-- YENİ: Şifre Tekrar -->
+<input autocomplete="new-password" id="rPass2" placeholder="Şifre (Tekrar)" type="password"/>
+<small id="passMismatchError" style="display:none;color:#ef4444;font-weight:600;">Şifreler eşleşmiyor</small>
+<button class="action" id="registerBtn" onclick="studentRegister()" type="button">Kayıt</button>
+</div>
+<!-- Öğrenci-Veli Giriş -->
+<div class="container" id="studentLogin" style="display:none">
+<h3>Öğrenci-Veli Giriş</h3>
+<input autocomplete="off" id="lNumber" placeholder="Okul Numarası" type="text"/>
+<input autocomplete="current-password" id="lPass" placeholder="Şifre" type="password"/>
+<button class="action" onclick="studentLogin()" type="button">Giriş Yap</button>
+</div>
+<!-- Giriş Türü Seçimi -->
+<div class="container" id="roleChoice" style="display:none">
+<h3>Giriş Türünü Seçin</h3>
+<div class="teacherWelcome" id="roleChoiceHello"></div>
+<div class="roleGrid">
+<button aria-label="Öğrenci Girişi" class="roleCard" onclick="enterAsStudent()" type="button">
+<div aria-hidden="true" class="roleIcon">
+<!-- Tek kişi ikonu -->
+<svg fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 12c2.761 0 5-2.686 5-6s-2.239-6-5-6-5 2.686-5 6 2.239 6 5 6Zm0 2c-4.418 0-8 2.686-8 6v2h16v-2c0-3.314-3.582-6-8-6Z"></path>
+</svg>
+</div>
+<div class="roleTitle">Öğrenci Girişi</div>
+</button>
+<button aria-label="Veli Girişi" class="roleCard parent" onclick="enterAsParent()" type="button">
+<div aria-hidden="true" class="roleIcon">
+<!-- İki kişi ikonu -->
+<svg fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M16 11c2.209 0 4-2.239 4-5s-1.791-5-4-5-4 2.239-4 5 1.791 5 4 5Zm-8 0c2.209 0 4-2.239 4-5S10.209 1 8 1 4 3.239 4 6s1.791 5 4 5Zm8 2c-2.761 0-5.2.937-6.64 2.378C7.409 14.855 5.132 14 3 14c-1.657 0-3 1.567-3 3.5V21h10v-2c0-1.252.467-2.393 1.256-3.33C12.466 14.646 14.066 14 16 14c3.866 0 7 2.015 7 4.5V21h-8v-1.5c0-2.485-1.79-4.5-4-4.5Z"></path>
+</svg>
+</div>
+<div class="roleTitle">Veli Girişi</div>
+</button>
+</div>
+<div class="smallRow" style="margin-top:10px">
+<button aria-label="Geri" class="pill exit" onclick="exitToHome()" type="button"><span aria-hidden="true" class="backIcon">←</span> Geri</button>
+</div>
+</div>
+<!-- Öğretmen Giriş -->
+<div class="container" id="teacherLogin" style="display:none">
+<h3>Öğretmen Giriş</h3>
+<input autocomplete="name" id="tName" placeholder="Ad Soyad" type="text"/>
+<input id="tCode" placeholder="Kod" type="password"/>
+<button class="action" onclick="teacherLogin()" type="button">Giriş Yap</button>
+</div>
+</div>
+<!-- ÖĞRENCİ PANELİ -->
+<div class="container" id="studentPanel" style="display:none">
+<h3>Öğrenci Paneli</h3>
+<div class="studentWelcomeBanner" id="studentWelcome" style="display:none"></div>
+<div class="pillTabs" id="studentTabs">
+<button class="pill active" id="stuTabEntryBtn" onclick="showStudentTab('entry')">Soru Girişi</button>
+<button class="pill" id="stuTabWeekBtn" onclick="showStudentTab('week')">Haftalık Rapor</button>
+<button class="pill" id="stuTabMonthBtn" onclick="showStudentTab('month')">Aylık Rapor</button>
+</div>
+<!-- Giriş Paneline Dön Butonu (Sadece Mobil) -->
+<div class="smallRow" style="margin:14px 0 10px">
+<button class="pill exit" onclick="exitStudentPanel()" type="button"><span aria-hidden="true" class="backIcon">←</span> Çıkış Yap</button>
+</div>
+<!-- Soru Girişi (Öğrenci) -->
+<div class="list" id="stuEntrySection">
+<div class="sectionTitle">Soru Girişi</div>
+<input autocomplete="off" id="stuEntryInput" placeholder="Sayısal veya sözel kaç soru çözdün?" type="number"/>
+<div class="smallRow" style="justify-content:flex-end">
+<button class="pill" id="stuEntryBtn" onclick="studentAddEntry()" type="button">Ekle</button>
+</div>
+<div id="stuEntryList"></div>
+</div>
+<!-- Haftalık Rapor (Öğrenci) -->
+<div class="list" id="stuWeekSection" style="display:none">
+<div class="sectionTitle">Haftalık Rapor</div>
+<canvas id="stuWeekChart"></canvas>
+<div class="smallRow" style="margin-top:6px">
+<button class="pill" id="stuWeekPrevBtn" onclick="changeWeek(-1)" type="button">Önceki</button>
+<button class="pill" id="stuWeekNextBtn" onclick="changeWeek(1)" type="button">Sonraki</button>
+</div>
+</div>
+<!-- Aylık Rapor (Öğrenci) -->
+<div class="list" id="stuMonthSection" style="display:none">
+<div class="sectionTitle">Aylık Rapor</div>
+<canvas id="stuMonthChart"></canvas>
+<div class="smallRow" style="margin-top:6px">
+<button class="pill" id="stuMonthPrevBtn" onclick="changeMonth(-1)" type="button">Önceki</button>
+<button class="pill" id="stuMonthNextBtn" onclick="changeMonth(1)" type="button">Sonraki</button>
+</div>
+</div>
+<!-- PDF Export & Logout (only visible on student/parent panel) -->
+<button class="action logout" onclick="logout()" style="margin:18px auto 8px; display:block; max-width:220px" type="button">Çıkış Yap</button>
+</div>
+<!-- ÖĞRETMEN PANELİ -->
+<div class="container" id="teacherPanel" style="display:none">
+<h3 id="teacherPanelTitle">Öğretmen Paneli</h3>
+<div class="teacherWelcomeBanner" id="teacherWelcome"></div>
+<div class="pillTabs" id="teacherTabs">
+<button class="pill active" id="tabClasses" onclick="showTeacherSection('classes')">Sınıflar</button>
+<button class="pill" id="tabFavorites" onclick="showTeacherSection('favorites')">Favorilerim</button>
+</div>
+<!-- Sınıflar -->
+<div id="classesSection" style="margin-top:14px">
+<div class="list">
+<div class="sectionTitle">Sınıflarım</div>
+<div class="classGrid" id="classesList"></div>
+</div>
+<div class="row" style="margin-top:6px">
+<input class="grow" id="newClass" placeholder="Yeni Sınıf Adı" type="text"/>
+<button class="pill" id="newClassBtn" onclick="addClass()" type="button">Ekle</button>
+</div>
+</div>
+<!-- Favoriler -->
+<div id="favoritesSection" style="display:none; margin-top:14px">
+<div class="list">
+<div class="sectionTitle">Favori Öğrencilerim</div>
+<div id="favoritesList"></div>
+</div>
+<button class="action logout" onclick="logout()" style="margin:18px auto 8px; display:block; max-width:220px" type="button">Çıkış Yap</button>
+</div>
+</div>
+<!-- ÖĞRENCİ DETAY (ÖĞRETMEN GÖRÜNTÜSÜ) -->
+<div class="container asModal studentDetail" id="teacherStudentDetail" style="display:none">
+<div class="modalHead">
+<h3 id="tsdTitle" style="margin-right:10px; flex:1">DETAY</h3>
+<div class="smallRow" style="gap:4px">
+<button aria-label="Hedef Belirle" class="pill" id="openTargetBtn" onclick="openTargetForCurrent()" title="Hedef belirle" type="button">🎯 Hedef Belirle</button>
+<button aria-label="Kapat" class="pill exit" onclick="closeTeacherStudentDetail()" type="button">×</button>
+</div>
+</div>
+<div class="list">
+<div class="sectionTitle" style="margin-top:0">Genel Toplamlar</div>
+<div id="tsdTotals"></div>
+</div>
+<div class="list">
+<div class="sectionTitle">Günler</div>
+<div id="tsdDays"></div>
+</div>
+<div class="list">
+<div class="sectionTitle">Seçilen Gün – Ders Tablosu</div>
+<div id="tsdTable"></div>
+</div>
+</div>
+<!-- Chart ve Export modalları (genel) -->
+<div class="container asModal" id="chartModal" style="display:none">
+<div class="modalHead">
+<h3 id="chartTitle" style="margin-right:10px; flex:1">Grafik</h3>
+<button aria-label="Kapat" class="pill exit" onclick="closeChartModal()" type="button">×</button>
+</div>
+<div class="list" style="padding:8px">
+<canvas id="exportChart"></canvas>
+<button class="action" id="exportPdfBtn" onclick="downloadPdf()" type="button">PDF İndir</button>
+</div>
+</div>
+<div class="container asModal" id="targetModal" style="display:none">
+<div class="modalHead">
+<h3 style="margin-right:10px; flex:1">Hedef Belirle</h3>
+<button aria-label="Kapat" class="pill exit" onclick="closeTargetModal()" type="button">×</button>
+</div>
+<div class="list">
+<div class="sectionTitle" id="targetStudentName"></div>
+<div class="row">
+<input id="targetInput" placeholder="Günlük soru hedefi (sayı)" type="number"/>
+<button class="pill" onclick="saveTarget()" type="button">Kaydet</button>
+</div>
+</div>
+</div>
+<script>
+    const TRASH_ICON = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBmaWxsPSIjZWY0NDQ0Ij4KICA8cGF0aCBkPSJNOSAyaDZ2Mmg1djJINFY0aDVWMnptLTMgNmgxMmwtMSAxMmEyIDIgMCAwIDEtMiAySDlhMiAyIDAgMCAxLTItMkw2IDh6bTQgM3Y3aDJ2LTdoLTJ6bTQgMHY3aDJ2LTdoLTJ6bS00IDB2N2gydjdoLTJ6Ii8+CiAgPHBhdGggZD0iTTMgOGgxMHYybC0xIDEyYTIgMiAwIDAgMS0yIDJIOSBhMiAyIDAgMCAxLTItMkw2IDh6bTQgM3Y3aDJ2LTdoLTJ6bTQgMHY3aDJ2LTdoLTJ6bS00IDB2N2gxdjdoLTF6bS0zLTdsMS0xMmgydi0yaC02di0yaDYgMnptNSAwVjZoLTJ2MmgydjB6IiBmaWxsPSIjZWY0NDQ0Ii8+Cjwvc3ZnPg==";
+    const TARGET_ICON = "🎯";
+    let currentGoalClass = null;
+    function updateGoalHeading(name){
+      try{
+        const goalTitle = document.getElementById('goalsPageTitle');
+        if(goalTitle){
+          goalTitle.textContent = name ? (name + ' Soru Hedefleri') : 'Soru Hedefleri';
+          // mobilde header altındaki goals title güncelle
+          const headerGoals = document.querySelector('.header-goals-title');
+          if(headerGoals){
+            headerGoals.textContent = goalTitle.textContent;
+            headerGoals.style.display = name ? 'block' : 'none';
+          }
+        }
+      }catch(e){}
+    }
+    function openLessonGoalsPage(){
+      try{
+        const page = document.getElementById('goalsPage');
+        if(!page) return;
+        const st = document.getElementById('studentPanelTitle');
+        const goalTitle = document.getElementById('goalsPageTitle');
+        const list = document.getElementById('goalsClassList');
+        const container = document.getElementById('goalsPageContainer');
+        const closeBtn = document.getElementById('closeGoalsBtn');
+        if(!goalTitle || !list || !st || !container || !closeBtn) return;
+        page.style.display = 'block';
+        container.style.display = 'block';
+        st.textContent = 'Ders Hedefleri';
+        closeBtn.style.display = 'inline-block';
+        const firstClass = list.querySelector('button.pill');
+        firstClass ? firstClass.click() : (list.innerHTML = "<div class='empty'>Sınıf bulunamadı.</div>");
+      }catch(e){ /* no-op */}
+    }
+    function addGoalsClass(name, classKey){
+      try{
+        const list = document.getElementById('goalsClassList');
+        if(list){
+          const classBtn = document.createElement('button');
+          classBtn.className = 'pill';
+          classBtn.textContent = name;
+          classBtn.onclick = () => { selectGoalsClass(classKey, name); };
+          list.appendChild(classBtn);
+        }
+      }catch(e){ /* no-op */}
+    }
+    function selectGoalsClass(classKey, name){
+      if(!classKey) return;
+      currentGoalClass = classKey;
+      updateGoalHeading(name);
+      const list = document.getElementById('goalsList');
+      if(list){
+        list.innerHTML = '<div class="loader">Yükleniyor...</div>';
+      }
+      // Ders hedeflerini veritabanından al
+      db.ref('goals/'+classKey).get().then(snap=>{
+        if(list){
+          if(!snap.exists()){ list.innerHTML = "<div class='empty'>Hedef bulunamadı.</div>"; return; }
+          const data = snap.val();
+          // Listele
+          let html = '';
+          Object.keys(data).sort().forEach(title => {
+            html += '<div class="gp-row"><div>'+escHTML(title)+'</div><div>'+escHTML(data[title])+'</div></div>';
+          });
+          list.innerHTML = html || "<div class='empty'>Hedef bulunamadı.</div>";
+        }
+      }).catch(e=>{
+        if(list) list.innerHTML = "<div class='empty'>Hedef bulunamadı.</div>";
+      });
+    }
+    function showGoalsPage(show){
+      const sp = document.getElementById('studentPanel');
+      const gp = document.getElementById('goalsPage');
+      if(!sp || !gp) return;
+      if(show){
+        gp.style.display = 'block';
+        sp.style.display = 'none';
+      } else {
+        gp.style.display = 'none';
+        sp.style.display = 'block';
+      }
+    }
+    function closeGoalsPage(){
+      try{
+        document.getElementById('goalsPage').style.display='none';
+        document.getElementById('studentPanel').style.display='block';
+        document.getElementById('closeGoalsBtn').style.display='none';
+        document.getElementById('studentPanelTitle').textContent = 'Öğrenci Paneli';
+      }catch(e){}
+    }
+    function addGoalEntry(){
+      const title = document.getElementById('goalTitle');
+      const value = document.getElementById('goalValue');
+      if(!currentGoalClass || !title || !value) return;
+      const t = title.value.trim();
+      const v = Number(value.value);
+      if(!t){ setAlert("Hedef adı gerekli."); return; }
+      db.ref('goals/'+currentGoalClass+'/'+t).set(v).then(()=>{
+        title.value=''; value.value='';
+        selectGoalsClass(currentGoalClass, null);
+        setAlert("Hedef eklendi.");
+      }).catch(e=> setAlert("Hedef ekleme hatası: "+e.message));
+    }
+    function deleteGoalEntry(title){
+      if(!currentGoalClass || !title) return;
+      if(!confirm('"'+title+'" hedefini silmek istiyor musunuz?')) return;
+      db.ref('goals/'+currentGoalClass+'/'+title).remove().then(()=>{
+        selectGoalsClass(currentGoalClass, null);
+        setAlert("Hedef silindi.");
+      }).catch(e=> setAlert("Hedef silme hatası: "+e.message));
+    }
+    /* === Goals (Ders Hedefleri) Arayüz === */
+    function renderGoalsUI(className){
+      const main = document.getElementById('studentPanel');
+      const page = document.createElement('div');
+      page.id = 'goalsPage';
+      page.style.display='none';
+      page.innerHTML = `
+      <h3 id="studentPanelTitle" style="display:inline-block">Öğrenci Paneli</h3>
+      <h3 class="header-goals-title" style="display:none;"></h3>
+      <button class="pill exit" id="closeGoalsBtn" style="float:right; display:none" onclick="closeGoalsPage()">×</button>
+      <div id="goalsPageContainer" style="display:none; margin-top:12px">
+        <div class="list">
+          <div class="sectionTitle"><span id="goalsPageTitle">Soru Hedefleri</span></div>
+          <div class="twoCol" style="margin-bottom:8px">
+            <input autocomplete="off" id="goalTitle" placeholder="Hedef Adı" type="text"/>
+            <input autocomplete="off" id="goalValue" placeholder="Hedef Değeri" type="number"/>
           </div>
+          <div class="smallRow">
+            <button class="pill" id="goalAddBtn" onclick="addGoalEntry()" type="button">Ekle</button>
+          </div>
+          <div id="goalsList"></div>
         </div>
-        <div id="weekChartWrap"><canvas id="weekChart" height="140"></canvas></div>
-        <div id="weekMatrix" class="exportCard" style="margin-top:10px"></div>
-        <div class="ghost" id="weekHint" style="margin-top:6px">Not: Haftalar, verinin en eski tarihinden başlayarak pazartesi–pazar aralığına göre numaralandırılır.</div>
-      </div>
-    </div>
-
-    <button type="button" class="action logout" style="margin-top:16px" onclick="logout()">Çıkış Yap</button>
-  </div>
-
-  <div id="exportArea" style="position:absolute; left:-99999px; top:-99999px">
-    <div id="exportHead">
-      <h1>Haftalık Gelişim Raporu</h1>
-      <span id="exportRange" style="color:#a5b4fc;font-weight:700;"></span>
-    </div>
-    <h2 id="exportStudent"></h2>
-    <div class="exportCard" style="margin-bottom:10px">
-      <canvas id="exportChart" height="260"></canvas>
-    </div>
-    <div id="exportTable" class="exportCard"></div>
-    <div id="exportLegend">Ders × Gün matrisi (Pzt–Paz). Renkler ve tipografi PDF için optimize edilmiştir.</div>
-  </div>
-
-  <div class="footer">Tasarlayan Uğur Yaşayan</div>
-
-  <script>
-    /* ============ Firebase Config ============ */
-    // İSTENEN ADRES: sorutakipsistemi Realtime DB (europe-west1)
-    const firebaseConfig = {
-      apiKey: "AIzaSyD-D-Jp8GDuoc2b-My7cOpSViRyrcAypX0",
-      authDomain: "kocluksistemi-69e89.firebaseapp.com",
-      databaseURL: "https://sorutakipsistemi-default-rtdb.europe-west1.firebasedatabase.app/",
-      projectId: "kocluksistemi-69e89",
-      storageBucket: "kocluksistemi-69e89.appspot.com",
-      messagingSenderId: "1025155254767",
-      appId: "1:1025155254767:web:492d53b2d6f36d0ea88e1a",
-      measurementId: "G-PZMLQHZP2L"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    /* ============ Global Durum ============ */
-    let currentStudent=null;
-    let currentTeacherId=null, currentTeacherName=null;
-    let favoritesCache={}, classesMap={}, activeClassName=null, currentDetailNum=null;
-    let currentDetailLessons=null, currentWeeks=[], selectedWeekKey=null, weekChart=null;
-
+        <div class="list">
+          <div class="sectionTitle">Sınıflar</div>
+          <div id="goalsClassList" class="classesTable"></div>
+        </div>
+      </div>`;
+      // main parentine sayfayı ekle
+      main.parentNode.insertBefore(page, main);
+      // buton ekle (Stu panelde)
+      const stuPanelTitle = document.getElementById('studentPanelTitle') || document.querySelector('#studentPanel h3');
+      if(stuPanelTitle){
+        stuPanelTitle.insertAdjacentHTML('afterend', \`<button class="pill" style="float:right" onclick="showGoalsPage(true)">🎯 Ders Hedefleri</button>\`);
+      }
+      // teacher panel title (className param)
+      const teacherPanelTitle = document.getElementById('teacherPanelTitle');
+      teacherPanelTitle.innerHTML = \`Öğretmen Paneli – <span style="font-weight:normal; opacity:.8">${escHTML(className)}</span>\`;
+    }
+    /* === Chart ve Öğrenci verileri (Teacher) === */
+    let stuDataCache = {};
+    function prepareStudentReports(lessons){
+      // Veriyi yıla göre gruplamak için yardımcı (sadece haftalık)
+      function _groupByWeek(data){
+        if(!data) return {};
+        const weeks = {};
+        for(const subject in data){
+          for(const key in data[subject]){
+            const entry = data[subject][key];
+            const [date] = (entry.time||'').split(' ');
+            if(!date) continue;
+            // ISO week number al
+            const week = getISOWeek(date);
+            const y = new Date(date.split('.').reverse().join('-')).getFullYear();
+            const yearWeekKey = y+'-W'+week;
+            if(!weeks[yearWeekKey]) weeks[yearWeekKey] = {};
+            if(!weeks[yearWeekKey][subject]) weeks[yearWeekKey][subject] = 0;
+            weeks[yearWeekKey][subject] += Number(entry.count)||0;
+          }
+        }
+        return weeks;
+      }
+      // Haftalık ve aylık verileri hazırla
+      try{
+        _stuWeeks = [];
+        _stuMonths = [];
+        const allWeeks = _groupByWeek(lessons);
+        const allMonths = {};
+        // Toplamları topla (Tüm haftalar/tüm aylar)
+        for(const wk in allWeeks){
+          const total = Object.values(allWeeks[wk]).reduce((a,b)=>a+b,0);
+          _stuWeeks.push({ label: wk, total });
+        }
+        for(const subject in lessons){
+          for(const key in lessons[subject]){
+            const entry = lessons[subject][key];
+            const [date] = (entry.time||'').split(' ');
+            if(!date) continue;
+            const ym = date.split('.').reverse().slice(0,2).join('-'); // "YYYY-MM"
+            if(!allMonths[ym]) allMonths[ym] = 0;
+            allMonths[ym] += Number(entry.count)||0;
+          }
+        }
+        for(const ym in allMonths){
+          _stuMonths.push({ label: ym, total: allMonths[ym] });
+        }
+        _stuWeeks.sort((a,b)=> a.label.localeCompare(b.label));
+        _stuMonths.sort((a,b)=> a.label.localeCompare(b.label));
+      }catch(e){ _stuWeeks=[]; _stuMonths=[]; }
+    }
+    function destroyWeekChart(){
+      if(stuWeekChart){ stuWeekChart.destroy(); stuWeekChart = null; }
+      if(stuMonthChart){ stuMonthChart.destroy(); stuMonthChart = null; }
+    }
+    function renderStudentCharts(){
+      const weekCtx = document.getElementById('stuWeekChart');
+      const monthCtx = document.getElementById('stuMonthChart');
+      if(weekCtx && !_stuWeeks.length) weekCtx.parentNode.style.display = 'none'; else if(weekCtx) weekCtx.parentNode.style.display = 'block';
+      if(monthCtx && !_stuMonths.length) monthCtx.parentNode.style.display = 'none'; else if(monthCtx) monthCtx.parentNode.style.display = 'block';
+      if(weekCtx){
+        stuWeekChart = new Chart(weekCtx, {
+          type: 'bar',
+          data: {
+            labels: _stuWeeks.map(o=>o.label),
+            datasets: [{
+              label: 'Haftalık Çözüm',
+              data: _stuWeeks.map(o=>o.total),
+              backgroundColor: 'rgba(59, 130, 246, 0.5)',
+              borderColor: 'rgba(59, 130, 246, 1)',
+              borderWidth: 1
+            }]
+          },
+          options: { responsive: true, maintainAspectRatio: false }
+        });
+      }
+      if(monthCtx){
+        stuMonthChart = new Chart(monthCtx, {
+          type: 'bar',
+          data: {
+            labels: _stuMonths.map(o=>o.label),
+            datasets: [{
+              label: 'Aylık Çözüm',
+              data: _stuMonths.map(o=>o.total),
+              backgroundColor: 'rgba(134, 239, 172, 0.5)',
+              borderColor: 'rgba(16, 185, 129, 1)',
+              borderWidth: 1
+            }]
+          },
+          options: { responsive: true, maintainAspectRatio: false }
+        });
+      }
+    }
+    function exitStudentPanel(){
+      document.getElementById('studentPanel').style.display = 'none';
+      document.getElementById('loginPanel').style.display = 'block';
+    }
+    function enterAsStudent(){
+      // Yeni oturum: temp verileri temizle
+      currentStudent = null; currentStudentName = null;
+      // Studenta geçiş: login paneli gizle, student paneli göster
+      document.getElementById('loginPanel').style.display='none';
+      document.getElementById('studentPanel').style.display='block';
+      document.getElementById('studentWelcome').style.display = 'none';
+      document.getElementById('stuEntrySection').style.display = 'block';
+      document.getElementById('stuWeekSection').style.display = 'none';
+      document.getElementById('stuMonthSection').style.display = 'none';
+      document.getElementById('stuTabEntryBtn').classList.add('active');
+      document.getElementById('stuTabWeekBtn').classList.remove('active');
+      document.getElementById('stuTabMonthBtn').classList.remove('active');
+      try{ if(typeof renderGoalsUI === 'function') renderGoalsUI("Alparslan Ortaokulu"); }catch(e){}
+      try{ setWelcomeStudentBanner(); }catch(e){}
+    }
+    function enterAsParent(){ enterAsStudent(); }
+    function enterAsTeacher(){
+      // Login paneli gizle, teacher paneli göster
+      document.getElementById('loginPanel').style.display='none';
+      document.getElementById('teacherPanel').style.display='block';
+      // Tüm verileri temizle
+      currentTeacherId=null; currentTeacherName=null; favoritesCache={};
+      ["rName","rNumber","rPass","rPass2","lNumber","lPass","tName","tCode","newClass"].forEach(id=>{const el=document.getElementById(id); if(el) el.value="";});
+      // Sınıfları yükle
+      listenClasses();
+      listenFavorites();
+    }
+    function exitToHome(){
+      // Role seçimi panelinden geri çıkış
+      document.getElementById('roleChoice').style.display = 'none';
+      document.getElementById('loginPanel').style.display = 'block';
+    }
+    function exitTeacherPanel(){
+      document.getElementById('teacherPanel').style.display = 'none';
+      document.getElementById('loginPanel').style.display = 'block';
+      // event detach (dinleyicileri kapat)
+      try{ if(classesRef) classesRef.off(); }catch(e){}
+      try{ if(favRef) favRef.off(); }catch(e){}
+    }
+    function showStudentTab(tab){
+      document.getElementById('stuEntrySection').style.display = (tab==='entry') ? 'block' : 'none';
+      document.getElementById('stuWeekSection').style.display = (tab==='week') ? 'block' : 'none';
+      document.getElementById('stuMonthSection').style.display = (tab==='month') ? 'block' : 'none';
+      document.getElementById('stuTabEntryBtn').classList.toggle('active', tab==='entry');
+      document.getElementById('stuTabWeekBtn').classList.toggle('active', tab==='week');
+      document.getElementById('stuTabMonthBtn').classList.toggle('active', tab==='month');
+      if(tab==='week' && (!_stuWeeks || !_stuWeeks.length) && window._studentLessons){
+        prepareStudentReports(window._studentLessons);
+        renderStudentCharts();
+      }
+      if(tab==='month' && (!_stuMonths || !_stuMonths.length) && window._studentLessons){
+        if(!_stuWeeks || !_stuWeeks.length){
+          prepareStudentReports(window._studentLessons);
+        }
+        renderStudentCharts();
+      }
+    }
+    function showTeacherSection(sec){
+      const tabClasses = document.getElementById('tabClasses');
+      const tabFavorites = document.getElementById('tabFavorites');
+      const classesSection = document.getElementById('classesSection');
+      const favoritesSection = document.getElementById('favoritesSection');
+      if(sec==='classes'){
+        classesSection.style.display='block'; favoritesSection.style.display='none';
+        tabClasses.classList.add('active'); tabFavorites.classList.remove('active');
+      }else{
+        classesSection.style.display='none'; favoritesSection.style.display='block';
+        tabFavorites.classList.add('active'); tabClasses.classList.remove('active');
+      }
+    }
+    function studentRegister(){
+      const name = (document.getElementById('rName').value||'').trim();
+      const className = document.getElementById('rClass').value;
+      const number = (document.getElementById('rNumber').value||'').trim();
+      const pass = document.getElementById('rPass').value;
+      const pass2 = document.getElementById('rPass2').value;
+      if(!name || !className || !number || !pass){ setAlert("Lütfen tüm alanları doldurun."); return; }
+      if(pass !== pass2){ document.getElementById('passMismatchError').style.display = 'block'; return; } else { document.getElementById('passMismatchError').style.display = 'none'; }
+      const stuKey = normalizeId(name);
+      if(!stuKey){ setAlert("Geçerli bir ad giriniz."); return; }
+      const studentsRef = db.ref("students");
+      studentsRef.get().then(snap=>{
+        if(snap.child(number).exists()){ setAlert("Bu okul numarasıyla kayıtlı öğrenci var."); return; }
+        const studentData = { name, class: className, pass };
+        studentsRef.child(number).set(studentData).then(()=>{
+          setAlert("Kayıt başarılı.");
+          document.getElementById('rName').value='';
+          document.getElementById('rClass').selectedIndex = 0;
+          document.getElementById('rNumber').value='';
+          document.getElementById('rPass').value='';
+          document.getElementById('rPass2').value='';
+          enterAsStudent();
+          currentStudent = number;
+          currentStudentName = name;
+          setWelcomeStudentBanner();
+        }).catch(e=> setAlert("Kayıt hatası: "+e.message));
+      });
+    }
+    function studentLogin(){
+      const number = (document.getElementById('lNumber').value||'').trim();
+      const pass = document.getElementById('lPass').value;
+      if(!number || !pass){ setAlert("Lütfen tüm alanları doldurun."); return; }
+      db.ref("students/"+number).get().then(snap=>{
+        if(!snap.exists()){ setAlert("Bu numarada kayıtlı öğrenci bulunamadı."); return; }
+        const s = snap.val();
+        if(pass !== s.pass){ setAlert("Şifre hatalı."); return; }
+        setAlert("Giriş başarılı.");
+        currentStudent = number;
+        currentStudentName = s.name;
+        enterAsStudent();
+        setWelcomeStudentBanner();
+        // Verileri önceden yükle (haftalık-aylık raporlar için)
+        db.ref("students/"+number+"/lessons").get().then(snap=>{
+          if(snap.exists()){ window._studentLessons = snap.val(); }
+        });
+      }).catch(e=> setAlert("Giriş hatası: "+e.message));
+    }
+    function teacherLogin(){
+      const name = (document.getElementById('tName').value||'').trim();
+      const code = document.getElementById('tCode').value;
+      if(!name || !code){ setAlert("Lütfen tüm alanları doldurun."); return; }
+      if(code!=="703504"){ setAlert("Kod hatalı."); return; }
+      currentTeacherName = name;
+      currentTeacherId = normalizeId(name);
+      if(!currentTeacherId){ setAlert("Geçerli bir ad giriniz."); return; }
+      setAlert("Giriş başarılı.");
+      enterAsTeacher();
+    }
+    function normalizeId(name){
+      // Türkçe karakter dönüştürme ve normalizasyon
+      const trMap = { 'ç':'c','Ç':'c','ğ':'g','Ğ':'g','ı':'i','İ':'i','ö':'o','Ö':'o','ş':'s','Ş':'s','ü':'u','Ü':'u' };
+      const norm = (name||'').replace(/[\u0300-\u036f]/g, '').replace(/./g, c=> trMap[c] || c);
+      const lower = norm.toLowerCase().replace(/[^a-z0-9]/g, '');
+      return lower || null;
+    }
     /* ============ Yardımcılar ============ */
     function setAlert(msg){
       const a=document.getElementById('alert');
@@ -326,505 +761,267 @@
       a.textContent=msg; a.style.display='block';
       setTimeout(()=>{ a.style.display='none'; }, 3500);
     }
-    function showTab(tab){
-      ["register","studentLogin","teacherLogin"].forEach(id=>{
-        document.getElementById(id).style.display = (id===tab) ? "block" : "none";
-      });
-      document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));
-      if(tab==="register") document.getElementById("tabRegister").classList.add("active");
-      if(tab==="studentLogin") document.getElementById("tabStudent").classList.add("active");
-      if(tab==="teacherLogin") document.getElementById("tabTeacher").classList.add("active");
+    function escHTML(str){ return (str||'').replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+    function escAttr(str){ return (str||'').replace(/"/g, '&quot;'); }
+    function toTitleCaseTR(str){
+      // Türkçe için özel bir Title Case: kelime başlarını büyük yap
+      return (str||'').toLowerCase().split(' ').map(w=> w.charAt(0).toUpperCase()+w.slice(1)).join(' ');
     }
-    function normalizeId(str){
-      if(!str) return "";
-      const map={'ç':'c','ğ':'g','ı':'i','i':'i','ö':'o','ş':'s','ü':'u','Ç':'c','Ğ':'g','İ':'i','I':'i','Ö':'o','Ş':'s','Ü':'u'};
-      return str.trim().toLowerCase()
-        .replace(/[çğıİiöşüÇĞIÖŞÜ]/g, m=>map[m]||m)
-        .replace(/[^a-z0-9]+/g,'-')
-        .replace(/^-+|-+$/g,'');
+    function getISOWeek(dateStr){
+      const date = new Date(dateStr.split('.').reverse().join('-'));
+      // Yılın ilk Perşembe'sini bul
+      const target = new Date(date.valueOf());
+      const dayNr = (date.getDay() + 6) % 7;
+      target.setDate(target.getDate() - dayNr + 3);
+      const firstThursday = target.valueOf();
+      target.setMonth(0, 1);
+      if(target.getDay() !== 4){
+        target.setMonth(0, 1 + ((4 - target.getDay()) + 7) % 7);
+      }
+      const weekNumber = 1 + Math.round((firstThursday - target) / 604800000);
+      return weekNumber;
     }
-    function capitalizeName(name) {
-        if(!name) return "";
-        return name.toLowerCase().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-    }
-
-    /* ============ Öğrenci kayıt & giriş ============ */
-    async function studentRegister(){
-      const nameInput = document.getElementById("rName").value.trim();
-      const sclass=document.getElementById("rClass").value;
-      const num=document.getElementById("rNumber").value.trim();
-      const pass=document.getElementById("rPass").value;
-
-      if(!nameInput||!sclass||!num||!pass){setAlert("Tüm alanları doldurun.");return;}
-
-      const name = capitalizeName(nameInput);
-      
-      try {
-        const snap = await db.ref("students").get();
-        if (snap.exists()) {
-            const students = snap.val();
-            let numExists = false;
-            let nameExists = false;
-            for(const key in students) {
-                if(students[key].num === num) numExists = true;
-                if(students[key].name.toLowerCase() === name.toLowerCase()) nameExists = true;
-            }
-            if(numExists) { setAlert("Bu okul numarası zaten kayıtlı."); return; }
-            if(nameExists) { setAlert("Bu isimde bir öğrenci zaten mevcut."); return; }
-        }
-        await db.ref("students/"+num).set({name,sclass,num,pass});
-        setAlert("Kayıt başarılı! Giriş yapabilirsiniz.");
-        showTab("studentLogin");
-      } catch(e) {
-        setAlert("Hata: "+e.message)
+    function setStudentTargetInfo(val){
+      const box = document.getElementById('studentTargetInfo');
+      const span = document.getElementById('studentTargetValue');
+      if(!box || !span) return;
+      if(val===null || val===undefined || isNaN(Number(val))){
+        box.style.display='none'; span.textContent='—';
+      }else{
+        span.textContent = String(val);
+        box.style.display='flex';
       }
     }
-
-    function studentLogin(){
-      const num=document.getElementById("lNumber").value.trim();
-      const pass=document.getElementById("lPass").value;
-      db.ref("students/"+num).get().then(snap=>{
-        if(snap.exists()&&snap.val().pass===pass){
-          currentStudent=num;
-          document.getElementById("loginPanel").style.display="none";
-          document.getElementById("studentPanel").style.display="block";
-          document.getElementById("lPass").value="";
-          loadStudentData();
-          calculateAndDisplaySOTW();
-          setupDatePicker();
-          calculateAndDisplayStudentStats();
-        }else setAlert("Numara veya şifre hatalı.");
-      });
+    function loadStudentTarget(){
+      if(!currentStudent) { setStudentTargetInfo(null); return; }
+      db.ref("students/"+currentStudent+"/dailyTarget").get().then(snap=>{
+        setStudentTargetInfo(snap.exists()? Number(snap.val())||0 : null);
+      }).catch(()=> setStudentTargetInfo(null));
     }
-    function logout(){
-      currentStudent=null; currentDetailNum=null;
-      currentTeacherId=null; currentTeacherName=null; favoritesCache={};
-      ["rName","rNumber","rPass","lNumber","lPass","tName","tCode","newClass"].forEach(id=>{const el=document.getElementById(id); if(el) el.value="";});
-      ["studentPanel","teacherPanel","teacherStudentDetail"].forEach(id=>document.getElementById(id).style.display="none");
-      document.getElementById("loginPanel").style.display="block";
-      showTab("studentLogin");
-      destroyWeekChart();
+    function openTargetModal(num, name){
+      try{ currentTargetEditNum = String(num||""); }catch(_){}
+      try{ currentStudent = String(num||""); }catch(_){}
+      // Öğrenci sayfasına geç ve Ders Hedefleri sayfasını aç
+      try{ enterAsStudent(); }catch(_){}
+      try{ if(typeof openLessonGoalsPage === 'function') openLessonGoalsPage(); }catch(_){}
     }
-
-    /* ============ Öğrenci Paneli ============ */
-    function setupDatePicker() {
-        const datePicker = document.getElementById('entryDate');
-        const today = new Date();
-        const startOfWeek = mondayOf(today);
-        const formatDate = (d) => d.toISOString().split('T')[0];
-        datePicker.min = formatDate(startOfWeek);
-        datePicker.max = formatDate(today);
-        datePicker.value = formatDate(today);
+    function closeTargetModal(){ try{ /* no-op: legacy */ }catch(_){} }
+    function saveTarget(){ try{ /* no-op: legacy */ }catch(_){} }
+    function closeTargetModal(){
+      const m = document.getElementById('targetModal');
+      if(m) m.style.display='none';
     }
-
-    function addAll(){
-      if(!currentStudent){ setAlert("Oturum bulunamadı."); return; }
-      
-      const datePicker = document.getElementById('entryDate');
-      if(!datePicker.value) { setAlert("Lütfen geçerli bir tarih seçin."); return; }
-      const selectedDate = new Date(datePicker.value);
-      const userTimezoneOffset = selectedDate.getTimezoneOffset() * 60000;
-      const correctedDate = new Date(selectedDate.getTime() + userTimezoneOffset);
-      const timeStr = correctedDate.toLocaleDateString("tr-TR") + " " + new Date().toLocaleTimeString("tr-TR");
-
-      const map={"Türkçe":"Turkce","Sosyal Bilgiler":"Sosyal","Din Kültürü":"Din","İngilizce":"Ingilizce","Matematik":"Matematik","Fen Bilimleri":"Fen"};
-      let hasData = false;
-      for(const lesson in map){
-        let v=parseInt(document.getElementById(map[lesson]).value);
-        if(!isNaN(v) && v > 0) {
-            hasData = true;
-            db.ref(`students/${currentStudent}/lessons/${lesson}`).push({count:v,time:timeStr});
+    function saveTarget(){
+      const input = document.getElementById('targetInput');
+      const val = Number(input && input.value ? input.value : 0);
+      if(!currentTargetEditNum){ setAlert("Öğrenci bulunamadı."); return; }
+      db.ref("students/"+currentTargetEditNum+"/dailyTarget").set(val).then(()=>{
+        setAlert("Hedef güncellendi.");
+        // Eğer güncellediğimiz mevcut öğrenci ise ekranda göster
+        if(currentStudent && String(currentStudent)===String(currentTargetEditNum)){
+          setStudentTargetInfo(val);
         }
-      }
-      if(hasData) {
-        setAlert("Kayıt eklendi!");
-        document.getElementById("lessonForm").reset();
-        setupDatePicker();
-        loadStudentData(); calculateAndDisplaySOTW(); calculateAndDisplayStudentStats();
-      } else { setAlert("Lütfen en az bir derse çözülen soru sayısını girin."); }
+        closeTargetModal();
+      }).catch(e=> setAlert("Kayıt hatası: "+e.message));
     }
-    
-    async function calculateAndDisplayStudentStats() {
-        const container = document.getElementById('studentStatsContainer');
-        if (!currentStudent || !container) return;
-        container.innerHTML = "İstatistikler hesaplanıyor...";
-
-        const now = new Date();
-        const startOfWeek = mondayOf(now);
-        const endOfWeek = addDays(new Date(startOfWeek), 6); endOfWeek.setHours(23, 59, 59, 999);
-        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0); endOfMonth.setHours(23, 59, 59, 999);
-
-        const weeklyTotals = {}, monthlyTotals = {};
-        const allLessons = ["Türkçe","Sosyal Bilgiler","Din Kültürü","İngilizce","Matematik","Fen Bilimleri"];
-        allLessons.forEach(l => { weeklyTotals[l] = 0; monthlyTotals[l] = 0; });
-
-        const snap = await db.ref(`students/${currentStudent}/lessons`).get();
-        if (snap.exists()) {
-            const lessonsData = snap.val();
-            for (const lesson in lessonsData) {
-                for (const key in lessonsData[lesson]) {
-                    const entry = lessonsData[lesson][key];
-                    const entryDate = parseTRDateStr((entry.time || "").split(" ")[0]);
-                    if (isNaN(entryDate)) continue;
-                    const count = Number(entry.count) || 0;
-                    if (entryDate >= startOfWeek && entryDate <= endOfWeek) { weeklyTotals[lesson] += count; }
-                    if (entryDate >= startOfMonth && entryDate <= endOfMonth) { monthlyTotals[lesson] += count; }
-                }
-            }
-        }
-        const buildTableHTML = (totals) => {
-            let table = '<table><tbody>';
-            allLessons.forEach(l => { if(totals[l] > 0) table += `<tr><td>${l}</td><td>${totals[l]}</td></tr>`; });
-            return table + '</tbody></table>';
-        };
-        container.innerHTML = `
-            <div class="statBox">
-                <div class="label">Bu Hafta</div>
-                ${buildTableHTML(weeklyTotals)}
-            </div>
-            <div class="statBox">
-                <div class="label">Bu Ay</div>
-                ${buildTableHTML(monthlyTotals)}
-            </div>`;
-    }
-
-    function loadStudentData(){
-      const box=document.getElementById("studentRecords");
-      box.innerHTML="Yükleniyor...";
-      db.ref("students/"+currentStudent+"/lessons").get().then(snap=>{
-        if(!snap.exists()){ box.innerHTML="<div class='empty'>Henüz veri yok.</div>"; return; }
-        const data=snap.val();
-        const grouped={};
-        for(const lesson in data){
-          for(const key in data[lesson]){
-            const e=data[lesson][key];
-            const day=(e.time||"").split(" ")[0]||"Bilinmeyen";
-            if(!grouped[day]) grouped[day]={};
-            if(!grouped[day][lesson]) grouped[day][lesson]=[];
-            grouped[day][lesson].push({count:e.count, key});
+    function setWelcomeStudentBanner(){
+      try{
+        var box = document.getElementById('studentWelcome');
+        if(!box) return;
+        var name = currentStudentName;
+        function apply(nm){
+          var pretty = toTitleCaseTR(nm||'').trim();
+          if(pretty){
+            box.textContent = 'Sayfana hoş geldin ' + pretty + '.';
+            box.style.display = 'block';
+          }else{
+            box.style.display = 'none';
           }
         }
-        box.innerHTML="";
-        const sortedDays = Object.keys(grouped).sort((a,b)=> parseTRDateStr(b) - parseTRDateStr(a));
-        sortedDays.forEach(day=>{
-          box.innerHTML+=`<button type="button" class="dayBtn" onclick="showDay('${day}')">${day}</button>
-                            <div id="day-${day}" class="dayDetails" style="display:none"></div>`;
-        });
-        window._grouped=grouped;
-      });
-    }
-
-    function showDay(day){
-      const details=window._grouped[day];
-      let html="<table><tr><th>Ders</th><th>Toplam Soru</th><th>İşlem</th></tr>";
-      for(const lesson in details){
-        const totalCount = details[lesson].reduce((sum, item) => sum + (item.count || 0), 0);
-        html+=`<tr>
-            <td>${lesson}</td>
-            <td>${totalCount}</td>
-            <td><button type="button" class="editBtn" onclick="editDailyTotal('${lesson}','${day}', ${totalCount})">Düzenle</button></td>
-          </tr>`;
-      }
-      html+="</table>";
-      const el=document.getElementById("day-"+day);
-      el.innerHTML=html;
-      el.style.display = (el.style.display==="none"||!el.style.display) ? "block" : "none";
-    }
-    
-    async function editDailyTotal(lesson, day, oldTotal) {
-        let newTotal = prompt(`'${day}' tarihindeki '${lesson}' dersi için yeni toplam soru sayısını girin:`, oldTotal);
-        if (newTotal === null) return;
-        newTotal = parseInt(newTotal);
-        if(isNaN(newTotal) || newTotal < 0) { setAlert("Lütfen geçerli bir sayı girin."); return; }
-
-        try {
-            const lessonRef = db.ref(`students/${currentStudent}/lessons/${lesson}`);
-            const snap = await lessonRef.get();
-            const updates = {};
-            if (snap.exists()) {
-                snap.forEach(childSnap => {
-                    const entry = childSnap.val();
-                    const entryDay = (entry.time || "").split(" ")[0];
-                    if (entryDay === day) { updates[childSnap.key] = null; }
-                });
+        if(name){ apply(name); return; }
+        // Eğer isim henüz yoksa, öğrenciyi DB'den çek
+        if(currentStudent){
+          firebase.database().ref('students/' + currentStudent).get().then(function(snap){
+            if(snap && snap.exists()){
+              currentStudentName = (snap.val() && snap.val().name) ? snap.val().name : null;
+              apply(currentStudentName);
+            }else{
+              box.style.display='none';
             }
-            await lessonRef.update(updates);
-            if (newTotal > 0) {
-                const timeStr = `${day} ${new Date().toLocaleTimeString('tr-TR')}`;
-                await lessonRef.push({ count: newTotal, time: timeStr });
-            }
-            setAlert("Güncelleme başarılı!");
-            loadStudentData(); calculateAndDisplaySOTW(); calculateAndDisplayStudentStats();
-        } catch(e) { setAlert("Güncelleme sırasında hata: " + e.message); }
-    }
-
-    /* ============ Öğretmen Paneli ============ */
-    function teacherLogin(){
-      const nameInput = document.getElementById("tName").value.trim();
-      const name = capitalizeName(nameInput);
-      const code=document.getElementById("tCode").value;
-      if(!name || !code){ setAlert("Ad Soyad ve kod gerekli."); return; }
-      if(code!=="703504"){ setAlert("Kod hatalı."); return; }
-      
-      currentTeacherName = name;
-      currentTeacherId = normalizeId(name);
-      if(!currentTeacherId){ setAlert("Geçerli bir ad giriniz."); return; }
-
-      db.ref("teachers/"+currentTeacherId).set({ name: currentTeacherName, createdAt: firebase.database.ServerValue.TIMESTAMP }).catch(()=>{});
-      document.getElementById("teacherWelcome").textContent = `Hoş geldiniz, ${currentTeacherName}`;
-      document.getElementById("loginPanel").style.display="none";
-      document.getElementById("teacherPanel").style.display="block";
-
-      listenClasses();
-      listenFavorites();
-      calculateAndDisplaySOTW();
-    }
-    
-    async function calculateAndDisplaySOTW() {
-        const teacherBox = document.getElementById('sotwContainerTeacher');
-        const studentBox = document.getElementById('sotwContainerStudent');
-        const loadingHTML = "🏆 Haftanın Yıldızı Hesaplanıyor...";
-        if (teacherBox) teacherBox.innerHTML = loadingHTML;
-        if (studentBox) studentBox.innerHTML = loadingHTML;
-
-        const now = new Date();
-        const startOfWeek = mondayOf(now);
-        const endOfWeek = addDays(new Date(startOfWeek), 6); endOfWeek.setHours(23, 59, 59, 999);
-
-        try {
-            const studentsSnap = await db.ref("students").get();
-            if (!studentsSnap.exists()) {
-                const noDataHTML = "🏆 Henüz öğrenci verisi yok.";
-                if (teacherBox) teacherBox.innerHTML = noDataHTML;
-                if (studentBox) studentBox.innerHTML = noDataHTML;
-                return;
-            }
-
-            let topStudent = { name: '?', score: 0 };
-            const studentsData = studentsSnap.val();
-
-            for (const studentNum in studentsData) {
-                const student = studentsData[studentNum];
-                if (!student || !student.name) continue;
-
-                let weeklyScore = 0;
-                if (student.lessons) {
-                    for (const lesson in student.lessons) {
-                        for (const entryKey in student.lessons[lesson]) {
-                            const entry = student.lessons[lesson][entryKey];
-                            const timeStr = (entry.time || "").split(" ")[0];
-                            if (!timeStr) continue;
-                            const entryDate = parseTRDateStr(timeStr);
-                            if (!isNaN(entryDate) && entryDate >= startOfWeek && entryDate <= endOfWeek) {
-                                weeklyScore += Number(entry.count) || 0;
-                            }
-                        }
-                    }
-                }
-                if (weeklyScore > topStudent.score) { topStudent = { name: student.name, score: weeklyScore }; }
-            }
-
-            let resultHTML = (topStudent.score > 0)
-              ? `🏆 Haftanın Yıldızı: <span>${topStudent.name}</span> (${topStudent.score} Soru)`
-              : "🏆 Bu hafta henüz soru çözülmedi.";
-            if (teacherBox) teacherBox.innerHTML = resultHTML;
-            if (studentBox) studentBox.innerHTML = resultHTML;
-        } catch (error) {
-            console.error("Haftanın yıldızı hesaplanırken hata:", error);
-            const errorHTML = "🏆 Bilgiler alınamadı.";
-            if (teacherBox) teacherBox.innerHTML = errorHTML;
-            if (studentBox) studentBox.innerHTML = errorHTML;
+          }).catch(function(){ box.style.display='none'; });
+        }else{
+          box.style.display='none';
         }
+      }catch(e){ /* no-op */ }
     }
-
     function addClass(){
-      const cls=document.getElementById("newClass").value.trim();
-      if(!cls){ setAlert("Sınıf adı girin (örn: 8/A)."); return; }
-      db.ref("classes").orderByChild("name").equalTo(cls).get().then(s=>{
-        if(s.exists()){ setAlert("Bu sınıf zaten ekli."); return; }
-        return db.ref("classes").push({name:cls,createdAt:firebase.database.ServerValue.TIMESTAMP});
-      }).then(()=>{ document.getElementById("newClass").value=""; });
+      const className = (document.getElementById('newClass').value||'').trim();
+      if(!className){ setAlert("Sınıf adı giriniz."); return; }
+      const ref = db.ref("classes/"+currentTeacherId);
+      // Aynı adda sınıf var mı kontrol
+      ref.orderByValue().equalTo(className).once('value').then(snap=>{
+        if(snap.exists()){ setAlert("Bu adla bir sınıf zaten var."); return; }
+        ref.push(className).then(()=>{
+          setAlert("Sınıf eklendi.");
+          document.getElementById('newClass').value = '';
+        }).catch(e=> setAlert("Ekleme hatası: "+e.message));
+      });
     }
-    function deleteClassByName(name){
-      if(currentTeacherName !== "Uğur Yaşayan"){
-          setAlert("Sadece yetkili öğretmenler sınıf silebilir.");
-          return;
-      }
-      const classId = classesMap[name];
-      if(!classId){ setAlert("Sınıf id bulunamadı."); return; }
-      if(!confirm(`"${name}" sınıfını silmek istiyor musunuz?`)) return;
-      db.ref("classes/"+classId).remove()
-        .then(()=>{ setAlert("Sınıf silindi."); if(activeClassName===name){ activeClassName=null; document.getElementById("classStudents").style.display="none"; document.getElementById("teacherStudentDetail").style.display="none"; } })
-        .catch(e=>setAlert("Silme hatası: "+e.message));
-    }
-
     function listenClasses(){
-      db.ref("classes").on("value",snap=>{
-        classesMap = {};
-        const names=[]; 
-        snap.forEach(ch=>{const v=ch.val(); if(v&&v.name){ names.push(v.name); classesMap[v.name]=ch.key; }});
-
-        const grid=document.getElementById("classGrid"); grid.innerHTML="";
-        if(!names.length){ grid.innerHTML="<div class='empty' style='grid-column:1/-1'>Henüz sınıf yok.</div>"; document.getElementById("classStudents").style.display="none"; }
-
-        names.sort().forEach(name=>{
-          const card=document.createElement("div"); card.className="classCard";
-          const title=document.createElement("div"); title.className="className"; title.textContent=name;
-          const pick=document.createElement("button"); pick.className="classPick"; pick.textContent="Öğrencileri Gör";
-          pick.onclick=()=>{
-            activeClassName=name;
-            document.querySelectorAll(".classPick").forEach(b=>b.classList.remove("active"));
-            pick.classList.add("active");
-            selectClass(name);
-          };
-
-          if(currentTeacherName === 'Uğur Yaşayan'){
-            const del=document.createElement("button"); del.className="delFloat"; del.textContent="🗑️ Sil";
-            del.onclick=(e)=>{ e.stopPropagation(); deleteClassByName(name); };
-            card.appendChild(del);
-          }
-          card.appendChild(title);
-          card.appendChild(pick);
-          grid.appendChild(card);
-        });
-
-        const sel=document.getElementById("rClass"); const keep=sel.value;
-        sel.innerHTML="<option value=''>Sınıf Seçin</option>";
-        names.forEach(n=>{const o=document.createElement("option"); o.value=n; o.text=n; sel.add(o);});
-        if(names.includes(keep)) sel.value=keep;
-
-        if(activeClassName && names.includes(activeClassName)){
-          const btn=[...document.querySelectorAll(".classPick")].find(b=>b.parentElement.querySelector(".className").textContent===activeClassName);
-          if(btn){ btn.classList.add("active"); selectClass(activeClassName); }
-        } else {
-            activeClassName = null;
-            document.getElementById("classStudents").style.display="none";
-        }
+      const ref = db.ref("classes/"+currentTeacherId);
+      if(classesRef){ classesRef.off(); }
+      classesRef = ref;
+      ref.on('value', snap=>{
+        const box = document.getElementById('classesList');
+        if(!box) return;
+        if(!snap.exists()){ box.innerHTML="<div class='empty'>Henüz sınıf yok.</div>"; return; }
+        const classes = [];
+        snap.forEach(ch=>{ classes.push({ key: ch.key, name: ch.val() }); });
+        // Listele (isim sırasına göre)
+        classes.sort((a,b)=> (a.name||"").localeCompare(b.name||""));
+        box.innerHTML = classes.map(c=>{
+          const name = c.name;
+          return `
+          <div class="classCard">
+            <div class="className">${escHTML(name)}</div>
+            <button class="classPick" onclick="pickClass('${c.key}', '${escAttr(name)}')">Seç</button>
+            <button class="delFloat" title="Sil" onclick="deleteClass('${c.key}', '${escAttr(name)}')">
+              <img class="trashIcon" src="${TRASH_ICON}" alt="">
+            </button>
+          </div>`;
+        }).join("");
       });
     }
-
-    function clearChildren(node){ while(node.firstChild) node.removeChild(node.firstChild); }
-
-    function selectClass(name){
-      const list=document.getElementById("studentsContainer");
-      document.getElementById("classStudents").style.display="block";
-      list.innerHTML = "Yükleniyor...";
-
-      db.ref("students").get().then(snap=>{
-        if(!snap.exists()){ list.innerHTML="<div class='empty'>Kayıtlı öğrenci yok.</div>"; return; }
-        
-        const studentsInClass = [];
-        snap.forEach(ch => {
-            const s = ch.val();
-            if(s && s.sclass === name) { studentsInClass.push(s); }
+    function pickClass(classId, name){
+      if(!classId) return;
+      activeClassName = name;
+      const path = 'students';
+      const listRef = db.ref(path);
+      const title = document.getElementById('teacherPanelTitle');
+      if(title) title.innerHTML = \`Öğretmen Paneli – <span style="font-weight:normal; opacity:.8">${escHTML(name)}</span>\`;
+      // Öğrenci listesini doldur
+      listRef.orderByChild('class').equalTo(name).get().then(snap=>{
+        const box = document.getElementById('studentsList');
+        if(!box) return;
+        if(!snap.exists()){ box.innerHTML="<div class='empty'>Bu sınıfta henüz öğrenci yok.</div>"; return; }
+        const list = [];
+        snap.forEach(stu=>{ 
+          const s = stu.val();
+          list.push({ num: stu.key, name: s.name, sclass: s.class });
         });
-
-        if(studentsInClass.length === 0) {
-            list.innerHTML=`<div class='empty'>'${name}' sınıfında öğrenci bulunamadı.</div>`;
-            return;
-        }
-
-        clearChildren(list);
-        studentsInClass.sort((a,b)=> (a.name||"").localeCompare(b.name||""));
-        
-        const frag=document.createDocumentFragment();
-        studentsInClass.forEach(s=>{
-          if(!s.num) return;
-          const row=document.createElement("div"); row.className="studentItem"; row.id="stu-row-"+s.num;
-
-          const left=document.createElement("div"); left.className="leftGroup";
-          const nameBtn=document.createElement("button"); nameBtn.className="studentNameBtn"; nameBtn.textContent=`${s.num} - ${s.name}`; nameBtn.onclick=()=>teacherShowStudent(s.num);
-
-          const star=document.createElement("button");
+        // Liste (sayıya göre sırala)
+        list.sort((a,b)=> (Number(a.num)||0) - (Number(b.num)||0));
+        let html = '';
+        list.forEach(s=>{
+          const n = s.num;
           const isFav=!!favoritesCache[s.num];
-          star.className="starBtn "+(isFav?"":"off");
-          star.title=isFav?"Favoriden çıkar":"Favoriye ekle";
-          star.dataset.role="fav"; star.dataset.num=s.num; star.dataset.name=s.name; star.dataset.sclass=s.sclass; star.textContent=isFav?"★":"☆";
-
-          left.appendChild(nameBtn); left.appendChild(star);
-
-          const delStu=document.createElement("button"); delStu.className="delStuBtn"; delStu.textContent="🗑️ Sil";
-          delStu.dataset.role="delStudent"; delStu.dataset.num=s.num; delStu.dataset.name=s.name;
-
-          row.appendChild(left); row.appendChild(delStu);
-          frag.appendChild(row);
+          const prettyName = toTitleCaseTR(s.name||"");
+          html += `
+          <div class="studentItem hasDel" id="stu-row-${escAttr(n)}">
+            <div class="leftGroup">
+              <button class="studentNameBtn" title="Detay panelinde aç" onclick="teacherShowStudent('${escAttr(s.num)}')">${escHTML(s.num)} – ${escHTML(prettyName)} – <span style="opacity:.8">${escHTML(s.sclass||'')}</span></button>
+              <button class="starBtn" title="Favoriden çıkar" data-role="fav" data-num="${escAttr(s.num)}" data-name="${escAttr(prettyName)}" data-sclass="${escAttr(s.sclass||'')}">★</button>
+              <button class="targetBtn" title="Hedef belirle" data-role="target" data-num="${escAttr(s.num)}" data-name="${escAttr(prettyName)}">🎯</button>
+            </div>
+            <button class="editBtn" style="min-width:100px" onclick="toggleFavInline('${escAttr(s.num)}')">Göster</button>
+          </div>
+          <div id="fav-block-${escAttr(s.num)}" class="favBlock" style="display:none">
+            <div class="smallRow"><b>Günler</b></div>
+            <div id="fav-days-${escAttr(s.num)}" class="smallRow" style="margin-top:6px"></div>
+            <div class="sectionTitle" style="margin-top:10px">Seçilen Gün – Ders Tablosu</div>
+            <div id="fav-table-${escAttr(s.num)}"></div>
+          </div>`;
         });
-        list.appendChild(frag);
+        box.innerHTML = html;
       });
+      // Favorileri doldur
+      listenFavorites();
+      // Ders hedefleri sayfası için sınıfı ekle
+      try{ addGoalsClass(name, classId); }catch(e){}
     }
-
-    function favPath(){ return currentTeacherId ? "teacherData/"+currentTeacherId+"/favorites" : null; }
     function listenFavorites(){
-      const path=favPath(); if(!path) return;
-      db.ref(path).on("value",(snap)=>{
-        favoritesCache={};
-        const favList = [];
+      const path = favPath();
+      if(!path) return;
+      if(favRef){ favRef.off(); }
+      favRef = db.ref(path);
+      favRef.on('value', snap=>{
+        const uniqueFavorites = new Map();
+        const list=[];
         snap.forEach(ch=>{
-            const v = ch.val();
-            if(v && v.num) { favoritesCache[v.num]=true; favList.push(v); }
+          const v=ch.val();
+          const numStr = String(v.num);
+          uniqueFavorites.set(numStr, {num:numStr, name:v.name, sclass:v.sclass});
         });
-        renderFavorites(favList);
-        if(activeClassName) selectClass(activeClassName);
+        uniqueFavorites.forEach((value) => { list.push(value); });
+        favoritesCache={}; 
+        list.forEach(v=> favoritesCache[v.num]=true);
+        renderFavorites(list);
+        if(activeClassName){
+          // Sınıf seçiliyse öğrenci listesini güncelle (favori ikonları)
+          try{ pickClass(null, activeClassName); }catch(e){}
+        }
       });
     }
-    document.addEventListener("click",function(e){
-      const t=e.target; if(!t||!t.dataset) return;
-      if(t.dataset.role==="fav"){ const {num,name,sclass}=t.dataset; toggleFavorite(num,name,sclass); }
-      if(t.dataset.role==="delStudent"){ const {num,name}=t.dataset; deleteStudent(num,name); }
-    });
+    function favPath(){ return currentTeacherId ? "teacherData/"+currentTeacherId+"/favorites" : null; }
     function toggleFavorite(num,name,sclass){
       const path=favPath(); if(!path){ setAlert("Öğretmen oturumu yok."); return; }
       const ref=db.ref(path+"/"+num);
       if(favoritesCache[num]) ref.remove().catch(e=>setAlert("Favoriden çıkarma hatası: "+e.message));
-      else ref.set({num,name,sclass,createdAt:firebase.database.ServerValue.TIMESTAMP})
-          .catch(e=>setAlert("Favoriye ekleme hatası: "+e.message));
+      else ref.set({num,name,sclass,createdAt:firebase.database.ServerValue.TIMESTAMP}).catch(e=>setAlert("Favoriye ekleme hatası: "+e.message));
     }
     function deleteStudent(num,name){
       if(!confirm(`"${name} (${num})" öğrencisini silmek istiyor musunuz?`)) return;
-      const updates={}; updates["students/"+num]=null;
-      db.ref("teacherData").get().then(snap=>{
-        if(snap.exists()){ snap.forEach(t=>{ updates[`teacherData/${t.key}/favorites/${num}`]=null; }); }
+      // Öğrenci ve ilişkili verileri (lessons, targets, vs) sil
+      const updates={};
+      updates["students/"+num]=null;
+      updates["studentEntries/"+num]=null;
+      updates["studentTargets/"+num]=null;
+      // Bu öğrenci favorilerdeyse sil (tüm öğretmenlerden)
+      db.ref('teacherData').once('value').then(ts=>{
+        ts.forEach(t=>{ updates["teacherData/"+t.key+"/favorites/"+num]=null; }); 
         return db.ref().update(updates);
       }).then(()=>{
         setAlert("Öğrenci silindi.");
-        if(currentDetailNum===num){ currentDetailNum=null; document.getElementById("teacherStudentDetail").style.display="none"; }
-        if(activeClassName) selectClass(activeClassName);
-      }).catch(e=>setAlert("Öğrenci silme hatası: "+e.message));
+        // Ekrandan kaldır
+        const row=document.getElementById('stu-row-'+num);
+        const block=document.getElementById('fav-block-'+num);
+        if(row) row.remove();
+        if(block) block.remove();
+      }).catch(e=> setAlert("Silme hatası: "+e.message));
     }
     function renderFavorites(items){
       const box=document.getElementById("favoritesList");
       if(!items || !items.length){ box.innerHTML="<div class='empty'>Henüz favori yok.</div>"; return; }
-      items.sort((a,b)=> (a.sclass||"").localeCompare(b.sclass||"") || (a.name||"").localeCompare(b.name||""));
-      box.innerHTML = items.map(s=>`
-        <div class="studentItem" id="fav-row-${s.num}">
+      // Liste (isim sırasına göre)
+      items.sort((a,b)=> (a.name||"").localeCompare(b.name||""));
+      let html='';
+      items.forEach(s=>{
+        const prettyName = toTitleCaseTR(s.name||"");
+        html += `
+        <div class="studentItem" id="fav-row-${escAttr(s.num)}">
           <div class="leftGroup">
-            <button class="studentNameBtn" title="Detay panelinde aç" onclick="teacherShowStudent('${s.num}')">${s.num} - ${s.name} (${s.sclass||''})</button>
-            <button class="starBtn" title="Favoriden çıkar" data-role="fav" data-num="${s.num}" data-name="${s.name}" data-sclass="${s.sclass}">★</button>
+            <button class="studentNameBtn" title="Detay panelinde aç" onclick="teacherShowStudent('${escAttr(s.num)}')">${escHTML(s.num)} – ${escHTML(prettyName)} – <span style="opacity:.8">${escHTML(s.sclass||'')}</span></button>
+            <button class="starBtn" title="Favoriden çıkar" data-role="fav" data-num="${escAttr(s.num)}" data-name="${escAttr(prettyName)}" data-sclass="${escAttr(s.sclass||'')}">★</button>
+            <button class="targetBtn" title="Hedef belirle" data-role="target" data-num="${escAttr(s.num)}" data-name="${escAttr(prettyName)}">🎯</button>
           </div>
-          <button class="editBtn" style="min-width:100px" onclick="teacherShowStudent('${s.num}')">Detay Gör</button>
-        </div>`).join("");
+          <button class="editBtn" style="min-width:100px" onclick="toggleFavInline('${escAttr(s.num)}')">Göster</button>
+        </div>
+        <div id="fav-block-${escAttr(s.num)}" class="favBlock" style="display:none">
+          <div class="smallRow"><b>Günler</b></div>
+          <div id="fav-days-${escAttr(s.num)}" class="smallRow" style="margin-top:6px"></div>
+          <div class="sectionTitle" style="margin-top:10px">Seçilen Gün – Ders Tablosu</div>
+          <div id="fav-table-${escAttr(s.num)}"></div>
+        </div>`;
+      });
+      box.innerHTML = html;
+      // Favoriler listesi için event listenerları (fav ve target tuşları)
+      box.querySelectorAll("button").forEach(el=>{
+        const role = el.dataset.role;
+        if(role==="fav"){ const {num,name,sclass}=el.dataset; el.onclick=()=>toggleFavorite(num,name,sclass); }
+        if(role==="target"){ const {num,name}=el.dataset; el.onclick=()=> openTargetModal(num,name); }
+        if(role==="delStudent"){ const {num,name}=el.dataset; el.onclick=()=> deleteStudent(num,name); }
+      });
     }
-    
-    function showTeacherSection(sec){
-      const classesSection = document.getElementById('classesSection');
-      const favoritesSection = document.getElementById('favoritesSection');
-      const tabClasses = document.getElementById('tabClasses');
-      const tabFavorites = document.getElementById('tabFavorites');
-      hideStudentDetail();
-      if(sec==='classes'){
-        classesSection.style.display='block'; favoritesSection.style.display='none';
-        tabClasses.classList.add('active'); tabFavorites.classList.remove('active');
-      } else {
-        classesSection.style.display='none'; favoritesSection.style.display='block';
-        tabClasses.classList.remove('active'); tabFavorites.classList.add('active');
-      }
-    }
-    function hideStudentDetail() {
-        document.getElementById('teacherStudentDetail').style.display = 'none';
-        currentDetailNum = null;
-    }
-
     function teacherShowStudent(num){
       currentDetailNum=num;
       document.getElementById("teacherStudentDetail").style.display="block";
@@ -832,10 +1029,10 @@
       db.ref("students/"+num).get().then(snap=>{
         if(!snap.exists()){ setAlert("Öğrenci bulunamadı."); return; }
         const s=snap.val();
-        document.getElementById("tsdTitle").textContent = `${s.num} - ${s.name} (${s.sclass})`;
+        const prettyName = toTitleCaseTR(s.name||"");
+        document.getElementById("tsdTitle").textContent = `${prettyName} (${s.num}) – ${s.sclass}`;
         const lessons=s.lessons||{};
         currentDetailLessons = lessons;
-
         const dayMap={}, totals={};
         for(const l in lessons){
           for(const k in lessons[l]){
@@ -845,185 +1042,172 @@
           }
         }
         const daysBox=document.getElementById("tsdDays");
-        const dayNames=Object.keys(dayMap).sort((a,b)=> parseTRDateStr(b) - parseTRDateStr(a));
-        daysBox.innerHTML = dayNames.length ? dayNames.map(d=>`<button class="dayBtn" onclick="teacherShowStudentDay('${d}')">${d}</button>`).join("") : "<div class='empty'>Gün bulunamadı.</div>";
-        renderTotalsTable(totals,"tsdTotals");
-        if(dayNames.length) teacherShowStudentDay(dayNames[0]); else document.getElementById("tsdDayTable").innerHTML="<div class='empty'>Gün seçiniz.</div>";
-
-        currentWeeks = buildWeeksFromLessons(lessons);
-        renderWeekList(currentWeeks);
-        if(currentWeeks.length){ selectWeek(currentWeeks[currentWeeks.length-1].key); } else { clearWeekArea(); }
-      });
-    }
-    function renderTotalsTable(totals,targetId){
-      let html="<table><tr><th>Ders</th><th>Toplam Soru</th></tr>";
-      const ks=Object.keys(totals).sort();
-      if(!ks.length) html+=`<tr><td colspan="2">Veri yok</td></tr>`;
-      else ks.forEach(l=>{ html+=`<tr><td>${l}</td><td>${totals[l]}</td></tr>`; });
-      html+="</table>";
-      document.getElementById(targetId).innerHTML=html;
-    }
-    function teacherShowStudentDay(day){
-        let perLesson={};
-        const data = currentDetailLessons;
-        for(const l in data){
-            for(const k in data[l]){
-                const e=data[l][k]; const d=(e.time||"").split(" ")[0]||"";
-                if(d===day){ if(!perLesson[l]) perLesson[l]=0; perLesson[l]+= Number(e.count)||0; }
-            }
-        }
-        let html="<table><tr><th>Ders</th><th>O Gün Çözülen</th></tr>";
-        const ks=Object.keys(perLesson).sort();
-        if(!ks.length) html+=`<tr><td colspan="2">Bu gün için veri yok</td></tr>`;
-        else ks.forEach(l=>{ html+=`<tr><td>${l}</td><td>${perLesson[l]}</td></tr>`; });
+        const dayNames=Object.keys(dayMap).sort((a,b)=> a.split('.').reverse().join('').localeCompare(b.split('.').reverse().join('')) ).reverse();
+        daysBox.innerHTML = dayNames.length ? dayNames.map(d=>`<button class="dayBtn" onclick="renderDetailDay('${d}')">${d}</button>`).join("") : "<div class='empty'>Gün yok</div>";
+        if(dayNames.length) renderDetailDay(dayNames[0]);
+        // Toplamlar
+        const totalsBox = document.getElementById("tsdTotals");
+        const dersSirasi = ["Türkçe", "Sosyal Bilgiler", "Din Kültürü", "İngilizce", "Matematik", "Fen Bilimleri"];
+        let html="<table class='classesTable'><tr><th>Ders</th><th>Toplam Çözülen</th></tr>";
+        dersSirasi.forEach(l => {
+          const value = totals[l] || 0;
+          html += `<tr><td>${l}</td><td>${value}</td></tr>`;
+        });
         html+="</table>";
-        document.getElementById("tsdDayTable").innerHTML=html;
-    }
-
-    function parseTRDateStr(dstr){ const parts = dstr.split('.'); if(parts.length < 3) return new Date('invalid'); const [dd,mm,yy]=parts.map(x=>parseInt(x,10)); return new Date(yy, mm-1, dd); }
-    function formatTR(d){ return d.toLocaleDateString("tr-TR"); }
-    function mondayOf(date){ const d=new Date(date.getFullYear(),date.getMonth(),date.getDate()); const day=d.getDay(); const diff=(day===0?-6:1-day); d.setDate(d.getDate()+diff); d.setHours(0,0,0,0); return d; }
-    function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
-
-    function buildWeeksFromLessons(lessons){
-      let minDate=null;
-      for(const l in lessons){
-        for(const k in lessons[l]){
-          const e=lessons[l][k];
-          const d=parseTRDateStr((e.time||"").split(" ")[0]||"");
-          if(isNaN(d)) continue;
-          if(!minDate||d<minDate) minDate=d;
-        }
-      }
-      if(!minDate) return [];
-      let curStart=mondayOf(minDate);
-      const lastStart=mondayOf(new Date());
-      const out=[];
-      while(curStart<=lastStart){
-        const curEnd=addDays(curStart,6);
-        out.push({ key: curStart.toISOString().slice(0,10), start: new Date(curStart), end: curEnd, label:"" });
-        curStart=addDays(curStart,7);
-      }
-      out.forEach((w,i)=>{ w.label=`${i+1}. Hafta (${formatTR(w.start)} - ${formatTR(w.end)})`; });
-      return out;
-    }
-    function renderWeekList(weeks){
-      const wrap=document.getElementById("weekList");
-      if(!weeks.length){ wrap.innerHTML="<span class='empty'>Haftalık veri yok.</span>"; document.getElementById("btnExportPDF").disabled=true; return; }
-      wrap.innerHTML="";
-      weeks.slice().reverse().forEach(w=>{
-        const b=document.createElement("button");
-        b.type="button"; b.className="weekBtn"; b.textContent=w.label;
-        b.onclick=()=>selectWeek(w.key);
-        b.dataset.key=w.key;
-        wrap.appendChild(b);
+        totalsBox.innerHTML=html;
+        // Öğrenci verilerini önceden yükle (haftalık-aylık grafikler için)
+        window._studentLessons = lessons;
       });
     }
-    function selectWeek(weekKey){
-      selectedWeekKey=weekKey;
-      const buttons=document.querySelectorAll("#weekList button");
-      buttons.forEach(b=>{
-        b.style.background = (b.dataset.key===weekKey) ? 'linear-gradient(90deg,var(--accent1),var(--accent2))' : '#334155';
-      });
-      document.getElementById("btnExportPDF").disabled=false;
-      drawWeek(currentDetailLessons, currentWeeks.find(w=>w.key===weekKey));
+    function closeTeacherStudentDetail(){
+      document.getElementById("teacherStudentDetail").style.display="none";
     }
-    function clearWeekArea(){
-      destroyWeekChart();
-      document.getElementById("weekMatrix").innerHTML="";
-      const ctx=document.getElementById("weekChart").getContext('2d'); ctx.clearRect(0,0,9999,9999);
-      document.getElementById("btnExportPDF").disabled=true;
-    }
-    function aggregateWeekDetailed(lessons, week){
-      const dayLabels=["Pzt","Sal","Çar","Per","Cum","Cmt","Paz"];
-      const daily=[0,0,0,0,0,0,0];
-      const perLessonPerDay = {};
-      const allLessons=["Türkçe","Sosyal Bilgiler","Din Kültürü","İngilizce","Matematik","Fen Bilimleri"];
-      allLessons.forEach(l=>perLessonPerDay[l]=[0,0,0,0,0,0,0]);
-      if(!lessons) return {dayLabels,daily,perLessonPerDay};
-      for(const l in lessons){
-        for(const k in lessons[l]){
-          const e=lessons[l][k];
-          const dStr=(e.time||"").split(" ")[0]||"";
-          if(!dStr) continue;
-          const d=parseTRDateStr(dStr);
-          if(isNaN(d)) continue;
-          if(d>=week.start && d<=week.end){
-            const dow=(d.getDay()+6)%7;
-            const cnt=Number(e.count)||0;
-            daily[dow]+=cnt;
-            if(!perLessonPerDay[l]) perLessonPerDay[l]=[0,0,0,0,0,0,0];
-            perLessonPerDay[l][dow]+=cnt;
+    function renderDetailDay(day){
+      const tableDiv=document.getElementById("tsdTable");
+      let perLesson={};
+      if(currentDetailLessons){
+        for(const l in currentDetailLessons){
+          for(const k in currentDetailLessons[l]){
+            const e=currentDetailLessons[l][k]; const d=(e.time||"").split(" ")[0]||"";
+            if(d===day){ if(!perLesson[l]) perLesson[l]=0; perLesson[l]+=Number(e.count)||0; }
           }
         }
       }
-      return {dayLabels,daily,perLessonPerDay};
+      const dersSirasi = ["Türkçe", "Sosyal Bilgiler", "Din Kültürü", "İngilizce", "Matematik", "Fen Bilimleri"];
+      let html="<table class='classesTable'><tr><th>Ders</th><th>O Gün Çözülen</th></tr>";
+      dersSirasi.forEach(l => {
+        const value = perLesson[l] || 0;
+        html += `<tr><td>${l}</td><td>${value}</td></tr>`;
+      });
+      html+="</table>";
+      tableDiv.innerHTML=html;
     }
-    function drawWeek(lessons, week){
-      if(!week){ clearWeekArea(); return; }
-      const {dayLabels,daily,perLessonPerDay}=aggregateWeekDetailed(lessons, week);
+    function toggleFavInline(num){
+      const block=document.getElementById("fav-block-"+num);
+      const shown = block.style.display==="block";
+      if(shown){ block.style.display="none"; return; }
+      block.style.display="block";
+      db.ref("students/"+num+"/lessons").get().then(snap=>{
+        const daysDiv=document.getElementById("fav-days-"+num);
+        const tableDiv=document.getElementById("fav-table-"+num);
+        if(!snap.exists()){ daysDiv.innerHTML="<div class='empty'>Veri yok</div>"; tableDiv.innerHTML=""; return; }
+        const data=snap.val(); const dayMap={};
+        for(const l in data){
+          for(const k in data[l]){
+            const e=data[l][k]; const d=(e.time||"").split(" ")[0]||"";
+            if(!d) continue;
+            if(!dayMap[d]) dayMap[d]={};
+            if(!dayMap[d][l]) dayMap[d][l]=0;
+            dayMap[d][l]+=Number(e.count)||0;
+          }
+        }
+        const dayNames=Object.keys(dayMap).sort((a,b)=> a.split('.').reverse().join('').localeCompare(b.split('.').reverse().join('')) ).reverse();
+        daysDiv.innerHTML = dayNames.length ? dayNames.map(d=>`<button class="dayBtn" onclick="renderFavDay('${num}','${d}')">${d}</button>`).join("") : "<div class='empty'>Gün yok</div>";
+        if(dayNames.length) renderFavDay(num, dayNames[0]);
+      });
+    }
+    function renderFavDay(num, day){
+      db.ref("students/"+num+"/lessons").get().then(snap=>{
+        const tableDiv=document.getElementById("fav-table-"+num);
+        let perLesson={};
+        if(snap.exists()){
+          const data=snap.val();
+          for(const l in data){
+            for(const k in data[l]){
+              const e=data[l][k]; const d=(e.time||"").split(" ")[0]||"";
+              if(d===day){ if(!perLesson[l]) perLesson[l]=0; perLesson[l]+=Number(e.count)||0; }
+            }
+          }
+        }
+        const dersSirasi = ["Türkçe", "Sosyal Bilgiler", "Din Kültürü", "İngilizce", "Matematik", "Fen Bilimleri"];
+        let html="<table><tr><th>Ders</th><th>O Gün Çözülen</th></tr>";
+        dersSirasi.forEach(l => {
+          const value = perLesson[l] || 0;
+          html += `<tr><td>${l}</td><td>${value}</td></tr>`;
+        });
+        html+="</table>";
+        tableDiv.innerHTML=html;
+      });
+    }
+    function logout(){
+      // Aktif chart varsa kapat
       destroyWeekChart();
-      const ctx=document.getElementById("weekChart").getContext("2d");
-      weekChart=new Chart(ctx,{
-        type:"line",
-        data:{ labels:dayLabels, datasets:[{ label:`${week.label} Günlük Toplam`, data:daily, tension:0.35, pointRadius:3, borderWidth:2, fill:false }]},
-        options:{ responsive:true, maintainAspectRatio:false, scales:{ y:{ beginAtZero:true, ticks:{ precision:0 } } }, plugins:{ legend:{ labels:{ color:"#e2e8f0" } } } }
-      });
-      const matDiv=document.getElementById("weekMatrix");
-      matDiv.innerHTML = buildMatrixTableHTML(perLessonPerDay, dayLabels);
-      prepareExportDOM(week, dayLabels, daily, perLessonPerDay);
+      // Modalları kapat
+      closeChartModal();
+      closeTeacherStudentDetail();
+      closeGoalsPage();
+      // Öğrenci/Teacher panellerini kapat, login paneli göster
+      document.getElementById('studentPanel').style.display = 'none';
+      document.getElementById('teacherPanel').style.display = 'none';
+      document.getElementById('loginPanel').style.display = 'block';
+      // event detach (teacher)
+      try{ if(classesRef) classesRef.off(); }catch(e){}
+      try{ if(favRef) favRef.off(); }catch(e){}
     }
-    function buildMatrixTableHTML(perLessonPerDay, dayLabels){
-      let html = `<div class="sectionTitle" style="margin:0 0 6px">Ders × Gün Matrisi</div>`;
-      html += `<table><tr><th>Ders</th>${dayLabels.map(d=>`<th>${d}</th>`).join("")}</tr>`;
-      Object.keys(perLessonPerDay).sort().forEach(lesson=>{
-        const row=perLessonPerDay[lesson];
-        html += `<tr><td>${lesson}</td>${row.map(v=>`<td>${v||0}</td>`).join("")}</tr>`;
-      });
-      html += `</table>`;
-      return html;
+    function closeReportModal(){ document.getElementById('reportOverlay').style.display='none'; }
+    function openReportModal(){
+      const overlay=document.getElementById('reportOverlay');
+      if(overlay) overlay.style.display='block';
     }
-    function destroyWeekChart(){ if(weekChart){ weekChart.destroy(); weekChart=null; } }
-
-    function prepareExportDOM(week, dayLabels, daily, perLessonPerDay){
-      const title=document.getElementById("tsdTitle").textContent;
-      document.getElementById("exportStudent").textContent = title;
-      document.getElementById("exportRange").textContent = week.label;
-
-      const ctx=document.getElementById("exportChart").getContext("2d");
-      if(window._exportChart) { window._exportChart.destroy(); }
-      window._exportChart = new Chart(ctx,{
-        type:"line",
-        data:{ labels:dayLabels, datasets:[{ label:`${week.label} Günlük Toplam`, data:daily, tension:0.35, pointRadius:3, borderWidth:2, fill:false }]},
-        options:{ responsive:true, maintainAspectRatio:false, scales:{ y:{ beginAtZero:true, ticks:{ precision:0 } } }, plugins:{ legend:{ labels:{ color:"#e2e8f0" } } } }
-      });
-
-      document.getElementById("exportTable").innerHTML = buildMatrixTableHTML(perLessonPerDay, dayLabels);
-    }
-    async function exportSelectedWeekPDF(){
-      if(!currentDetailNum || !selectedWeekKey) return;
-      const { jsPDF } = window.jspdf;
-      const exportEl=document.getElementById("exportArea");
-      const canvas=await html2canvas(exportEl, { backgroundColor:null, scale:2 });
-      const img=canvas.toDataURL("image/png",1.0);
-      const pdf=new jsPDF({orientation:"portrait", unit:"pt", format:"a4"});
-      const pageW=pdf.internal.pageSize.getWidth();
-      const margin=18;
-      const drawW=pageW - margin*2;
-      const drawH=drawW * (canvas.height/canvas.width);
-      pdf.addImage(img,"PNG", margin, 12, drawW, drawH);
-      const safeName = (document.getElementById("tsdTitle").textContent || "Rapor").replace(/[^\wğüşöçıİĞÜŞÖÇ\s\-().]/g,"").slice(0,60);
-      pdf.save(`${safeName} - ${document.getElementById("exportRange").textContent}.pdf`);
-    }
-
-    // Kayıt ekranında sınıfları doldur
-    db.ref("classes").on("value",snap=>{
-      const names=[]; snap.forEach(ch=>{const v=ch.val(); if(v&&v.name) names.push(v.name);});
-      const sel=document.getElementById("rClass"); const keep=sel.value;
-      sel.innerHTML="<option value=''>Sınıf Seçin</option>";
-      names.sort().forEach(n=>{const o=document.createElement("option"); o.value=n;o.text=n; sel.add(o);});
-      if(names.includes(keep)) sel.value=keep;
+    /* Kayıtlı sınıf listesi: ilk seferde bir defa dinle */
+    let __firstLoaded = false;
+    db.ref("classList").once('value').then(snap=>{
+      if(__firstLoaded) return;
+      __firstLoaded = true;
+      const sel=document.getElementById('rClass');
+      if(sel){
+        const list = snap.exists() ? snap.val() : {};
+        Object.values(list).sort().forEach(c=>{
+          const opt=document.createElement('option');
+          opt.value=c; opt.textContent=c;
+          sel.appendChild(opt);
+        });
+      }
     });
-  </script>
+    /* ============ Data dinleyicileri ============ */
+    function listenStudentEntries(studentKey){
+      if(!studentKey) return;
+      db.ref("studentEntries/"+studentKey).on('value', snap=>{
+        const list = document.getElementById('stuEntryList');
+        if(!list) return;
+        if(!snap.exists()){ list.innerHTML = "<div class='empty'>Henüz giriş yok.</div>"; return; }
+        const data = snap.val();
+        const entries = [];
+        for(const key in data){ entries.push({ key, count: data[key] }); }
+        // Tarihe göre sırala (desc)
+        entries.sort((a,b)=> b.key.localeCompare(a.key));
+        list.innerHTML = entries.map(e=> \`<div>\${e.key}: \${e.count} soru</div>\`).join("");
+      });
+    }
+    function listenStudentGoal(studentKey){
+      if(!studentKey) return;
+      db.ref("studentTargets/"+studentKey).on('value', snap=>{
+        const box=document.getElementById('studentTargetInfo');
+        const valSpan=document.getElementById('studentTargetValue');
+        if(!box || !valSpan) return;
+        if(!snap.exists()){
+          box.style.display='none';
+          valSpan.textContent='—';
+        } else {
+          const target = Number(snap.val())||0;
+          valSpan.textContent = target;
+          box.style.display='flex';
+        }
+      });
+    }
+    /* ============ Global Durum ============ */
+    const firebaseConfig = {
+      apiKey: "AIzaSyD-D-Jp8GDuoc2b-My7cOpSViRyrcAypX0",
+      authDomain: "kocluksistemi-69e89.firebaseapp.com",
+      databaseURL: "https://kocluksistemi-69e89-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "kocluksistemi-69e89",
+      storageBucket: "kocluksistemi-69e89.appspot.com",
+      messagingSenderId: "1025155254767",
+      appId: "1:1025155254767:web:492d53b2d6f36d0ea88e1a",
+      measurementId: "G-PZMLQHZP2L"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+</script>
 </body>
 </html>
