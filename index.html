@@ -1,18 +1,16 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1" name="viewport"/>
-<title>ÖĞRENCİ TAKİP PROGRAMI</title>
-<!-- Firebase compat SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-database-compat.js"></script>
-<!-- Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<!-- html2canvas & jsPDF for PDF export -->
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-<style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ÖĞRENCİ TAKİP PROGRAMI</title>
+  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.11/firebase-database-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+  <style>
     :root{
       --bg:#0f172a; --panel:#1e293b; --muted:#334155; --text:#e2e8f0;
       --accent1:#3b82f6; --accent2:#06b6d4; --warn:#f97316; --ok:#10b981; --danger:#ef4444;
@@ -23,9 +21,11 @@
     body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
     .header{padding:22px;text-align:center;font-size:22px;font-weight:800;color:#93c5fd;text-transform:uppercase}
     .subheader{font-size:16px;color:#cbd5e1;margin-top:4px;font-weight:600;}
+
     .tabs{display:flex;gap:8px;justify-content:center;max-width:1080px;margin:0 auto 12px;padding:8px;background:var(--panel);border-radius:12px;flex-wrap:wrap}
     .tabs button{flex:1;min-width:160px;padding:12px;border:0;border-radius:10px;background:transparent;color:#cbd5e1;font-weight:700;cursor:pointer}
     .tabs button.active{background:var(--ok);color:#fff}
+
     /* Odak halkalarını yeşil yap */
     .tabs button:focus,
     .pill:focus,
@@ -40,6 +40,7 @@
       outline:3px solid rgba(16,185,129,.55);
       outline-offset:2px;
     }
+
     .container{max-width:1080px;margin:16px auto;background:var(--panel);border-radius:16px;padding:22px}
     h3{margin:0 0 14px}
     input,select{width:100%;padding:12px;border:0;border-radius:10px;background:var(--bg);color:#e2e8f0;margin:8px 0}
@@ -49,6 +50,7 @@
     th,td{border:1px solid var(--muted);padding:10px;text-align:center}
     .row{display:flex;gap:10px;align-items:center}
     .row>.grow{flex:1}
+
     /* ---- Sınıf kartları ---- */
     .classGrid{
       display:grid;
@@ -73,6 +75,7 @@
       background:linear-gradient(90deg,var(--accent1),var(--accent2));
     }
     .classPick.active{ outline:3px solid rgba(16,185,129,.40) }
+
     /* --- Sınıf silme ikonu (zemin üstünde, hover'da flu kırmızı) --- */
     .delFloat{
       position:absolute; top:10px; right:10px;
@@ -94,6 +97,7 @@
       z-index:-1;
     }
     .delFloat:hover::before{ opacity:1; }
+
     /* --- Öğrenci silme: tuş yerine zeminde çöp kovası simgesi --- */
     .studentItem{display:flex;align-items:center;gap:8px;justify-content:space-between;padding:10px;background:#0b1427;margin:6px 0;border-radius:10px; position:relative;}
     .studentItem.hasDel{ padding-right:48px; } /* sağ üstteki ikon için yer aç */
@@ -117,6 +121,7 @@
       z-index:-1;
     }
     .delStuFloat:hover::before{ opacity:1; }
+
     /* (Eski) Öğrenci silme butonu – geriye dönük stil, artık kullanılmıyor */
     .delStuBtn{
       background:linear-gradient(180deg,#ef4444,#dc2626);
@@ -132,11 +137,13 @@
     .delStuBtn:hover{ transform:translateY(-1px); box-shadow:0 10px 22px rgba(239,68,68,.35); }
     .delStuBtn:active{ transform:translateY(0); box-shadow:0 4px 12px rgba(239,68,68,.3); }
     .delStuBtn img.trashIcon{ width:16px; height:16px; filter:brightness(10); }
+
     /* Eski küçük pill stilleri bazı yerlerde hâlâ kullanılıyor */
     .pill{padding:10px 16px;border:0;border-radius:999px;background:#334155;color:#e5e7eb;font-weight:800;cursor:pointer;transition:.2s}
     .pill.active{background:linear-gradient(90deg,var(--accent1),var(--accent2)); box-shadow:0 0 0 3px rgba(16,185,129,.35);}
     .pill:hover{filter:brightness(1.05)}
     .delBtn{padding:8px 10px;border:0;border-radius:10px;background:linear-gradient(90deg,#fb7185,#f43f5e);color:#fff;font-weight:800;cursor:pointer}
+
     .list{margin-top:14px;background:var(--bg);border-radius:12px;padding:12px}
     .leftGroup{display:flex;align-items:center;gap:8px}
     .studentNameBtn{border:0;background:transparent;color:#e2e8f0;font-weight:800;cursor:pointer;text-align:left}
@@ -149,9 +156,11 @@
     .editBtn{padding:6px 12px;border:0;border-radius:6px;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:#fff;font-weight:700;cursor:pointer}
     .smallRow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
     .ghost{opacity:.6}
+
     #alert{max-width:1080px;margin:0 auto 8px;padding:10px 14px;border-radius:10px;background:#0b1427;color:#ffd6a5;display:none}
     #weekChartWrap{background:#0b1427;border-radius:12px;padding:12px;margin-top:10px}
     #pdfBtns{display:flex;gap:10px;flex-wrap:wrap}
+
     /* EXPORT (PDF görünümü) */
     #exportArea{
       width:1240px; padding:40px 48px 48px;
@@ -164,102 +173,186 @@
     #exportTable table{width:100%;border-collapse:collapse}
     #exportTable th,#exportTable td{border:1px solid #21314f;padding:10px;text-align:center}
     #exportLegend{font-size:12px;opacity:.8;margin-top:6px}
-    /* ========= MODERN TAKVİM (Eklendi) ========= */
-    .calendarWrap{
-      background: var(--card);
-      border: 1px solid var(--cardBorder);
-      border-radius: 14px;
-      padding: 12px;
-      margin-top: 12px;
+
+    /* GİRİŞ EKRANI MOBİL OPTİMİZASYON */
+    #loginPanel h3{font-size:22px}
+    #loginPanel .tabs button{font-size:16px;padding:14px;min-height:48px}
+    #loginPanel input,#loginPanel select{font-size:16px;min-height:48px}
+    #loginPanel button.action{font-size:16px;min-height:52px}
+    @media (max-width: 768px){
+      .header{font-size:20px}
+      .subheader{font-size:14px}
+      #loginPanel .container{padding:18px}
+      #loginPanel h3{font-size:24px}
+      #loginPanel .tabs{gap:6px}
+      #loginPanel .tabs button{font-size:17px;padding:14px 12px}
+      #loginPanel input,#loginPanel select{font-size:17px}
+      #loginPanel button.action{font-size:17px}
+      .twoCol{grid-template-columns:1fr}
     }
-    .calHeader{
-      display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;
+    @media (max-width: 480px){
+      .header{font-size:18px;padding:18px}
+      .subheader{font-size:12px}
+      #loginPanel .tabs{padding:6px}
+      #loginPanel .tabs button{font-size:18px;min-width:130px;padding:12px}
+      #loginPanel h3{font-size:22px;margin-bottom:10px}
+      #loginPanel input,#loginPanel select{font-size:18px;padding:14px;min-height:52px}
+      #loginPanel button.action{font-size:18px;padding:14px;min-height:56px}
+      .container{margin:12px}
     }
-    .calTitle{font-weight:900;letter-spacing:.2px;text-transform:capitalize}
-    .calNav{display:flex;gap:8px;}
-    .calBtn{
-      border:0;border-radius:10px;background:#0f1a31;color:#e2e8f0;
-      padding:8px 10px;cursor:pointer;font-weight:800;
+    .teacherWelcome{opacity:.8;margin:0 0 10px}
+    .favBlock{background:#0b1427;border-radius:12px;padding:10px;margin-top:8px}
+  
+    
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: 3px solid rgba(34,197,94,.65);
+      outline-offset: 2px;
+      border-color: rgba(34,197,94,.65);
+      box-shadow: 0 0 0 3px rgba(34,197,94,.25);
     }
-    .calGrid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
-    .calWd{opacity:.75;font-size:12px;text-align:center;margin-bottom:2px}
-    .calCell{
-      position:relative;min-height:42px;border:1px solid #23324a;border-radius:10px;
-      display:flex;align-items:flex-start;justify-content:flex-end;padding:8px;cursor:pointer;background:#0f1a31;
-      transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+
+    .delFloat img.trashIcon,
+    .delStuFloat img.trashIcon {
+      width: 24px;
+      height: 24px;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,.4));
+      transition: transform .15s ease, filter .15s ease;
     }
-    .calCell:hover{ transform:translateY(-1px); box-shadow:0 8px 18px rgba(0,0,0,.25); border-color:#3b4b6a; }
-    .calCell.muted{opacity:.5}
-    .calDay{font-weight:800}
-    .calDot{
-      position:absolute;left:8px;bottom:8px;width:8px;height:8px;border-radius:999px;background:#ef4444;
-      box-shadow:0 0 0 2px rgba(239,68,68,.15);
+    .delFloat:hover img.trashIcon,
+    .delStuFloat:hover img.trashIcon {
+      transform: scale(1.15);
+      filter: drop-shadow(0 0 6px rgba(220,38,38,.7));
     }
-    /* ==== /Teacher Modal Takvim === */
-    /* ===== Günlük Rapor Tasarımı ===== */
-    #repTab-daily #selDayBlock .sectionTitle{
-      font-weight:800; margin-bottom:10px;
+
+    .delFloat img.trashIcon,
+    .delStuFloat img.trashIcon {
+      width: 24px;
+      height: 24px;
+      display: block;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,.4));
+      transition: transform .15s ease, filter .15s ease;
     }
-    /* Tablo görünümü */
-    #repTab-daily #stuDayTable, #repTab-daily #tsdDayTable table{ width:100%; border-collapse:separate; border-spacing:0; }
-    #repTab-daily #stuDayTable, #repTab-daily #tsdDayTable th,
-    #repTab-daily #stuDayTable, #repTab-daily #tsdDayTable td{
-      padding:12px 14px;
-      border-bottom:1px solid #23324a;
+    .delFloat:hover img.trashIcon,
+    .delStuFloat:hover img.trashIcon {
+      transform: scale(1.2);
+      filter: drop-shadow(0 0 6px rgba(239,68,68,.8));
     }
-    #repTab-daily #stuDayTable, #repTab-daily #tsdDayTable thead th{
-      text-align:left; font-weight:700; background:#0d1628;
+
+    .delFloat img.trashIcon,
+    .delStuFloat img.trashIcon {
+      width: 24px;
+      height: 24px;
+      display: block;
+      stroke: #ef4444;
+      transition: transform .15s ease, filter .15s ease;
     }
-    #repTab-daily #stuDayTable, #repTab-daily #tsdDayTable tr:last-child td{ border-bottom:0; }
-    /* Düzenle düğmesi */
-    #repTab-daily #stuDayTable, #repTab-daily #tsdDayTable .editBtn{
-      border:0; border-radius:10px; padding:6px 12px; min-height:32px;
-      background: linear-gradient(180deg, #3b82f6, #06b6d4);
-      color:#fff; font-weight:800; cursor:pointer;
-      transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+    .delFloat:hover img.trashIcon,
+    .delStuFloat:hover img.trashIcon {
+      transform: scale(1.2);
+      filter: drop-shadow(0 0 6px rgba(239,68,68,.8));
     }
-    #repTab-daily #stuDayTable, #repTab-daily #tsdDayTable .editBtn:hover{
-      transform:translateY(-1px); box-shadow:0 10px 22px rgba(0,0,0,.25);
-      filter:saturate(1.05);
+
+    .delFloat img.trashIcon,
+    .delStuFloat img.trashIcon {
+      width: 22px;
+      height: 22px;
+      display: block;
+      image-rendering: auto;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,.35));
+      transition: transform .15s ease, filter .15s ease, opacity .15s ease;
     }
-    #repTab-daily #stuDayTable, #repTab-daily #tsdDayTable .editBtn:focus{
-      outline:3px solid rgba(16,185,129,.45); outline-offset:2px;
+    .delFloat:hover img.trashIcon,
+    .delStuFloat:hover img.trashIcon {
+      transform: scale(1.12);
+      filter: drop-shadow(0 0 8px rgba(239,68,68,.75));
     }
-    /* Küçük ekran ayarı */
-    @media (max-width: 560px){
-      #repTab-daily .calGrid{ gap:8px; }
-      #repTab-daily .calCell{ min-height:44px; padding:8px; }
-      #repTab-daily #selDayBlock{ padding:12px; }
-      #repTab-daily #stuDayTable, #repTab-daily #tsdDayTable th, #repTab-daily #stuDayTable, #repTab-daily #tsdDayTable td{ padding:10px 12px; }
+
+    /* ==== Giriş Türü Seçimi (Öğrenci / Veli) ==== */
+    .roleGrid{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap:14px;
+      margin-top:8px;
     }
-    /* ====== /Günlük Rapor Tasarımı ====== */
-    /* === Haftalık Sekme: Açılır Hafta Listesi (Dropdown) === */
-    #repTab-weekly #weekControls{ display:flex; align-items:center; gap:12px; }
-    #repTab-weekly .weekDropdown{ position:relative; display:inline-block; }
-    #repTab-weekly .wdToggle{
-      border:0; border-radius:12px; padding:8px 12px; min-height:36px;
-      background: linear-gradient(180deg, #3b82f6, #06b6d4);
-      color:#fff; font-weight:900; cursor:pointer;
-      display:flex; align-items:center; gap:10px;
+    .roleCard{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding:22px 16px;
+      border:1px solid var(--cardBorder);
+      border-radius:14px;
+      background:var(--card);
+      cursor:pointer;
+      transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+      text-align:center;
+      color:var(--text);
     }
-    #repTab-weekly .wdToggle .chev{ font-weight:900; opacity:.9; }
-    #repTab-weekly .wdMenu{
-      position:absolute; top:calc(100% + 6px); left:0; z-index:50;
-      background:#0f1a31; border:1px solid #23324a; border-radius:12px; padding:8px;
-      box-shadow:0 20px 50px rgba(0,0,0,.45); min-width:320px; max-height:280px; overflow:auto;
-      display:none;
+    .roleCard:hover{ transform:translateY(-2px); box-shadow:0 8px 18px rgba(0,0,0,.25); border-color:#3b4b6a; }
+    .roleCard:focus{
+      outline:3px solid rgba(16,185,129,.55);
+      outline-offset:2px;
     }
-    #repTab-weekly .wdMenu.open{ display:block; }
-    #repTab-weekly .wdItem{
-      display:block; width:100%; text-align:left; border:0; background:transparent; color:inherit;
-      padding:8px 10px; border-radius:8px; cursor:pointer;
+    .roleIcon{
+      width:68px; height:68px; display:grid; place-items:center;
+      border-radius:14px;
+      background:linear-gradient(135deg, rgba(59,130,246,.12), rgba(6,182,212,.12));
+      color:#93c5fd;
     }
-    #repTab-weekly .wdItem:hover{ background:rgba(148,163,184,.08); }
-    #repTab-weekly .wdItem.active{ background:rgba(34,197,94,.15); outline:1px dashed rgba(16,185,129,.45); }
-    @media (max-width:560px){
-      #repTab-weekly .wdMenu{ min-width:260px; }
-    }
-    /* === /Dropdown CSS === */
+    .roleIcon svg{ width:36px; height:36px; display:block; }
+    .roleCard.parent .roleIcon{ color:#34d399; background:linear-gradient(135deg, rgba(52,211,153,.12), rgba(6,182,212,.12)); }
+    .roleTitle{ font-weight:900; letter-spacing:.2px; }
+
+/* ==== Farklı Hesap ve Çıkış Butonları ==== */
+.smallRow {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+.smallRow .pill {
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: 600;
+}
+.smallRow .pill.account {
+  background: #facc15; /* sarı */
+  border: none;
+  color: #111;
+}
+.smallRow .pill.account:hover {
+  background: #eab308;
+}
+.smallRow .pill.exit {
+  background: #ef4444; /* kırmızı */
+  border: none;
+  color: #fff;
+}
+.smallRow .pill.exit:hover {
+  background: #dc2626;
+}
+
+
+/* ==== Mobil Optimizasyon: Giriş Türü Seçimi ==== */
+@media (max-width: 768px) {
+  .roleGrid { grid-template-columns: 1fr; gap: 12px; }
+  .roleCard { padding: 18px 14px; }
+  .roleIcon { width: 60px; height: 60px; }
+  .roleIcon svg { width: 30px; height: 30px; }
+  .roleTitle { font-size: 18px; }
+  .smallRow { justify-content: center; }
+  .smallRow .pill { width: 100%; max-width: 240px; }
+}
+@media (max-width: 480px) {
+  .roleCard { padding: 16px 12px; }
+  .roleIcon { width: 54px; height: 54px; }
+  .roleIcon svg { width: 28px; height: 28px; }
+  .roleTitle { font-size: 17px; }
+}
+
     /* === Öğrenci Hoşgeldin Bannerı === */
     .studentWelcomeBanner{
       margin:10px 0 12px;
@@ -272,32 +365,395 @@
       text-align:center;
       box-shadow: 0 10px 26px rgba(0,0,0,.25), inset 0 0 0 1px rgba(34,197,94,.15);
     }
-    /* === Hedef (daily target) === */
-    .targetBtn{
-      border:none;background:transparent;cursor:pointer;font-size:20px;line-height:1;
-      filter: drop-shadow(0 1px 1px rgba(0,0,0,.4));
-    }
-    .targetBtn:hover{ transform: scale(1.05); }
-    .targetInfo{
-      margin:6px 0 10px; padding:8px 10px; border-radius:10px;
-      background: rgba(16,185,129,.08); border:1px solid rgba(16,185,129,.25);
-      font-weight:600; display:flex; gap:8px; align-items:center; justify-content:space-between;
-    }
-    .targetInfo small{opacity:.9}
-    /* Float target button next to trash */
-    .targetFloat{
-      position:absolute; top:8px; right:52px;
-      display:grid; place-items:center;
-      width:36px; height:36px; padding:0;
-      border:0; border-radius:999px;
-      background:transparent;
-      cursor:pointer;
-      transition:transform .12s ease, opacity .12s ease;
-      z-index:2;
-    }
-    .targetFloat:hover{ transform:translateY(-1px); }
-</style>
-<style>
+
+/* === Hedef (daily target) === */
+.targetBtn{
+  border:none;background:transparent;cursor:pointer;font-size:20px;line-height:1;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,.4));
+}
+.targetBtn:hover{ transform: scale(1.05); }
+.targetInfo{
+  margin:6px 0 10px; padding:8px 10px; border-radius:10px;
+  background: rgba(16,185,129,.08); border:1px solid rgba(16,185,129,.25);
+  font-weight:600; display:flex; gap:8px; align-items:center; justify-content:space-between;
+}
+.targetInfo small{opacity:.9}
+
+/* Float target button next to trash */
+.targetFloat{
+  position:absolute; top:8px; right:52px; /* 8px (gap) + 36px (trash width) => sit left of trash */
+  display:grid; place-items:center;
+  width:36px; height:36px; padding:0;
+  border:0; border-radius:999px;
+  background:transparent;
+  cursor:pointer;
+  transition:transform .12s ease, opacity .12s ease;
+  z-index:2;
+}
+.targetFloat:hover{ transform:translateY(-1px); }
+
+/* === Haftanın Yıldızı Bannerı === */
+.sotwContainer {
+    background: linear-gradient(90deg, #f59e0b, #f97316);
+    color: white;
+    border-radius: 12px;
+    padding: 14px;
+    margin: -10px 0 16px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 700;
+    min-height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.sotwContainer span {
+    font-weight: 900;
+    font-size: 18px;
+    margin: 0 6px;
+}
+
+/* === Öğrenci İstatistikleri === */
+.studentStats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.statBox {
+  background: var(--card);
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--cardBorder);
+}
+.statBox .label {
+  font-size: 16px;
+  font-weight: 800;
+  opacity: 0.9;
+  margin-bottom: 8px;
+  text-align: center;
+  color: var(--accent1);
+}
+.statBox table{
+    margin:0;
+}
+.statBox th{
+    display:none;
+}
+.statBox td{
+    border: 1px solid var(--muted);
+    padding: 6px 8px;
+    font-size: 14px;
+}
+.statBox td:first-child{
+    text-align: left;
+    font-weight: 700;
+}
+
+/* === Öğretmen Üst Çubuğu ve Küçük Çıkış Düğmesi === */
+.teacherTopbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:6px 0 8px;}
+button.exitSmall{border:0;border-radius:10px;padding:6px 10px;min-height:32px;background:#ef4444;color:#fff;font-weight:800;cursor:pointer}
+button.exitSmall:hover{background:#dc2626}
+button.exitSmall:focus{outline:3px solid rgba(16,185,129,.55);outline-offset:2px;}
+
+/* === Update: Larger Exit Button + Icon === */
+button.exitSmall{padding:8px 12px;min-height:38px;font-size:14px;display:inline-flex;align-items:center;gap:8px}
+button.exitSmall .icon{width:16px;height:16px;line-height:0;display:inline-flex}
+button.exitSmall .icon svg{display:block}
+button.exitSmall .label{line-height:1}
+
+/* === Liste Görünümü: Soru Sayısı & Hedef Bölgesi Renkli ==== */
+.student-toolbar{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin:12px 0 6px; }
+.densityToggle{
+  background: var(--card); color: var(--text); border: 1px solid var(--cardBorder);
+  border-radius: 10px; padding: 8px 12px; cursor:pointer;
+}
+.chip{
+  display:inline-flex; align-items:center; gap:6px;
+  border-radius:999px; padding:6px 10px; font-weight:800; font-size:12px;
+  background:var(--card); border:1px solid var(--cardBorder);
+}
+.chip .dot{ width:10px; height:10px; border-radius:999px; }
+.chip.turkce .dot{ background:#fb923c; }
+.chip.sosyal .dot{ background:#6366f1; }
+.chip.din .dot{ background:#22c55e; }
+.chip.ing .dot{ background:#0ea5e9; }
+.chip.mat .dot{ background:#f43f5e; }
+.chip.fen .dot{ background:#14b8a6; }
+
+.lessonList.dense{ display:flex; flex-direction:column; gap:8px; margin:10px 0; }
+.lessonRow.dense{
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+  background:var(--card); border:1px solid var(--cardBorder);
+  border-radius:12px; padding:6px 10px;
+  transition:border-color .15s ease, box-shadow .15s ease;
+}
+.lessonRow.dense:hover{ border-color:#3b4b6a; box-shadow:0 8px 18px rgba(0,0,0,.22); }
+
+.lessonControls{ display:flex; align-items:center; gap:8px; margin-left:auto; }
+.lessonControls input[type=number]{
+  width:100px; min-height:34px; font-size:14px;
+  background:var(--bg); color:var(--text); border:0; border-radius:10px; padding:8px 10px;
+}
+.lessonControls input[type=number]::-webkit-outer-spin-button,
+.lessonControls input[type=number]::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+.lessonControls input[type=number]{ -moz-appearance:textfield; }
+.numBtn{
+  width:34px; height:34px; display:grid; place-items:center; border:0; border-radius:10px;
+  background:#334155; color:#fff; font-weight:900; font-size:15px; cursor:pointer;
+  transition: transform .08s ease, filter .12s ease;
+}
+.numBtn:hover{ filter:brightness(1.06); }
+.numBtn:active{ transform: translateY(1px); }
+
+/* === Renkli bölgeler === */
+/* Soru sayısı bölgesi: indigo ton */
+.countWrap{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:4px 6px; border-radius:999px;
+  background: rgba(99,102,241,.10);           /* indigo-500 @10% */
+  border:1px solid rgba(99,102,241,.35);
+  box-shadow: inset 0 0 0 1px rgba(99,102,241,.12);
+}
+.countWrap:focus-within{ box-shadow: 0 0 0 3px rgba(99,102,241,.25); }
+.countWrap .numBtn{ background:#4f46e5; }     /* indigo-600 */
+.countWrap input[type=number]{ background:transparent; }
+
+/* Hedef bölgesi: sky ton */
+.goalWrap{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:4px 6px; border-radius:999px;
+  background: rgba(14,165,233,.10);           /* sky-500 @10% */
+  border:1px solid rgba(14,165,233,.35);
+  box-shadow: inset 0 0 0 1px rgba(14,165,233,.12);
+}
+.goalWrap:focus-within{ box-shadow: 0 0 0 3px rgba(14,165,233,.25); }
+.goalIcon{ font-size:16px; line-height:1; width:18px; height:18px; display:grid; place-items:center;
+cursor: pointer;}
+.goalInput{
+  width:64px; min-height:30px; font-size:14px; border:0; outline:none;
+  background:transparent; color:var(--text); text-align:center;
+}
+
+.sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+
+/* Footer: progress + % badge sağda */
+.rowFooter{ display:flex; align-items:center; gap:8px; width:100%; padding-top:6px; }
+.progressWrap{ position:relative; flex:1 1 auto; min-width:0; height:6px; background:var(--cardBorder);
+  border-radius:999px; overflow:hidden; }
+.progressBar{ position:absolute; top:0; left:0; height:100%; width:0%;
+  background:linear-gradient(90deg,#22c55e,#0ea5e9); transition: width .15s ease; }
+.pctBadge{
+  min-width:44px; height:24px; display:grid; place-items:center;
+  padding:0 8px; border-radius:999px; font-weight:800; font-size:12px;
+  background:#0b9444; color:#fff; margin-left:auto;
+}
+.pctBadge.low{ background:#eab308; }
+.pctBadge.zero{ background:#6b7280; }
+
+.totalBar{ display:flex; align-items:center; justify-content:flex-end; gap:8px; margin-top:8px; font-weight:800; }
+.totalBadge{ min-width:56px; text-align:center; background:#0ea5e9; color:white; border-radius:10px; padding:8px 10px; }
+
+@media (max-width: 560px){
+  .lessonControls{ width:100%; justify-content:flex-end; gap:6px; }
+  .countWrap, .goalWrap{ width:100%; justify-content:space-between; }
+}
+
+/* ========= MODERN TAKVİM ========= */
+.calendarWrap{
+  background:var(--card);
+  border:1px solid var(--cardBorder);
+  border-radius:14px;
+  padding:12px;
+  margin-top:12px;
+}
+.calHeader{
+  display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;
+}
+.calTitle{font-weight:900;letter-spacing:.2px;text-transform:capitalize}
+.calNav{display:flex;gap:8px;}
+.calBtn{
+  border:0;border-radius:10px;background:#0f1a31;color:#e2e8f0;
+  padding:8px 10px;cursor:pointer;font-weight:800;
+}
+.calGrid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+.calWd{opacity:.75;font-size:12px;text-align:center;margin-bottom:2px}
+.calCell{
+  position:relative;min-height:42px;border:1px solid #23324a;border-radius:10px;
+  display:flex;align-items:flex-start;justify-content:flex-end;padding:8px;cursor:pointer;background:#0f1a31;
+  transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+}
+.calCell:hover{ transform:translateY(-1px); box-shadow:0 8px 18px rgba(0,0,0,.25); border-color:#3b4b6a; }
+.calCell.muted{opacity:.5}
+.calDay{font-weight:800}
+.calDot{
+  position:absolute;left:8px;bottom:8px;width:8px;height:8px;border-radius:999px;background:#ef4444;
+  box-shadow:0 0 0 2px rgba(239,68,68,.15);
+}
+.calCell.today{outline:2px dashed rgba(59,130,246,.6); outline-offset:2px;}
+.calCell.selected{box-shadow:0 0 0 3px rgba(16,185,129,.45) inset;border-color:#16a34a;}
+@media (max-width:560px){
+  .calCell{min-height:38px;padding:6px}
+  .calTitle{font-size:14px}
+}
+/* ================================== */
+
+/* === Bugün butonu + mobil düzenlemeleri === */
+.calHeader{ position:sticky; top:0; z-index:5; background:linear-gradient(180deg, rgba(11,20,39,.95), rgba(11,20,39,.88)); backdrop-filter:saturate(1.2) blur(4px); border-radius:12px 12px 0 0; padding:8px; }
+.calBtnToday{
+  border:0;border-radius:10px;background:#14532d;color:#e2e8f0;
+  padding:8px 12px;cursor:pointer;font-weight:900;
+}
+.calBtn:disabled,.calBtnToday:disabled{opacity:.5;cursor:default}
+.calendarWrap{ position:relative; }
+/* Floating "Bugün" on mobile */
+.calFab{
+  position:sticky; bottom:8px; left:100%; transform:translateX(-100%);
+  margin-top:8px; display:none;
+}
+.calFab button{
+  border:0; border-radius:999px; padding:10px 14px; font-weight:900; background:#14532d; color:#fff;
+  box-shadow:0 6px 14px rgba(0,0,0,.35);
+}
+/* Touch-friendly cells */
+.calCell{ min-height:48px; }
+@media (max-width:600px){
+  .calGrid{ gap:4px; }
+  .calWd{ font-size:11px; }
+  .calCell{ min-height:44px; padding:6px; }
+  .calTitle{ font-size:15px; }
+  .calNav .calBtn{ padding:8px 10px; }
+  .calFab{ display:block; }
+}
+
+/* === Haftalık Sekme: Açılır Hafta Listesi (Dropdown) === */
+#repTab-weekly #weekControls{ display:flex; align-items:center; gap:12px; }
+#repTab-weekly .weekDropdown{ position:relative; display:inline-block; }
+#repTab-weekly .wdToggle{
+  border:0; border-radius:12px; padding:8px 12px; min-height:36px;
+  background: linear-gradient(180deg, #3b82f6, #06b6d4);
+  color:#fff; font-weight:900; cursor:pointer;
+  display:flex; align-items:center; gap:10px;
+}
+#repTab-weekly .wdToggle .chev{ font-weight:900; opacity:.9; }
+#repTab-weekly .wdMenu{
+  position:absolute; top:calc(100% + 6px); left:0; z-index:50;
+  background:#0f1a31; border:1px solid #23324a; border-radius:12px; padding:8px;
+  box-shadow:0 20px 50px rgba(0,0,0,.45); min-width:320px; max-height:280px; overflow:auto;
+  display:none;
+}
+#repTab-weekly .wdMenu.open{ display:block; }
+#repTab-weekly .wdItem{
+  display:block; width:100%; text-align:left; border:0; background:transparent; color:inherit;
+  padding:8px 10px; border-radius:8px; cursor:pointer;
+}
+#repTab-weekly .wdItem:hover{ background:rgba(148,163,184,.08); }
+#repTab-weekly .wdItem.active{ background:rgba(34,197,94,.15); outline:1px dashed rgba(16,185,129,.45); }
+@media (max-width:560px){
+  #repTab-weekly .wdMenu{ min-width:260px; }
+}
+/* === /Dropdown CSS === */
+
+/* ====== Günlük Rapor Tasarımı (Calendar + Table) ====== */
+/* Kapsamı yalnızca Günlük sekmesine uygula */
+#repTab-daily .calendarWrap{
+  background: linear-gradient(180deg, rgba(11,18,32,.92), rgba(11,18,32,.92));
+  border: 1px solid var(--cardBorder, #1e293b);
+  border-radius: 16px;
+  box-shadow: 0 20px 50px rgba(0,0,0,.45);
+  padding: 16px;
+}
+
+/* Başlık çubuğu */
+#repTab-daily .calHeader{
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom: 12px;
+}
+#repTab-daily .calTitle{ font-weight:800; letter-spacing:.2px; }
+#repTab-daily .calNav .calBtn{
+  border:1px solid rgba(148,163,184,.25);
+  background: rgba(148,163,184,.06);
+  border-radius:10px; padding:6px 8px; min-height:32px;
+  cursor:pointer; transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+}
+#repTab-daily .calNav .calBtn:hover{ transform: translateY(-1px); box-shadow:0 8px 18px rgba(0,0,0,.25); }
+#repTab-daily .calBtnToday{
+  background: linear-gradient(180deg, #22c55e, #16a34a);
+  color:#fff; font-weight:900; border:0;
+  border-radius:12px; padding:6px 12px; min-height:32px;
+}
+
+/* Takvim ızgarası */
+#repTab-daily .calGrid{ gap: 10px; }
+#repTab-daily .calWd{ opacity:.9; font-weight:700; }
+#repTab-daily .calCell{
+  position:relative;
+  min-height:56px;
+  border:1px solid #23324a;
+  border-radius:14px;
+  background:#0f1a31;
+  display:flex; align-items:flex-start; justify-content:flex-end;
+  padding:10px;
+  transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+}
+#repTab-daily .calCell:hover{ transform:translateY(-1px); box-shadow:0 8px 18px rgba(0,0,0,.25); border-color:#3b4b6a; }
+#repTab-daily .calCell.today{ outline:2px dashed rgba(59,130,246,.6); outline-offset:2px; }
+#repTab-daily .calCell.selected{
+  outline: 2px dashed rgba(16,185,129,.55);
+  outline-offset: -4px;
+  box-shadow: 0 0 0 3px rgba(16,185,129,.25) inset;
+  border-color:#16a34a;
+}
+#repTab-daily .calDay{ font-weight:800; opacity:.95; }
+#repTab-daily .calDot{
+  position:absolute; left:10px; top:10px;
+  width:7px; height:7px; border-radius:9999px; background:#ef4444; box-shadow:0 0 0 2px rgba(239,68,68,.15);
+}
+
+/* Seçilen gün tablosu kartı */
+#repTab-daily #selDayBlock{
+  margin-top:14px;
+  background: linear-gradient(180deg, rgba(11,18,32,.92), rgba(11,18,32,.92));
+  border:1px solid var(--cardBorder,#1e293b);
+  border-radius:14px;
+  box-shadow: 0 20px 50px rgba(0,0,0,.45);
+  padding: 16px;
+}
+#repTab-daily #selDayBlock .sectionTitle{
+  font-weight:800; margin-bottom:10px;
+}
+
+/* Tablo görünümü */
+#repTab-daily #stuDayTable, #repTab-daily #tsdDayTable table{ width:100%; border-collapse:separate; border-spacing:0; }
+#repTab-daily #stuDayTable, #repTab-daily #tsdDayTable th,
+#repTab-daily #stuDayTable, #repTab-daily #tsdDayTable td{
+  padding:12px 14px;
+  border-bottom:1px solid #23324a;
+}
+#repTab-daily #stuDayTable, #repTab-daily #tsdDayTable thead th{
+  text-align:left; font-weight:700; background:#0d1628;
+}
+#repTab-daily #stuDayTable, #repTab-daily #tsdDayTable tr:last-child td{ border-bottom:0; }
+
+/* Düzenle düğmesi */
+#repTab-daily #stuDayTable, #repTab-daily #tsdDayTable .editBtn{
+  border:0; border-radius:10px; padding:6px 12px; min-height:32px;
+  background: linear-gradient(180deg, #3b82f6, #06b6d4);
+  color:#fff; font-weight:800; cursor:pointer;
+  transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+}
+#repTab-daily #stuDayTable, #repTab-daily #tsdDayTable .editBtn:hover{ transform:translateY(-1px); box-shadow:0 10px 22px rgba(0,0,0,.25); filter:saturate(1.05); }
+#repTab-daily #stuDayTable, #repTab-daily #tsdDayTable .editBtn:focus{ outline:3px solid rgba(16,185,129,.45); outline-offset:2px; }
+
+/* Küçük ekran ayarı */
+@media (max-width: 560px){
+  #repTab-daily .calGrid{ gap:8px; }
+  #repTab-daily .calCell{ min-height:44px; padding:8px; }
+  #repTab-daily #selDayBlock{ padding:12px; }
+  #repTab-daily #stuDayTable, #repTab-daily #tsdDayTable th, #repTab-daily #stuDayTable, #repTab-daily #tsdDayTable td{ padding:10px 12px; }
+}
+/* ====== /Günlük Rapor Tasarımı ====== */
+
 /* --- Açılır Pencere (Rapor Modal) --- */
 #reportOverlay{position:fixed;inset:0;display:none;background:rgba(0,0,0,.45);z-index:9998;}
 #teacherStudentDetail.asModal{position:fixed;inset:auto auto 5% 50%;transform:translateX(-50%);width:min(920px,92vw);max-height:88vh;overflow:auto;
@@ -308,38 +764,234 @@
 .modalClose{margin-left:auto}
 #repTab-daily,#repTab-weekly,#repTab-monthly{display:none;}
 #repTab-daily.active,#repTab-weekly.active,#repTab-monthly.active{display:block;}
-@media (max-width: 720px){
+@media (max-width:720px){
   #teacherStudentDetail.asModal{inset:auto auto 2% 50%; width:96vw; }
 }
-</style>
-<style>
+
 /* === MOBILE OVERRIDES (dikey mod için) === */
-* { min-width: 0; }
-html, body { width: 100%; }
-:root { --page-pad: 12px; }
-/* Küçük ekranlar: 600px ve altı */
-@media (max-width: 600px){
-  body { font-size: 15px; line-height: 1.35; }
-  /* Üst başlık ve alt başlık */
-  .header { padding: 18px var(--page-pad); font-size: 20px; }
-  .header .subheader { font-size: 12px; opacity: .9; }
-  /* Sekmeler: taşmadan yatay kaydırılabilir */
-  .tabs{
-    display:flex; gap:8px; padding: 0 var(--page-pad);
-    overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none;
+  /* Genel güvenli dokunuşlar */
+  * { min-width: 0; }
+  html, body { width: 100%; }
+  :root { --page-pad: 12px; }
+
+  /* Küçük ekranlar: 600px ve altı */
+  @media (max-width: 600px){
+    body { font-size: 15px; line-height: 1.35; }
+
+    /* Üst başlık ve alt başlık */
+    .header { padding: 12px var(--page-pad); font-size: 22px; }
+    .header .subheader { font-size: 12px; opacity: .9; }
+
+    /* Sekmeler: taşmadan yatay kaydırılabilir */
+    .tabs{
+      display:flex; gap:8px; padding: 0 var(--page-pad);
+      overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none;
+    }
+    .tabs::-webkit-scrollbar{ display:none; }
+    .tabs > * { flex: 0 0 auto; }
+
+    /* Kart/kutu düzenleri */
+    .container, .list, #studentPanel, #teacherPanel, #goalsPage .gp-note{
+      margin: 10px var(--page-pad); padding: 12px;
+    }
+
+    /* Form elemanları: parmak dostu */
+    input, select, button, textarea { font-size: 16px; }
+    input[type="number"] { -moz-appearance: textfield; }
+    input[type="number"]::-webkit-outer-spin-button,
+    input[type="number"]::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
+
+    /* Grid'leri tek kolona indir */
+    .roleGrid, .teacherGrid, .classGrid, .twoCol, .grid { 
+      display: grid; grid-template-columns: 1fr !important; gap: 10px;
+    }
+    .classGrid .classCard { min-width: 0; }
+
+    /* Öğrenci araç çubuğu ve küçük satırlar: kaymayı engelle */
+    .student-toolbar, .smallRow { display:flex; flex-wrap: wrap; gap: 8px; }
+
+    /* Tablolar taşarsa yatay kaydır */
+    table{ display:block; width: max-content; max-width: 100%; overflow-x:auto; -webkit-overflow-scrolling:touch; }
+    table th, table td { white-space: nowrap; }
+
+    /* Modallar: ekrana otursun, başlık sabitlensin */
+    .asModal{
+      position: fixed !important;
+      inset: 10px !important;
+      max-width: none !important;
+      width: auto; height: auto;
+      max-height: calc(100vh - 20px);
+      overflow: auto;
+      z-index: 999;
+      margin: 0 !important;
+    }
+    .modalHead{ position: sticky; top: 0; z-index: 5; background: var(--card, #0b1427); }
+
+    /* Takvim ve gün hücreleri daha sıkı */
+    .calendarWrap .calHeader{ gap: 8px; padding: 6px 8px; }
+    .calGrid{ gap: 4px; }
+    .calCell{ min-height: 40px; }
+    .calDay{ font-size: 12px; }
+
+    /* Haftalık/Aylık grafikler: ekran genişliğine göre sabitle */
+    #weekChartWrap canvas,
+    #tMonthChartWrap canvas,
+    #exportChart{
+      width: 100% !important;
+      height: 200px !important;
+    }
+
+    /* Hedef (Goals) tablo ızgarası */
+    .gp-table { margin: 0 var(--page-pad); }
+    .gp-row{ grid-template-columns: 1fr 100px !important; padding: 10px 12px; }
+    .gp-input{ min-height: 38px; font-size: 15px; }
+
+    /* Uzun başlık/isimlerin taşmasını engelle */
+    h1,h2,h3,.sectionTitle,#tsdTitle,#studentPanelTitle{ overflow-wrap:anywhere; word-break:break-word; }
+
+    /* Butonlar gerekiyorsa tam genişlik */
+    .action, .pill, .editBtn { min-height: 40px; }
+    .action[style*="max-width"], .pill[style*="max-width"] { width: 100%; max-width: none !important; }
   }
-  .tabs::-webkit-scrollbar{ display:none; }
-  .tabs > * { flex: 0 0 auto; }
-  /* Kart/kutu düzenleri */
-  .container, .list, #studentPanel, #teacherPanel, #goalsPage .gp-note{
-    margin: 10px var(--page-pad); padding: 12px;
+
+  /* iOS dinamik viewport kesilmelerini azalt */
+  @supports (height: 100dvh){
+    @media (max-width: 600px){
+      .asModal{ max-height: calc(100dvh - 20px); }
+    }
   }
-  /* Form elemanları: parmak dostu */
-  input, select, button, textarea { font-size: 16px; }
-  input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-  input[type="number"] { -moz-appearance: textfield; }
+
+/* ===== Ders Hedefleri (Goals Page) — Modern görünüm ===== */
+#goalsPage{
+  padding: 8px 12px 20px;
 }
-</style>
+#goalsPage .gp-header{
+  position: sticky; top: 0; z-index: 30;
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  padding:10px 0;
+  background: linear-gradient(180deg, rgba(11,20,39,.92), rgba(11,20,39,.86));
+  border-bottom: 1px solid var(--cardBorder);
+  backdrop-filter: saturate(1.1) blur(6px);
+}
+#goalsPage .gp-left{ display:flex; align-items:center; gap:10px; }
+#goalsPage .gp-title{ font-weight:900; letter-spacing:.2px; display:flex; align-items:center; gap:8px; }
+#goalsPage .gp-actions{ display:flex; align-items:center; gap:8px; }
+
+/* Buton ikon düzeni — mevcut .pill ve .action renklerini kullan */
+.gp-btn{ display:inline-flex; align-items:center; gap:8px; }
+.gp-btn .icon{ width:16px; height:16px; line-height:0; display:inline-flex; }
+.gp-btn .icon svg{ width:16px; height:16px; display:block; }
+
+/* "Tablo" kutusu — satır ızgarası */
+.gp-table{
+  max-width: 760px; margin: 0 auto;
+  background: var(--card);
+  border: 1px solid var(--cardBorder);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 16px 40px rgba(0,0,0,.35);
+}
+.gp-row{
+  display: grid; grid-template-columns: 1fr 140px;
+  align-items: center; gap: 12px;
+  padding: 12px 14px;
+  border-top: 1px solid var(--cardBorder);
+}
+.gp-row:first-child{ border-top:0; }
+.gp-row:nth-child(odd){ background: rgba(148,163,184,.05); }
+
+.gp-label{
+  display:flex; align-items:center; gap:10px; font-weight:800;
+}
+.gp-label .dot{ width:10px; height:10px; border-radius:999px; }
+.gp-label.turkce   .dot{ background:#fb923c; }
+.gp-label.sosyal   .dot{ background:#6366f1; }
+.gp-label.din      .dot{ background:#22c55e; }
+.gp-label.ing      .dot{ background:#0ea5e9; }
+.gp-label.matematik .dot{ background:#f43f5e; }
+.gp-label.fen      .dot{ background:#14b8a6; }
+
+.gp-input{
+  width:100%;
+  min-height:42px; font-size:16px; text-align:center; font-weight:700;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--cardBorder);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+.gp-input::-webkit-outer-spin-button,
+.gp-input::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+.gp-input{ -moz-appearance: textfield; }
+
+#goalsPage .gp-note{
+  max-width:760px; margin:8px auto 0; opacity:.8;
+}
+
+/* Mobil ayar */
+@media (max-width: 560px){
+  .gp-row{ grid-template-columns: 1fr 110px; padding: 10px 12px; }
+  .gp-input{ min-height:38px; font-size:15px; }
+}
+
+/* === Goals Page header buttons: same size + custom colors === */
+#goalsPage .gp-header .gp-btn{
+  min-height: 40px;
+  min-width: 120px;
+  padding: 8px 14px;
+  border-radius: 12px;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+#goalsPage .gp-header .gp-btn .icon{ width:16px; height:16px; }
+
+/* Back = red */
+#goalsPage .gp-header .gp-back{
+  background: linear-gradient(180deg,#ef4444,#dc2626) !important;
+  color:#fff !important;
+  border:1px solid #7f1d1d;
+  box-shadow:0 6px 16px rgba(239,68,68,.25), inset 0 1px 0 rgba(255,255,255,.08);
+}
+
+/* Clear = green */
+#goalsPage .gp-header .gp-clear{
+  background: linear-gradient(180deg,#10b981,#059669) !important;
+  color:#fff !important;
+  border:1px solid #065f46;
+  box-shadow:0 6px 16px rgba(16,185,129,.25), inset 0 1px 0 rgba(255,255,255,.08);
+}
+
+/* Override: goals title left-aligned and larger */
+#goalsPage .gp-header .gp-title{
+  position: static !important;
+  left: auto !important;
+  transform: none !important;
+  text-align: left !important;
+  font-size: 1.5rem !important; /* biraz büyütüldü */
+  line-height: 1.3 !important;
+}
+
+/* === Parent Mode Patch v2: Mirror student panel for parents, keep daily calendar; hide entry form in parent mode === */
+/* Hide only in parent mode */
+body[data-role="parent"] #studentTab-entry #lessonForm { display:none !important; }
+body[data-role="parent"] #studentTab-entry .totalBar { display:none !important; }
+body[data-role="parent"] #studentTab-entry .addBtn { display:none !important; }
+/* Optional: keep layout tidy when form is hidden */
+body[data-role="parent"] #studentTab-entry .student-toolbar { margin-bottom: 8px; }
+
+.footer{
+  position:fixed;
+  bottom:0;
+  right:0;
+  padding: 8px 12px;
+  font-size:12px;
+  color: #64748b;
+  z-index:100;
+}
+  </style>
 </head>
 <body>
 <div id="reportOverlay" onclick="closeReportModal()"></div>
@@ -361,6 +1013,7 @@ html, body { width: 100%; }
 <select id="rClass"><option value="">Sınıf Seçin</option></select>
 <input autocomplete="off" id="rNumber" placeholder="Okul Numarası" type="text"/>
 <input autocomplete="new-password" id="rPass" placeholder="Şifre" type="password"/>
+<!-- YENİ: Şifre Tekrar -->
 <input autocomplete="new-password" id="rPass2" placeholder="Şifre (Tekrar)" type="password"/>
 <small id="passMismatchError" style="display:none;color:#ef4444;font-weight:600;">Şifreler eşleşmiyor</small>
 <button class="action" id="registerBtn" onclick="studentRegister()" type="button">Kayıt</button>
@@ -379,6 +1032,7 @@ html, body { width: 100%; }
 <div class="roleGrid">
 <button aria-label="Öğrenci Girişi" class="roleCard" onclick="enterAsStudent()" type="button">
 <div aria-hidden="true" class="roleIcon">
+<!-- Tek kişi ikonu -->
 <svg fill="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
 <path d="M12 12c2.761 0 5-2.686 5-6s-2.239-6-5-6-5 2.686-5 6 2.239 6 5 6Zm0 2c-4.418 0-8 2.686-8 6v2h16v-2c0-3.314-3.582-6-8-6Z"></path>
 </svg>
@@ -387,6 +1041,7 @@ html, body { width: 100%; }
 </button>
 <button aria-label="Veli Girişi" class="roleCard parent" onclick="enterAsParent()" type="button">
 <div aria-hidden="true" class="roleIcon">
+<!-- İki kişi ikonu -->
 <svg fill="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
 <path d="M16 11c2.209 0 4-2.239 4-5s-1.791-5-4-5-4 2.239-4 5 1.791 5 4 5Zm-8 0c2.209 0 4-2.239 4-5S10.209 1 8 1 4 3.239 4 6s1.791 5 4 5Zm8 2c-2.761 0-5.2.937-6.64 2.378C7.409 14.855 5.132 14 3 14c-1.657 0-3 1.567-3 3.5V21h10v-2c0-1.252.467-2.393 1.256-3.33C12.466 14.646 14.066 14 16 14c3.866 0 7 2.015 7 4.5V21h-8v-1.5c0-2.485-1.79-4.5-4-4.5Z"></path>
 </svg>
@@ -410,27 +1065,157 @@ html, body { width: 100%; }
 <div class="container" id="studentPanel" style="display:none">
 <h3>Öğrenci Paneli</h3>
 <div class="studentWelcomeBanner" id="studentWelcome" style="display:none"></div>
+<div id="sotwContainerStudent" class="sotwContainer"></div>
+<div id="studentStatsContainer" class="studentStats"></div>
 <div class="pillTabs" id="studentTabs">
 <button class="pill active" id="stuTabEntryBtn" onclick="showStudentTab('entry')">Soru Girişi</button>
 <button class="pill" id="stuTabWeekBtn" onclick="showStudentTab('week')">Haftalık Rapor</button>
 <button class="pill" id="stuTabMonthBtn" onclick="showStudentTab('month')">Aylık Rapor</button>
 </div>
 <div id="studentTab-entry">
-<div class="sectionTitle">Soru Girişi</div>
-<form id="lessonForm">
-<table>
-<tr><th>Ders</th><th>Çözülen Soru</th></tr>
-<tr><td>Türkçe</td><td><input type="number" id="Turkce" inputmode="numeric"></td></tr>
-<tr><td>Sosyal Bilgiler</td><td><input type="number" id="Sosyal" inputmode="numeric"></td></tr>
-<tr><td>Din Kültürü</td><td><input type="number" id="Din" inputmode="numeric"></td></tr>
-<tr><td>İngilizce</td><td><input type="number" id="Ingilizce" inputmode="numeric"></td></tr>
-<tr><td>Matematik</td><td><input type="number" id="Matematik" inputmode="numeric"></td></tr>
-<tr><td>Fen Bilimleri</td><td><input type="number" id="Fen" inputmode="numeric"></td></tr>
-</table>
-<button type="button" class="action" onclick="addAll()">Ekle</button>
-</form>
-<div id="studentRecords" class="list"></div>
+<div class="student-toolbar">
+<div style="display:flex; gap:8px; align-items:center;">
+<strong>Öğrenci Paneli</strong>
+<span class="chip"><span class="dot" style="background:transparent;border:1px solid var(--cardBorder)"></span>Liste v5.4</span>
 </div>
+<div style="display:flex; gap:8px;">
+<button class="densityToggle" id="densityToggleBtn" title="Yoğun Mod" type="button">Yoğun Mod</button>
+</div>
+<div class="targetInfo" id="studentTargetInfo" style="display:none">
+<div><small>Günlük Hedef</small> <span id="studentTargetValue">—</span> soru</div>
+<div>
+<button class="pill" onclick="openTargetForCurrent()" type="button">Düzenle</button>
+</div>
+</div>
+</div>
+<form id="lessonForm">
+<div class="sectionTitle">Soru Girişi</div>
+<label for="entryDate" style="opacity: 0.8; font-size: 14px;">Giriş yapılacak tarih (Sadece bu hafta içinde bir gün seçilebilir):</label>
+<input type="date" id="entryDate">
+<ul class="lessonList dense" role="list">
+<li class="lessonRow dense">
+<span class="chip turkce"><span class="dot"></span>Türkçe</span>
+<div class="lessonControls">
+<span aria-label="Soru sayısı" class="countWrap">
+<button aria-label="Türkçe azalt" class="numBtn" data-step="-1" data-target="Turkce" type="button">−</button>
+<input id="Turkce" inputmode="numeric" min="0" placeholder="0" type="number"/>
+<button aria-label="Türkçe artır" class="numBtn" data-step="1" data-target="Turkce" type="button">+</button>
+</span>
+<span class="goalWrap" title="Hedef">
+<span aria-hidden="true" class="goalIcon">🎯</span>
+<label class="sr-only" for="goal-Turkce">Türkçe hedef</label>
+<input class="goalInput" id="goal-Turkce" inputmode="numeric" min="1" placeholder="50" type="number" value="50"/>
+</span>
+</div>
+<div class="rowFooter">
+<div class="progressWrap"><div class="progressBar" data-bar-for="Turkce"></div></div>
+<span class="pctBadge zero" data-pct-for="Turkce">0%</span>
+</div>
+</li>
+<li class="lessonRow dense">
+<span class="chip sosyal"><span class="dot"></span>Sosyal Bilgiler</span>
+<div class="lessonControls">
+<span aria-label="Soru sayısı" class="countWrap">
+<button aria-label="Sosyal Bilgiler azalt" class="numBtn" data-step="-1" data-target="Sosyal" type="button">−</button>
+<input id="Sosyal" inputmode="numeric" min="0" placeholder="0" type="number"/>
+<button aria-label="Sosyal Bilgiler artır" class="numBtn" data-step="1" data-target="Sosyal" type="button">+</button>
+</span>
+<span class="goalWrap" title="Hedef">
+<span aria-hidden="true" class="goalIcon">🎯</span>
+<label class="sr-only" for="goal-Sosyal">Sosyal Bilgiler hedef</label>
+<input class="goalInput" id="goal-Sosyal" inputmode="numeric" min="1" placeholder="50" type="number" value="50"/>
+</span>
+</div>
+<div class="rowFooter">
+<div class="progressWrap"><div class="progressBar" data-bar-for="Sosyal"></div></div>
+<span class="pctBadge zero" data-pct-for="Sosyal">0%</span>
+</div>
+</li>
+<li class="lessonRow dense">
+<span class="chip din"><span class="dot"></span>Din Kültürü</span>
+<div class="lessonControls">
+<span aria-label="Soru sayısı" class="countWrap">
+<button aria-label="Din Kültürü azalt" class="numBtn" data-step="-1" data-target="Din" type="button">−</button>
+<input id="Din" inputmode="numeric" min="0" placeholder="0" type="number"/>
+<button aria-label="Din Kültürü artır" class="numBtn" data-step="1" data-target="Din" type="button">+</button>
+</span>
+<span class="goalWrap" title="Hedef">
+<span aria-hidden="true" class="goalIcon">🎯</span>
+<label class="sr-only" for="goal-Din">Din Kültürü hedef</label>
+<input class="goalInput" id="goal-Din" inputmode="numeric" min="1" placeholder="50" type="number" value="50"/>
+</span>
+</div>
+<div class="rowFooter">
+<div class="progressWrap"><div class="progressBar" data-bar-for="Din"></div></div>
+<span class="pctBadge zero" data-pct-for="Din">0%</span>
+</div>
+</li>
+<li class="lessonRow dense">
+<span class="chip ing"><span class="dot"></span>İngilizce</span>
+<div class="lessonControls">
+<span aria-label="Soru sayısı" class="countWrap">
+<button aria-label="İngilizce azalt" class="numBtn" data-step="-1" data-target="Ingilizce" type="button">−</button>
+<input id="Ingilizce" inputmode="numeric" min="0" placeholder="0" type="number"/>
+<button aria-label="İngilizce artır" class="numBtn" data-step="1" data-target="Ingilizce" type="button">+</button>
+</span>
+<span class="goalWrap" title="Hedef">
+<span aria-hidden="true" class="goalIcon">🎯</span>
+<label class="sr-only" for="goal-Ingilizce">İngilizce hedef</label>
+<input class="goalInput" id="goal-Ingilizce" inputmode="numeric" min="1" placeholder="50" type="number" value="50"/>
+</span>
+</div>
+<div class="rowFooter">
+<div class="progressWrap"><div class="progressBar" data-bar-for="Ingilizce"></div></div>
+<span class="pctBadge zero" data-pct-for="Ingilizce">0%</span>
+</div>
+</li>
+<li class="lessonRow dense">
+<span class="chip mat"><span class="dot"></span>Matematik</span>
+<div class="lessonControls">
+<span aria-label="Soru sayısı" class="countWrap">
+<button aria-label="Matematik azalt" class="numBtn" data-step="-1" data-target="Matematik" type="button">−</button>
+<input id="Matematik" inputmode="numeric" min="0" placeholder="0" type="number"/>
+<button aria-label="Matematik artır" class="numBtn" data-step="1" data-target="Matematik" type="button">+</button>
+</span>
+<span class="goalWrap" title="Hedef">
+<span aria-hidden="true" class="goalIcon">🎯</span>
+<label class="sr-only" for="goal-Matematik">Matematik hedef</label>
+<input class="goalInput" id="goal-Matematik" inputmode="numeric" min="1" placeholder="50" type="number" value="50"/>
+</span>
+</div>
+<div class="rowFooter">
+<div class="progressWrap"><div class="progressBar" data-bar-for="Matematik"></div></div>
+<span class="pctBadge zero" data-pct-for="Matematik">0%</span>
+</div>
+</li>
+<li class="lessonRow dense">
+<span class="chip fen"><span class="dot"></span>Fen Bilimleri</span>
+<div class="lessonControls">
+<span aria-label="Soru sayısı" class="countWrap">
+<button aria-label="Fen Bilimleri azalt" class="numBtn" data-step="-1" data-target="Fen" type="button">−</button>
+<input id="Fen" inputmode="numeric" min="0" placeholder="0" type="number"/>
+<button aria-label="Fen Bilimleri artır" class="numBtn" data-step="1" data-target="Fen" type="button">+</button>
+</span>
+<span class="goalWrap" title="Hedef">
+<span aria-hidden="true" class="goalIcon">🎯</span>
+<label class="sr-only" for="goal-Fen">Fen Bilimleri hedef</label>
+<input class="goalInput" id="goal-Fen" inputmode="numeric" min="1" placeholder="50" type="number" value="50"/>
+</span>
+</div>
+<div class="rowFooter">
+<div class="progressWrap"><div class="progressBar" data-bar-for="Fen"></div></div>
+<span class="pctBadge zero" data-pct-for="Fen">0%</span>
+</div>
+</li>
+</ul>
+<div class="totalBar">
+<span>Genel Toplam:</span>
+<span class="totalBadge" id="globalTotal">0</span>
+</div>
+<button class="action addBtn" onclick="addAll()" type="button">Ekle</button>
+</form>
+<div class="list" id="studentRecords"></div>
+</div> <!-- /studentTab-entry -->
 <!-- === STUDENT WEEKLY REPORT TAB === -->
 <div id="studentTab-week" style="display:none">
 <div class="sectionTitle">Hafta Seç</div>
@@ -457,8 +1242,17 @@ html, body { width: 100%; }
 <p class="teacherWelcome" id="teacherWelcome"></p>
 <div class="teacherTopbar">
 <h3 style="margin:0">Öğretmen Paneli</h3>
-<button aria-label="Çıkış" class="exitSmall" onclick="logout()" title="Çıkış" type="button"><span aria-hidden="true" class="icon"><svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16"><path d="M14 7V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-2"></path><path d="M9 12h11"></path><path d="M13 8l-4 4 4 4"></path></svg></span><span class="label">Çıkış</span></button>
+<button aria-label="Çıkış" class="exitSmall" onclick="logout()" title="Çıkış" type="button"><span aria-hidden="true" class="icon">
+<svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="16">
+<!-- Simple logout icon: arrow left + door -->
+<path d="M14 7V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-2"></path>
+<path d="M9 12h11"></path>
+<path d="M13 8l-4 4l4 4"></path>
+</svg>
+</span>
+<span class="label">Çıkış</span></button>
 </div>
+<div id="sotwContainerTeacher" class="sotwContainer"></div>
 <div class="pillTabs" id="teacherTopTabs">
 <button class="pill active" id="tabClasses" onclick="showTeacherSection('classes')">Sınıflar</button>
 <button class="pill" id="tabFavorites" onclick="showTeacherSection('favorites')">Favorilerim</button>
@@ -495,15 +1289,17 @@ html, body { width: 100%; }
 </div>
 <div class="active" id="repTab-daily">
 <div class="sectionTitle" id="tsdTitle"></div>
+<!-- Takvim (tsdDays içinde üretilecek) -->
 <div id="tsdDays"></div>
+<!-- Seçilen Gün Kartı -->
 <div id="selDayBlock" style="margin-top:12px">
 <div class="sectionTitle">Seçilen Gün – Ders Tablosu</div>
 <div id="tsdDayTable"></div>
 </div>
+<!-- Genel Toplam -->
 <div class="sectionTitle" style="margin-top:12px">Genel Toplam (Ders Bazlı)</div>
 <div id="tsdTotals"></div>
-</div>
-<div id="repTab-weekly">
+</div><div id="repTab-weekly">
 <div class="sectionTitle">Haftalık Gelişim (Pzt–Paz)</div>
 <div class="smallRow" id="weekControls">
 <div class="smallRow" id="weekList"></div>
@@ -538,7 +1334,94 @@ html, body { width: 100%; }
 <div class="exportCard" id="exportTable"></div>
 <div id="exportLegend">Ders × Gün matrisi (Pzt–Paz). Renkler ve tipografi PDF için optimize edilmiştir.</div>
 </div>
+</div>
+
+<!-- Hedef Soru Modalı -->
+<div class="list asModal" id="targetModal" style="display:none; max-width:420px">
+<div class="modalHead">
+<div class="modalTabs">
+<strong>🎯 Öğrenci Hedefi</strong>
+</div>
+<button class="pill modalClose" onclick="closeTargetModal()">Kapat ×</button>
+</div>
+<div style="display:flex; flex-direction:column; gap:10px; padding:8px">
+<div id="targetStudentName" style="font-weight:700"></div>
+<label>Günlük hedef soru sayısı:</label>
+<input id="targetInput" inputmode="numeric" min="0" placeholder="örn. 100" step="1" type="number"/>
+<button class="action" onclick="saveTarget()" type="button">Kaydet</button>
+</div>
+</div>
+
+<!-- === Goals Full Page (Student/Teacher) — MODERN === -->
+<div id="goalsPage" style="display:none">
+<div class="gp-header">
+<div class="gp-left">
+<button class="pill gp-btn gp-back" onclick="backFromGoalsPage()" title="Öğrenci Paneline Dön" type="button">
+<span aria-hidden="true" class="icon">
+<!-- back -->
+<svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24"><path d="M15 18l-6-6 6-6"></path><path d="M21 12H9"></path></svg>
+</span>
+        Geri
+      </button>
+<div class="gp-title">🎯 Ders Soru sayısı Hedefleri</div>
+</div>
+<div class="gp-actions">
+<button class="pill gp-btn gp-clear" onclick="resetGoalsInputs()" type="button">
+<span aria-hidden="true" class="icon">
+<!-- temizle (broom) -->
+<svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24"><path d="M3 20l1-5 11-11 3 3L7 18l-4 2z"></path><path d="M14 6l4 4"></path></svg>
+</span>
+        Temizle
+      </button>
+<button class="action gp-btn" onclick="saveLessonGoals()" type="button">
+<span aria-hidden="true" class="icon">
+<!-- kaydet (check) -->
+<svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg>
+</span>
+        Kaydet
+      </button>
+</div>
+</div>
+<!-- Tablo kutusu -->
+<div class="gp-table">
+<div class="gp-row">
+<label class="gp-label turkce"><span class="dot"></span>Türkçe</label>
+<input class="gp-input" id="lg-Turkce" inputmode="numeric" min="1" placeholder="örn. 50" type="number"/>
+</div>
+<div class="gp-row">
+<label class="gp-label sosyal"><span class="dot"></span>Sosyal Bilgiler</label>
+<input class="gp-input" id="lg-Sosyal" inputmode="numeric" min="1" placeholder="örn. 50" type="number"/>
+</div>
+<div class="gp-row">
+<label class="gp-label din"><span class="dot"></span>Din Kültürü</label>
+<input class="gp-input" id="lg-Din" inputmode="numeric" min="1" placeholder="örn. 50" type="number"/>
+</div>
+<div class="gp-row">
+<label class="gp-label ing"><span class="dot"></span>İngilizce</label>
+<input class="gp-input" id="lg-Ingilizce" inputmode="numeric" min="1" placeholder="örn. 50" type="number"/>
+</div>
+<div class="gp-row">
+<label class="gp-label matematik"><span class="dot"></span>Matematik</label>
+<input class="gp-input" id="lg-Matematik" inputmode="numeric" min="1" placeholder="örn. 50" type="number"/>
+</div>
+<div class="gp-row">
+<label class="gp-label fen"><span class="dot"></span>Fen Bilimleri</label>
+<input class="gp-input" id="lg-Fen" inputmode="numeric" min="1" placeholder="örn. 50" type="number"/>
+</div>
+</div>
+<p class="gp-note">Not: Kaydet ile eski hedefler silinir, girilen son hedefler saklanır.</p>
+</div>
+
+<div class="footer">Tasarlayan Uğur Yaşayan</div>
+
 <script>
+    /* ===== Silme ikonu (çöp tenekesi SVG) ===== */
+    const TRASH_ICON = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBmaWxsPSIjZWY0NDQ0Ij4KICA8cGF0aCBkPSJNOSAyaDZ2Mmg1djJINFY0aDVWMnptLTMgNmgxMmwtMSAxMmEyIDIgMCAwIDEtMiAySDlhMiAyIDAgMCAxLTItMkw2IDh6bTQgM3Y3aDJ2LTdoLTJ6bTQgMHY3aDJ2LTdoLTJ6Ii8+Cjwvc3ZnPg==";
+
+    /* ===== Veli paneli yönlendirme adresi (gerekirse değiştirin) ===== */
+    const PARENT_PORTAL_URL = "veli.html"; // Örn: "veli-panel.html" veya tam URL
+    
+
     /* ============ Firebase Config ============ */
     const firebaseConfig = {
       apiKey: "AIzaSyD-D-Jp8GDuoc2b-My7cOpSViRyrcAypX0",
@@ -552,923 +1435,1482 @@ html, body { width: 100%; }
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
-/* ============ Global Durum ============ */
-let currentTargetEditNum = null;
-let currentStudent=null;
-let currentStudentName=null;
-let currentTeacherId=null, currentTeacherName=null;
-let stuWeekChart=null, stuMonthChart=null, _stuWeeks=[], _stuMonths=[];
-let favoritesCache={}, classesMap={}, activeClassName=null, currentDetailNum=null;
-let currentDetailLessons=null, currentWeeks=[], selectedWeekKey=null, weekChart=null;
-// --- Yeni: render çakışmalarını engellemek için ---
-let selectClassRenderToken = 0;
-// --- Yeni: dinleyicileri kapatmak için referanslar ---
-let favRef = null;
-let classesRef = null;
 
-/* ============ Yardımcılar ============ */
-function setAlert(msg){
-  const a=document.getElementById('alert');
-  if(!msg){ a.style.display='none'; a.textContent=''; return; }
-  a.textContent=msg; a.style.display='block';
-  setTimeout(()=>{ a.style.display='none'; }, 3500);
-}
-function showTab(tab){
-  // Sekme değiştirirken 'Giriş Türünü Seçin' panelini kapat ve öğrenci oturumunu sıfırla
-  const rc = document.getElementById('roleChoice');
-  if (rc) rc.style.display = 'none';
-  // Öğrenci oturumunu sıfırla (numara bilgisini temizle)
-  if (typeof currentStudent !== 'undefined') currentStudent = null;
-  ["register","studentLogin","teacherLogin"].forEach(id=>{
-    document.getElementById(id).style.display = (id===tab) ? "block" : "none";
-  });
-  document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));
-  if(tab==="register") document.getElementById("tabRegister").classList.add("active");
-  if(tab==="studentLogin") document.getElementById("tabStudent").classList.add("active");
-  if(tab==="teacherLogin") document.getElementById("tabTeacher").classList.add("active");
-}
-function normalizeId(str){
-  if(!str) return "";
-  const map={'ç':'c','ğ':'g','ı':'i','i':'i','ö':'o','ş':'s','ü':'u','Ç':'c','Ğ':'g','İ':'i','I':'i','Ö':'o','Ş':'s','Ü':'u'};
-  return str.trim().toLowerCase()
-    .replace(/[çğıİiöşüÇĞIÖŞÜ]/g, m=>map[m]||m)
-    .replace(/[^a-z0-9]+/g,'-')
-    .replace(/^-+|-+$/g,'');
-}
-function toTitleCaseTR(str){
-  if(!str) return "";
-  return String(str).toLocaleLowerCase('tr-TR')
-    .split(/\s+/).map(part=>{
-      return part.split('-').map(seg=>{
-        if(!seg) return seg;
-        return seg.charAt(0).toLocaleUpperCase('tr-TR') + seg.slice(1);
-      }).join('-');
-    }).join(' ');
-}
-function isPrivilegedTeacher(){
-  if(!currentTeacherName) return false;
-  const low = s=>s.trim().toLocaleLowerCase('tr-TR');
-  return low(currentTeacherName) === low("Uğur Yaşayan");
-}
+    /* ============ Global Durum ============ */
+    let currentStudent=null;
+    let currentStudentName=null; // Öğrenci adı (hoşgeldin için)
+    let currentTeacherId=null, currentTeacherName=null;
+    let stuWeekChart=null, stuMonthChart=null, _stuWeeks=[], _stuMonths=[];
+    let favoritesCache={}, classesMap={}, activeClassName=null, currentDetailNum=null;
+    let currentDetailLessons=null, currentWeeks=[], selectedWeekKey=null, weekChart=null;
+    let tMonthChart = null, _tMonths = [];
 
-/* ============ Öğrenci kayıt & giriş ============ */
-function studentRegister(){
-  const name=document.getElementById("rName").value.trim();
-  const sclass=document.getElementById("rClass").value;
-  const num=document.getElementById("rNumber").value.trim();
-  const pass=document.getElementById("rPass").value;
-  const pass2=document.getElementById("rPass2").value;
-  if(!name||!sclass||!num||!pass||!pass2){
-    setAlert("Tüm alanları doldurun."); return;
-  }
-  if(pass!==pass2){
-    setAlert("Şifreler eşleşmiyor. Lütfen şifreyi iki kez aynı girin."); return;
-  }
-  db.ref("students/"+num).get().then(snap=>{
-    if(snap.exists()){
-      setAlert("Bu üye sisteme kayıtlıdır");
-      return Promise.reject("duplicate");
+    // --- Yeni: render çakışmalarını engellemek için ---
+    let selectClassRenderToken = 0;
+
+    // --- Yeni: dinleyicileri kapatmak için referanslar ---
+    let favRef = null;
+    let classesRef = null;
+
+    // Track active role
+    window.activeRole = window.activeRole || 'student';
+
+    /* ============ Yardımcılar ============ */
+    function setAlert(msg){
+      const a=document.getElementById('alert');
+      if(!msg){ a.style.display='none'; a.textContent=''; return; }
+      a.textContent=msg; a.style.display='block';
+      setTimeout(()=>{ a.style.display='none'; }, 3500);
     }
-    return db.ref("students/"+num).set({name,sclass,num,pass});
-  }).then(()=>{
-    setAlert("Kayıt başarılı!");
-    showTab("studentLogin");
-  }).catch(e=>{
-    if(e!=="duplicate") setAlert("Hata: "+e.message);
-  });
-}
-function studentLogin(){
-  const num=document.getElementById("lNumber").value.trim();
-  const pass=document.getElementById("lPass").value;
-  db.ref("students/"+num).get().then(snap=>{
-    if(snap.exists() && snap.val().pass===pass){
-      currentStudent = num;
+    function showTab(tab){
+      // Sekme değiştirirken 'Giriş Türünü Seçin' panelini kapat ve öğrenci oturumunu sıfırla
+      const rc = document.getElementById('roleChoice');
+      if (rc) rc.style.display = 'none';
+      // Öğrenci oturumunu sıfırla (numara bilgisini temizle)
+      if (typeof currentStudent !== 'undefined') currentStudent = null;
+
+      ["register","studentLogin","teacherLogin"].forEach(id=>{
+        document.getElementById(id).style.display = (id===tab) ? "block" : "none";
+      });
+      document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));
+      if(tab==="register") document.getElementById("tabRegister").classList.add("active");
+      if(tab==="studentLogin") document.getElementById("tabStudent").classList.add("active");
+      if(tab==="teacherLogin") document.getElementById("tabTeacher").classList.add("active");
+    }
+    function normalizeId(str){
+      if(!str) return "";
+      const map={'ç':'c','ğ':'g','ı':'i','i':'i','ö':'o','ş':'s','ü':'u','Ç':'c','Ğ':'g','İ':'i','I':'i','Ö':'o','Ş':'s','Ü':'u'};
+      return str.trim().toLowerCase()
+        .replace(/[çğıİiöşüÇĞIÖŞÜ]/g, m=>map[m]||m)
+        .replace(/[^a-z0-9]+/g,'-')
+        .replace(/^-+|-+$/g,'');
+    }
+    // Basit HTML kaçışları (güvenli veri yazımı için)
+    function escHTML(s){ return String(s||"").replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
+    function escAttr(s){ return escHTML(s); }
+
+    // Türkçe baş harfleri büyüt (Ad Soyad -> Ad Soyad)
+    function toTitleCaseTR(str){
+      if(!str) return "";
+      return String(str).toLocaleLowerCase('tr-TR')
+        .split(/\s+/).map(part=>{
+          return part.split('-').map(seg=>{
+            if(!seg) return seg;
+            return seg.charAt(0).toLocaleUpperCase('tr-TR') + seg.slice(1);
+          }).join('-');
+        }).join(' ');
+    }
+    function isPrivilegedTeacher(){
+      if(!currentTeacherName) return false;
+      const low = s=>s.trim().toLocaleLowerCase('tr-TR');
+      return low(currentTeacherName) === low("Uğur Yaşayan");
+    }
+
+    // Takvim yardımcıları
+    function parseTRDateStr(dstr){ const [dd,mm,yy]=dstr.split('.').map(x=>parseInt(x,10)); return new Date(yy, mm-1, dd); }
+    function formatTR(d){ return d.toLocaleDateString("tr-TR"); }
+    function mondayOf(date){ const d=new Date(date.getFullYear(),date.getMonth(),date.getDate()); const day=d.getDay(); const diff=(day===0?-6:1-day); d.setDate(d.getDate()+diff); d.setHours(0,0,0,0); return d; }
+    function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
+    function stuAddMonths(d,n){ return new Date(d.getFullYear(), d.getMonth()+n, 1); }
+    function stuSameYMD(a,b){ return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
+
+    /* ============ Öğrenci kayıt & giriş ============ */
+    async function studentRegister(){
+      const nameInput = document.getElementById("rName").value.trim();
+      const sclass=document.getElementById("rClass").value;
+      const num=document.getElementById("rNumber").value.trim();
+      const pass=document.getElementById("rPass").value;
+      const pass2=document.getElementById("rPass2").value;
+
+      if(!nameInput||!sclass||!num||!pass||!pass2){
+        setAlert("Tüm alanları doldurun."); return;
+      }
+      if(pass!==pass2){
+        setAlert("Şifreler eşleşmiyor. Lütfen şifreyi iki kez aynı girin."); return;
+      }
+
+      const name = toTitleCaseTR(nameInput);
+      
+      try {
+        const snap = await db.ref("students").get();
+        if (snap.exists()) {
+            const students = snap.val();
+            let numExists = false;
+            let nameExists = false;
+            for(const key in students) {
+                if(students[key].num === num) numExists = true;
+                if(students[key].name.toLowerCase() === name.toLowerCase()) nameExists = true;
+            }
+            if(numExists) {
+                setAlert("Bu okul numarası zaten kayıtlı. Lütfen farklı bir numara girin.");
+                return;
+            }
+            if(nameExists) {
+                setAlert("Bu isimde bir öğrenci zaten kayıtlı. Lütfen farklı bir isim girin.");
+                return;
+            }
+        }
+        const id=normalizeId(name);
+        await db.ref(`students/${id}`).set({ name, num, class: sclass, pass, dailyTarget: 100 });
+        setAlert(`✅ ${name} başarıyla kaydedildi. Giriş yapabilirsiniz.`);
+        document.getElementById("rName").value="";
+        document.getElementById("rClass").value="";
+        document.getElementById("rNumber").value="";
+        document.getElementById("rPass").value="";
+        document.getElementById("rPass2").value="";
+      } catch (err) {
+        console.error("Kayıt hatası:", err);
+        setAlert("Kayıt başarısız. Lütfen tekrar deneyin.");
+      }
+    }
+
+    async function studentLogin(){
+      const num=document.getElementById("lNumber").value.trim();
+      const pass=document.getElementById("lPass").value;
+      if(!num||!pass){ setAlert("Numara ve şifre girin."); return; }
+      try {
+        const snap=await db.ref("students").get();
+        if(!snap.exists()){ setAlert("Kayıtlı öğrenci yok."); return; }
+        const students=snap.val();
+        let found=null;
+        for(const id in students){
+          const s=students[id];
+          if(s.num===num && s.pass===pass){ found={...s,id}; break; }
+        }
+        if(!found){ setAlert("Numara veya şifre hatalı."); return; }
+        currentStudent=found.id;
+        currentStudentName = found.name;
+        // Giriş türü seçimi ekranını göster
+        document.getElementById("roleChoiceHello").textContent = `Merhaba ${found.name}! Giriş türünü seçin:`;
+        document.getElementById("loginPanel").style.display="none";
+        document.getElementById("roleChoice").style.display="block";
+      } catch (err) {
+        console.error("Giriş hatası:", err);
+        setAlert("Giriş başarısız. Lütfen tekrar deneyin.");
+      }
+    }
+
+    function enterAsStudent() {
+      window.activeRole = 'student';
+      document.getElementById("roleChoice").style.display="none";
+      document.getElementById("studentPanel").style.display="block";
+      document.getElementById("studentWelcome").textContent = `Merhaba ${currentStudentName}!`;
+      document.getElementById("studentWelcome").style.display="block";
+      loadStudentData();
+      calculateAndDisplaySOTW();
+      setupDatePicker();
+      calculateAndDisplayStudentStats();
+    }
+
+    function enterAsParent() {
+      window.activeRole = 'parent';
+      // Veli modu: öğrenci paneli görünümünü göster ama formu gizle
+      document.getElementById("roleChoice").style.display="none";
+      document.getElementById("studentPanel").style.display="block";
+      document.getElementById("studentWelcome").textContent = `Veli Görünümü: ${currentStudentName}`;
+      document.getElementById("studentWelcome").style.display="block";
+      document.body.setAttribute('data-role', 'parent');
+      loadStudentData();
+      calculateAndDisplaySOTW();
+      setupDatePicker();
+      calculateAndDisplayStudentStats();
+    }
+
+    function exitToHome() {
+      document.getElementById("roleChoice").style.display="none";
+      document.getElementById("loginPanel").style.display="block";
+      showTab('studentLogin');
+      // Öğrenci oturumunu sıfırla
+      currentStudent = null;
+      currentStudentName = null;
+    }
+
+    async function teacherLogin(){
+      const name=document.getElementById("tName").value.trim();
+      const code=document.getElementById("tCode").value;
+      if(!name||!code){ setAlert("Ad ve kod girin."); return; }
+      if(code!=="703504"){ setAlert("Geçersiz kod."); return; }
+      currentTeacherId=normalizeId(name);
+      currentTeacherName=toTitleCaseTR(name);
+      document.getElementById("loginPanel").style.display="none";
+      document.getElementById("teacherPanel").style.display="block";
+      document.getElementById("teacherWelcome").textContent=`Merhaba ${currentTeacherName}!`;
+      loadClasses();
+      loadFavorites();
+      calculateAndDisplaySOTW();
+    }
+
+    function logout(){
+      currentStudent=null;
+      currentTeacherId=null;
+      currentTeacherName=null;
+      document.getElementById("studentPanel").style.display="none";
+      document.getElementById("teacherPanel").style.display="none";
+      document.getElementById("loginPanel").style.display="block";
+      document.getElementById("roleChoice").style.display="none";
+      document.getElementById("teacherStudentDetail").style.display="none";
+      document.getElementById("reportOverlay").style.display="none";
+      document.getElementById("goalsPage").style.display="none";
+      document.body.removeAttribute('data-role');
+      // Dinleyicileri temizle
+      if(favRef) favRef.off(); favRef=null;
+      if(classesRef) classesRef.off(); classesRef=null;
+      showTab("register");
+      // Formları temizle
+      document.getElementById("rName").value="";
+      document.getElementById("rNumber").value="";
+      document.getElementById("rPass").value="";
+      document.getElementById("rPass2").value="";
+      document.getElementById("lNumber").value="";
       document.getElementById("lPass").value="";
-      showRoleChoice(snap.val());
-    }else{
-      setAlert("Numara veya şifre hatalı.");
+      document.getElementById("tName").value="";
+      document.getElementById("tCode").value="";
+      setAlert("");
     }
-  });
-}
-// Giriş başarılı ise tür seçimi panelini göster
-function showRoleChoice(student){
-  try{ currentStudentName = (student && student.name) ? student.name : null; }catch(_){}
-  // Kayıt ve diğer giriş panellerini gizle, sadece seçim panelini göster
-  const reg=document.getElementById("register");
-  const stu=document.getElementById("studentLogin");
-  const tea=document.getElementById("teacherLogin");
-  const rc =document.getElementById("roleChoice");
-  if(reg) reg.style.display="none";
-  if(stu) stu.style.display="none";
-  if(tea) tea.style.display="none";
-  if(rc)  rc.style.display="block";
-  // Sekmelerde aktiflik kaldır
-  document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));
-  // Selamlama
-  const prettyName = toTitleCaseTR((student && student.name) ? student.name : "");
-  const hello = document.getElementById("roleChoiceHello");
-  if(hello){
-    if(prettyName){
-      hello.textContent = `${prettyName} (${student.num}) olarak giriş yaptınız. Lütfen devam edin.`;
-    }else{
-      hello.textContent = "Giriş başarılı. Lütfen devam edin.";
-    }
-  }
-}
-// Öğrenci olarak devam et – mevcut sayfadaki öğrenci paneli
-function enterAsStudent(){
-  document.getElementById("roleChoice").style.display="none";
-  document.getElementById("loginPanel").style.display="none";
-  document.getElementById("studentPanel").style.display="block";
-  try{ setWelcomeStudentBanner(); }catch(_){}
-  try{ loadStudentTarget(); }catch(_){}
-  try{ loadLessonGoals(); }catch(_){}
-  showStudentTab('entry');
-  loadStudentData();
-}
-// Veli olarak devam et – farklı sayfaya yönlendir
-function enterAsParent(){
-  const base = (typeof PARENT_PORTAL_URL==='string' && PARENT_PORTAL_URL) ? PARENT_PORTAL_URL : "veli.html";
-  const target = currentStudent ? (base + (base.includes('?')?'&':'?') + 'num=' + encodeURIComponent(currentStudent)) : base;
-  window.location.href = target;
-}
-// Seçim ekranından geri dön
-function backToLogin(){
-  currentStudent = null;
-  const rc=document.getElementById('roleChoice'); if(rc) rc.style.display='none';
-  showTab("studentLogin");
-}
-function logout(){
-  const rc=document.getElementById('roleChoice'); if(rc) rc.style.display='none';
-  if(classesRef){ classesRef.off(); classesRef=null; }
-  if(favRef){ favRef.off(); favRef=null; }
-  currentStudent=null; currentDetailNum=null; currentStudentName=null;
-  try{ var b=document.getElementById('studentWelcome'); if(b){ b.style.display='none'; b.textContent=''; } }catch(_){ }
-  try{ setStudentTargetInfo(null); }catch(_){}
-  currentTeacherId=null; currentTeacherName=null; favoritesCache={};
-  ["rName","rNumber","rPass","rPass2","lNumber","lPass","tName","tCode","newClass"].forEach(id=>{const el=document.getElementById(id); if(el) el.value="";});
-  ["studentPanel","teacherPanel","teacherStudentDetail"].forEach(id=>document.getElementById(id).style.display="none");
-  document.getElementById("loginPanel").style.display="block";
-  showTab("studentLogin");
-  destroyWeekChart();
-}
 
-/* ============ Öğrenci Paneli ============ */
-function setWelcomeStudentBanner(){
-  try{
-    var box = document.getElementById('studentWelcome');
-    if(!box) return;
-    var name = currentStudentName;
-    function apply(nm){
-      var pretty = toTitleCaseTR(nm||'').trim();
-      if(pretty){
-        box.textContent = 'Sayfana hoş geldin ' + pretty + '.';
-        box.style.display = 'block';
-      }else{
-        box.style.display = 'none';
+    /* ============ Öğrenci İşlemleri ============ */
+    async function loadStudentData(){
+      const today=new Date();
+      const todayStr=formatTR(today);
+      const weekStart=mondayOf(today);
+      const weekEnd=addDays(weekStart,6);
+      const weekKey=`${weekStart.getFullYear()}-${(weekStart.getMonth()+1).toString().padStart(2,'0')}-${weekStart.getDate().toString().padStart(2,'0')}`;
+      try {
+        const snap=await db.ref(`students/${currentStudent}/weeks/${weekKey}`).get();
+        const data=snap.exists()?snap.val():{};
+        // Günlük hedefi yükle
+        const targetSnap = await db.ref(`students/${currentStudent}/dailyTarget`).get();
+        const target = targetSnap.exists() ? targetSnap.val() : 100;
+        document.getElementById("studentTargetValue").textContent = target;
+        document.getElementById("studentTargetInfo").style.display = "flex";
+        // Hedefleri yükle
+        const goalsSnap = await db.ref(`students/${currentStudent}/goals`).get();
+        const goals = goalsSnap.exists() ? goalsSnap.val() : {};
+        // Günlük formdaki hedef inputlarını doldur
+        ["Turkce","Sosyal","Din","Ingilizce","Matematik","Fen"].forEach(subj=>{
+          const inp = document.getElementById(`goal-${subj}`);
+          if(inp && goals[subj]) inp.value = goals[subj];
+        });
+        // Bugünün verisini yükle
+        const todayData = data[todayStr] || {};
+        ["Turkce","Sosyal","Din","Ingilizce","Matematik","Fen"].forEach(subj=>{
+          const inp=document.getElementById(subj);
+          if(inp) inp.value=todayData[subj]||"0";
+        });
+        updateProgressBars();
+        updateStudentRecords();
+      } catch (err) {
+        console.error("Öğrenci verisi yükleme hatası:", err);
+        setAlert("Veri yüklenemedi.");
       }
     }
-    if(name){ apply(name); return; }
-    if(currentStudent){
-      firebase.database().ref('students/' + currentStudent).get().then(function(snap){
-        if(snap && snap.exists()){
-          currentStudentName = (snap.val() && snap.val().name) ? snap.val().name : null;
-          apply(currentStudentName);
-        }else{
-          box.style.display='none';
-        }
-      }).catch(function(){ box.style.display='none'; });
-    }else{
-      box.style.display='none';
+
+    function setupDatePicker(){
+      const today = new Date();
+      const todayStr = today.toISOString().split('T')[0];
+      const entryDate = document.getElementById("entryDate");
+      if(entryDate) entryDate.value = todayStr;
+      // Bu hafta içinde sadece bir gün seçilebilir
+      const weekStart = mondayOf(today);
+      const weekEnd = addDays(weekStart, 6);
+      entryDate.min = weekStart.toISOString().split('T')[0];
+      entryDate.max = weekEnd.toISOString().split('T')[0];
     }
-  }catch(e){ /* no-op */ }
-}
-function addAll(){
-  if(!currentStudent){ setAlert("Oturum bulunamadı."); return; }
-  const map={"Türkçe":"Turkce","Sosyal Bilgiler":"Sosyal","Din Kültürü":"Din","İngilizce":"Ingilizce","Matematik":"Matematik","Fen Bilimleri":"Fen"};
-  const now=new Date();
-  const timeStr=now.toLocaleDateString("tr-TR")+" "+now.toLocaleTimeString("tr-TR");
-  for(const lesson in map){
-    let v=parseInt(document.getElementById(map[lesson]).value);
-    if(isNaN(v)) v=0;
-    db.ref("students/"+currentStudent+"/lessons/"+lesson).push({count:v,time:timeStr});
-  }
-  setAlert("Kayıt eklendi!");
-  document.getElementById("lessonForm").reset();
-  loadStudentData();
-}
-function loadStudentData(){
-  const box=document.getElementById("studentRecords");
-  box.innerHTML="Yükleniyor...";
-  db.ref("students/"+currentStudent+"/lessons").get().then(snap=>{
-    const grouped={};
-    if(snap.exists()){
-      const data=snap.val();
-      for(const lesson in data){
-        for(const key in data[lesson]){
-          const e=data[lesson][key];
-          const day=(e.time||"").split(" ")[0]||"Bilinmeyen";
-          if(!grouped[day]) grouped[day]={ totalPerLesson:{}, keysPerLesson:{} };
-          grouped[day].totalPerLesson[lesson]=(grouped[day].totalPerLesson[lesson]||0) + (Number(e.count)||0);
-          (grouped[day].keysPerLesson[lesson] ||= []).push(key);
+
+    function updateProgressBars(){
+      const total = document.getElementById("globalTotal");
+      let globalSum = 0;
+      ["Turkce","Sosyal","Din","Ingilizce","Matematik","Fen"].forEach(subj=>{
+        const inp=document.getElementById(subj);
+        const val=parseInt(inp?.value||0,10)||0;
+        globalSum += val;
+        // İlerleme çubuğu
+        const goalInp=document.getElementById(`goal-${subj}`);
+        const goal=parseInt(goalInp?.value||0,10)||1;
+        const pct = Math.min(100, Math.round(val*100/goal));
+        const bar=document.querySelector(`[data-bar-for="${subj}"]`);
+        if(bar) bar.style.width=`${pct}%`;
+        const badge=document.querySelector(`[data-pct-for="${subj}"]`);
+        if(badge){
+          badge.textContent=`${pct}%`;
+          badge.className=`pctBadge ${pct>=100?'':pct>0?'low':'zero'}`;
+        }
+      });
+      if(total) total.textContent = globalSum;
+    }
+
+    // Numara butonları ve input değişikliklerini dinle
+    document.addEventListener('click', e=>{
+      if(e.target.classList.contains('numBtn')){
+        const {target,step}=e.target.dataset;
+        const inp=document.getElementById(target);
+        if(inp){
+          let v=parseInt(inp.value||0,10)||0;
+          v+=parseInt(step,10);
+          if(v<0) v=0;
+          inp.value=v;
+          updateProgressBars();
         }
       }
-    }
-    box.innerHTML = `
-      <div id="calendarWrap" class="calendarWrap"></div>
-      <div id="selDayBlock" style="margin-top:12px">
-        <div class="sectionTitle">Seçilen Gün – Ders Tablosu</div>
-        <div id="stuDayTable"></div>
-      </div>
-    `;
-    const allDays = Object.keys(grouped);
-    window._calCtx = { grouped, selectedDate:new Date(), hasSet:new Set(allDays) };
-    renderStudentCalendar();
-  });
-}
-function renderStudentCalendar(){
-  const wrap = document.getElementById("calendarWrap");
-  if(!wrap) return;
-  const ctx = window._calCtx;
-  const monthLabel = ctx.selectedDate.toLocaleDateString('tr-TR', {month:'long', year:'numeric'});
-  let html = `
-    <div class="calHeader">
-      <div class="calTitle">${monthLabel}</div>
-      <div class="calNav">
-        <button class="calBtn" type="button" onclick="stuCalPrevMonth()">‹</button>
-        <button class="calBtnToday" type="button" id="btnToday" onclick="stuGoToday()">Bugün</button>
-        <button class="calBtn" type="button" onclick="stuCalNextMonth()">›</button>
-      </div>
-    </div>
-    <div class="calGrid">
-      ${['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'].map(d=>`<div class="calWd">${d}</div>`).join('')}
-  `;
-  const startGrid = mondayOf(new Date(ctx.selectedDate.getFullYear(), ctx.selectedDate.getMonth(), 1));
-  for(let i=0;i<42;i++){
-    const d = addDays(startGrid, i);
-    const inMonth = d.getMonth() === ctx.selectedDate.getMonth();
-    const dayStr = formatTR(d);
-    const hasData = ctx.hasSet.has(dayStr);
-    const isToday = stuSameYMD(d, new Date());
-    const isSelected = stuSameYMD(d, ctx.selectedDate);
-    html += `
-      <div class="calCell ${inMonth?'':'muted'} ${isToday?'today':''} ${isSelected?'selected':''}"
-           onclick="stuSelectDate('${dayStr}')">
-        <span class="calDay">${d.getDate()}</span>
-        ${hasData ? '<span class="calDot" aria-hidden="true"></span>' : ''}
-      </div>
-    `;
-  }
-  html += `</div>`;
-  wrap.innerHTML = html + `<div class='calFab'><button type='button' onclick='stuGoToday()'>Bugün</button></div>`;
-  (function(){
-    try{
-      const td = new Date();
-      const sameMonth = (td.getFullYear()===ctx.selectedDate.getFullYear()) && (td.getMonth()===ctx.selectedDate.getMonth());
-      const sameDay = stuSameYMD(td, ctx.selectedDate);
-      const dis = (sameMonth && sameDay);
-      const b = wrap.querySelector('#btnToday');
-      if(b){ b.disabled = dis; }
-    }catch(_){}
-  })();
-}
-function stuCalPrevMonth(){ _calCtx.selectedDate = stuAddMonths(_calCtx.selectedDate, -1); renderStudentCalendar(); }
-function stuCalNextMonth(){ _calCtx.selectedDate = stuAddMonths(_calCtx.selectedDate,  1); renderStudentCalendar(); }
-function stuSelectDate(dayStr){
-  const d = parseTRDateStr(dayStr);
-  if(!isNaN(d)) _calCtx.selectedDate = d;
-  renderStudentCalendar();
-  showDay(dayStr);
-}
-function stuGoToday(){
-  const now = new Date();
-  _calCtx.selectedDate = now;
-  _calCtx.viewMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-  renderStudentCalendar();
-  const dayStr = formatTR(now);
-}
-function parseTRDateStr(dstr){ const [dd,mm,yy]=dstr.split('.').map(x=>parseInt(x,10)); return new Date(yy, mm-1, dd); }
-function formatTR(d){ return d.toLocaleDateString("tr-TR"); }
-function mondayOf(date){ const d=new Date(date.getFullYear(),date.getMonth(),date.getDate()); const day=d.getDay(); const diff=(day===0?-6:1-day); d.setDate(d.getDate()+diff); d.setHours(0,0,0,0); return d; }
-function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
-function stuAddMonths(d,n){ return new Date(d.getFullYear(), d.getMonth()+n, 1); }
-function stuSameYMD(a,b){ return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
-function showDay(day){
-  const detailsObj = (_calCtx.grouped && _calCtx.grouped[day]) ? _calCtx.grouped[day].totalPerLesson : {};
-  const dersSirasi = ["Türkçe", "Sosyal Bilgiler", "Din Kültürü", "İngilizce", "Matematik", "Fen Bilimleri"];
-  let html="<table><tr><th>Ders</th><th>O Gün Toplam</th><th>İşlem</th></tr>";
-  dersSirasi.forEach(lesson=>{
-    const total = detailsObj[lesson] || 0;
-    html += `<tr>
-        <td>${lesson}</td>
-        <td>${total}</td>
-        <td><button type="button" class="editBtn" onclick="editAggregated('${day}','${lesson}',${total})">Düzenle</button></td>
-      </tr>`;
-  });
-  html+="</table>";
-  const el=document.getElementById("stuDayTable");
-  el.innerHTML=html;
-}
-async function editAggregated(day, lesson, oldTotal){
-  let nv = prompt(`${day} günü "${lesson}" dersi için yeni toplam değeri girin:`, oldTotal);
-  if(nv===null) return;
-  nv = parseInt(nv,10);
-  if(isNaN(nv)){ setAlert("Geçersiz sayı."); return; }
-  try {
-    const infoAgg = (_calCtx.grouped && _calCtx.grouped[day] && _calCtx.grouped[day].keysPerLesson && _calCtx.grouped[day].keysPerLesson[lesson]) ? _calCtx.grouped[day].keysPerLesson[lesson] : [];
-    const updates = {};
-    infoAgg.forEach(key=>{
-      updates[`students/${currentStudent}/lessons/${lesson}/${key}`] = null;
     });
-    const fakeTime = `${day} 12:00:00`;
-    const newKey = db.ref().child(`students/${currentStudent}/lessons/${lesson}`).push().key;
-    updates[`students/${currentStudent}/lessons/${lesson}/${newKey}`] = {count:nv, time:fakeTime};
-    await db.ref().update(updates);
-    setAlert("Güncellendi.");
-    loadStudentData();
-  } catch(e) {
-    setAlert("Hata: "+e.message);
-  }
-}
+    document.addEventListener('input', e=>{
+      if(e.target.type==='number' && e.target.id && ['Turkce','Sosyal','Din','Ingilizce','Matematik','Fen'].includes(e.target.id)){
+        updateProgressBars();
+      }
+    });
 
-/* ============ Öğretmen Giriş ============ */
-function teacherLogin(){
-  const name=document.getElementById("tName").value.trim();
-  const code=document.getElementById("tCode").value;
-  if(!name || !code){ setAlert("Ad Soyad ve kod gerekli."); return; }
-  if(code!=="703504"){ setAlert("Kod hatalı."); return; }
-  currentTeacherName = name;
-  currentTeacherId = normalizeId(name);
-  if(!currentTeacherId){ setAlert("Geçerli bir ad giriniz."); return; }
-  db.ref("teachers/"+currentTeacherId).set({ name: currentTeacherName, createdAt: firebase.database.ServerValue.TIMESTAMP }).catch(()=>{});
-  document.getElementById("teacherWelcome").textContent = `Hoş geldiniz, ${toTitleCaseTR(currentTeacherName)}`;
-  document.getElementById("loginPanel").style.display="none";
-  document.getElementById("teacherPanel").style.display="block";
-  listenClasses();
-  listenFavorites();
-}
-/* ============ Sınıflar (ortak) ============ */
-function addClass(){
-  const cls=document.getElementById("newClass").value.trim();
-  if(!cls){ setAlert("Sınıf adı girin (örn: 8/A)."); return; }
-  db.ref("classes").orderByChild("name").equalTo(cls).get().then(s=>{
-    if(s.exists()){ setAlert("Bu sınıf zaten ekli."); return; }
-    return db.ref("classes").push({name:cls,createdAt:firebase.database.ServerValue.TIMESTAMP});
-  }).then(()=>{ document.getElementById("newClass").value=""; });
-}
-function deleteClassByName(name){
-  // Güvenlik: sadece Uğur Yaşayan silebilir
-  if(!isPrivilegedTeacher()){
-    setAlert("Bu işlemi yapma yetkiniz yok.");
-    return;
-  }
-  const classId = classesMap[name];
-  if(!classId){ setAlert("Sınıf id bulunamadı."); return; }
-  if(!confirm(`"${name} (${classesMap[name]})" sınıfını silmek istiyor musunuz?`)) return;
-  db.ref("classes/"+classId).remove()
-    .then(()=>{ setAlert("Sınıf silindi."); if(activeClassName===name){ activeClassName=null; document.getElementById("classStudents").style.display="none"; document.getElementById("teacherStudentDetail").style.display="none"; } })
-    .catch(e=>setAlert("Silme hatası: "+e.message));
-}
-function listenClasses(){
-  if(classesRef){ classesRef.off(); }
-  classesRef = db.ref("classes");
-  classesRef.on("value",snap=>{
-    classesMap = {};
-    const names=[];
-    snap.forEach(ch=>{const v=ch.val(); if(v&&v.name){ names.push(v.name); classesMap[v.name]=ch.key; }});
-    const grid=document.getElementById("classGrid"); grid.innerHTML="";
-    if(!names.length){ grid.innerHTML="<div class='empty' style='grid-column:1/-1'>Henüz sınıf yok.</div>"; document.getElementById("classStudents").style.display="none"; }
-    names.sort().forEach(name=>{
-      const card=document.createElement("div"); card.className="classCard";
-      const title=document.createElement("div"); title.className="className"; title.textContent=name;
-      const pick=document.createElement("button"); pick.className="classPick"; pick.textContent="Öğrencileri Gör";
-      pick.onclick=()=>{
-        activeClassName=name;
-        document.querySelectorAll(".classPick").forEach(b=>b.classList.remove("active"));
-        pick.classList.add("active");
-        selectClass(name);
-      };
-      if(isPrivilegedTeacher()){
-        const del=document.createElement("button");
-        del.className="delFloat";
-        del.setAttribute("title","Sınıfı Sil");
-        del.setAttribute("aria-label","Sınıfı Sil");
-        del.innerHTML=`<img class="trashIcon" src="${TRASH_ICON}" alt="">`;
-        del.onclick=(e)=>{ e.stopPropagation(); deleteClassByName(name); };
-        card.appendChild(del);
+    async function addAll(){
+      const entryDate=document.getElementById("entryDate").value;
+      if(!entryDate){ setAlert("Tarih seçin."); return; }
+      const dateObj=new Date(entryDate);
+      const today=new Date();
+      const weekStart=mondayOf(today);
+      const weekEnd=addDays(weekStart,6);
+      if(dateObj<weekStart||dateObj>weekEnd){
+        setAlert("Sadece bu hafta içinde bir gün seçebilirsiniz."); return;
       }
-      card.appendChild(title);
-      card.appendChild(pick);
-      grid.appendChild(card);
-    });
-    const sel=document.getElementById("rClass"); const keep=sel.value;
-    sel.innerHTML="<option value=''>Sınıf Seçin</option>";
-    names.sort().forEach(n=>{const o=document.createElement("option"); o.value=n; o.text=n; sel.add(o);});
-    if(names.includes(keep)) sel.value=keep;
-    if(activeClassName){
-      const btn=[...document.querySelectorAll(".classPick")].find(b=>b.parentElement.querySelector(".className").textContent===activeClassName);
-      if(btn){ btn.classList.add("active"); selectClass(activeClassName); }
-    }
-  });
-}
-function clearChildren(node){ while(node.firstChild) node.removeChild(node.firstChild); }
-function selectClass(name){
-  const list=document.getElementById("studentsContainer");
-  document.getElementById("classStudents").style.display="block";
-  const myToken = ++selectClassRenderToken;
-  list.innerHTML = "<div class='empty'>Yükleniyor...</div>";
-  db.ref("students").get().then(snap=>{
-    if(myToken !== selectClassRenderToken) return;
-    if(!snap.exists()){
-      list.innerHTML="<div class='empty'>Kayıtlı öğrenci yok.</div>";
-      return;
-    }
-    const uniqByNum = {};
-    snap.forEach(ch=>{
-      const s=ch.val();
-      if(s && s.sclass===name && s.num){
-        uniqByNum[String(s.num)] = {name:s.name,num:String(s.num),sclass:s.sclass};
+      const dateStr=formatTR(dateObj);
+      const weekKey=`${weekStart.getFullYear()}-${(weekStart.getMonth()+1).toString().padStart(2,'0')}-${weekStart.getDate().toString().padStart(2,'0')}`;
+      const data={};
+      ["Turkce","Sosyal","Din","Ingilizce","Matematik","Fen"].forEach(subj=>{
+        const inp=document.getElementById(subj);
+        const val=parseInt(inp?.value||0,10)||0;
+        if(val>0) data[subj]=val;
+      });
+      if(Object.keys(data).length===0){ setAlert("En az bir ders için soru sayısı girin."); return; }
+      try {
+        await db.ref(`students/${currentStudent}/weeks/${weekKey}/${dateStr}`).set(data);
+        setAlert("✅ Sorular eklendi.");
+        loadStudentData();
+      } catch (err) {
+        console.error("Ekleme hatası:", err);
+        setAlert("Ekleme başarısız.");
       }
-    });
-    const nums = Object.keys(uniqByNum).sort((a,b)=> (uniqByNum[a].name||"").localeCompare(uniqByNum[b].name||""));
-    if(!nums.length){
-      list.innerHTML=`<div class='empty'>${name} sınıfına öğrenci yok.</div>`;
-      return;
     }
-    let html = "";
-    nums.forEach(n=>{
-      const s=uniqByNum[n];
-      const isFav=!!favoritesCache[s.num];
-      const prettyName = toTitleCaseTR(s.name||"");
-      html += `
-      <div class="studentItem hasDel" id="stu-row-${n}">
-        <div class="leftGroup">
-          <button class="studentNameBtn" onclick="teacherShowStudent('${s.num}')">${s.num} – ${prettyName}</button>
-          <button class="starBtn ${isFav ? "" : "off"}" title="${isFav ? "Favoriden çıkar" : "Favoriye ekle"}" data-role="fav" data-num="${s.num}" data-name="${prettyName}" data-sclass="${s.sclass||""}">${isFav ? "★" : "☆"}</button>
+
+    async function updateStudentRecords(){
+      const today=new Date();
+      const weekStart=mondayOf(today);
+      const weekEnd=addDays(weekStart,6);
+      const weekKey=`${weekStart.getFullYear()}-${(weekStart.getMonth()+1).toString().padStart(2,'0')}-${weekStart.getDate().toString().padStart(2,'0')}`;
+      try {
+        const snap=await db.ref(`students/${currentStudent}/weeks/${weekKey}`).get();
+        const data=snap.exists()?snap.val():{};
+        const dates=Object.keys(data).sort((a,b)=>parseTRDateStr(a)-parseTRDateStr(b));
+        const container=document.getElementById("studentRecords");
+        if(!container) return;
+        if(dates.length===0){
+          container.innerHTML=`<div class="empty">Bu hafta henüz kayıt yok.</div>`;
+          return;
+        }
+        let html=`<div class="sectionTitle">Bu Hafta Kayıtlar</div>`;
+        dates.forEach(d=>{
+          const dayData=data[d];
+          const dayTotal=Object.values(dayData).reduce((a,b)=>a+b,0);
+          html+=`<div style="margin-bottom:8px;padding:8px;background:#0b1427;border-radius:8px">
+            <strong>${d}</strong> — Toplam: ${dayTotal} soru
+          </div>`;
+        });
+        container.innerHTML=html;
+      } catch (err) {
+        console.error("Kayıtlar yüklenemedi:", err);
+      }
+    }
+
+    /* ============ Öğretmen İşlemleri ============ */
+    async function loadClasses(){
+      classesMap={};
+      try {
+        const snap=await db.ref("students").get();
+        if(!snap.exists()) return;
+        const students=snap.val();
+        const classes={};
+        for(const id in students){
+          const s=students[id];
+          if(!classes[s.class]) classes[s.class]=[];
+          classes[s.class].push({...s,id});
+        }
+        classesMap=classes;
+        renderClasses(classes);
+      } catch (err) {
+        console.error("Sınıflar yüklenemedi:", err);
+      }
+    }
+
+    function renderClasses(classes){
+      const grid=document.getElementById("classGrid");
+      if(!grid) return;
+      const classNames=Object.keys(classes).sort();
+      if(classNames.length===0){
+        grid.innerHTML=`<div class="empty">Henüz sınıf yok.</div>`;
+        return;
+      }
+      let html="";
+      classNames.forEach(c=>{
+        const count=classes[c].length;
+        html+=`<div class="classCard">
+          <div class="className">${escHTML(c)}</div>
+          <div>${count} öğrenci</div>
+          <button class="classPick" onclick="pickClass('${escAttr(c)}')">Seç</button>
+          ${isPrivilegedTeacher() ? `<button class="delFloat" onclick="deleteClass('${escAttr(c)}')" title="Sınıfı Sil">
+            <img src="${TRASH_ICON}" alt="Sil" class="trashIcon"/>
+          </button>` : ""}
+        </div>`;
+      });
+      grid.innerHTML=html;
+    }
+
+    function pickClass(className){
+      activeClassName=className;
+      document.querySelectorAll(".classPick").forEach(b=>b.classList.remove("active"));
+      document.querySelectorAll(".classCard").forEach(card=>{
+        if(card.querySelector(".className").textContent===className){
+          card.querySelector(".classPick").classList.add("active");
+        }
+      });
+      document.getElementById("classStudents").style.display="block";
+      renderClassStudents(className);
+    }
+
+    function renderClassStudents(className){
+      const container=document.getElementById("studentsContainer");
+      if(!container) return;
+      const students=classesMap[className]||[];
+      if(students.length===0){
+        container.innerHTML=`<div class="empty">Bu sınıfta öğrenci yok.</div>`;
+        return;
+      }
+      let html="";
+      students.forEach(s=>{
+        const isFav=favoritesCache[s.id];
+        html+=`<div class="studentItem hasDel">
+          <div class="leftGroup">
+            <button class="studentNameBtn" onclick="openStudentDetail('${escAttr(s.id)}')">${escHTML(s.name)}</button>
+            <button class="starBtn ${isFav?'':'off'}" onclick="toggleFavorite('${escAttr(s.id)}', this)">${isFav?'★':'☆'}</button>
+          </div>
+          <button class="delStuFloat" onclick="deleteStudent('${escAttr(s.id)}')" title="Öğrenciyi Sil">
+            <img src="${TRASH_ICON}" alt="Sil" class="trashIcon"/>
+          </button>
+        </div>`;
+      });
+      container.innerHTML=html;
+    }
+
+    async function addClass(){
+      const name=document.getElementById("newClass").value.trim();
+      if(!name){ setAlert("Sınıf adı girin."); return; }
+      setAlert(`✅ Sınıf eklendi: ${name}`);
+      document.getElementById("newClass").value="";
+      // Sınıf eklemek için veritabanına öğrenci eklemek gerekmez, sadece renderClasses'ı tetikler
+      loadClasses();
+    }
+
+    async function deleteClass(className){
+      if(!isPrivilegedTeacher()) return;
+      if(!confirm(`"${className}" sınıfını ve tüm öğrencilerini silmek istediğinize emin misiniz?`)) return;
+      try {
+        const snap=await db.ref("students").get();
+        if(!snap.exists()) return;
+        const students=snap.val();
+        const updates={};
+        for(const id in students){
+          if(students[id].class===className){
+            updates[`students/${id}`]=null;
+            updates[`favorites/${currentTeacherId}/${id}`]=null;
+          }
+        }
+        await db.ref().update(updates);
+        setAlert(`✅ "${className}" sınıfı silindi.`);
+        loadClasses();
+        loadFavorites();
+      } catch (err) {
+        console.error("Sınıf silme hatası:", err);
+        setAlert("Sınıf silinemedi.");
+      }
+    }
+
+    async function deleteStudent(id){
+      if(!isPrivilegedTeacher()) return;
+      const student=classesMap[activeClassName]?.find(s=>s.id===id);
+      if(!student) return;
+      if(!confirm(`"${student.name}" öğrencisini silmek istediğinize emin misiniz?`)) return;
+      try {
+        await db.ref(`students/${id}`).remove();
+        await db.ref(`favorites/${currentTeacherId}/${id}`).remove();
+        setAlert(`✅ "${student.name}" silindi.`);
+        loadClasses();
+        loadFavorites();
+      } catch (err) {
+        console.error("Öğrenci silme hatası:", err);
+        setAlert("Öğrenci silinemedi.");
+      }
+    }
+
+    async function loadFavorites(){
+      if(!currentTeacherId) return;
+      try {
+        const snap=await db.ref(`favorites/${currentTeacherId}`).get();
+        favoritesCache=snap.exists()?snap.val():{};
+        renderFavorites();
+      } catch (err) {
+        console.error("Favoriler yüklenemedi:", err);
+      }
+    }
+
+    function renderFavorites(){
+      const list=document.getElementById("favoritesList");
+      if(!list) return;
+      const favIds=Object.keys(favoritesCache);
+      if(favIds.length===0){
+        list.innerHTML=`<div class="empty">Henüz favori öğrenci yok.</div>`;
+        return;
+      }
+      let html="";
+      favIds.forEach(id=>{
+        const s=favoritesCache[id];
+        html+=`<div class="studentItem hasDel">
+          <div class="leftGroup">
+            <button class="studentNameBtn" onclick="openStudentDetail('${escAttr(id)}')">${escHTML(s.name)}</button>
+            <button class="starBtn" onclick="toggleFavorite('${escAttr(id)}', this)">★</button>
+          </div>
+          <button class="targetFloat" onclick="openTargetModal('${escAttr(id)}', '${escAttr(s.name)}')" title="Hedef Belirle">🎯</button>
+          <button class="delStuFloat" onclick="deleteStudent('${escAttr(id)}')" title="Öğrenciyi Sil">
+            <img src="${TRASH_ICON}" alt="Sil" class="trashIcon"/>
+          </button>
+        </div>`;
+      });
+      list.innerHTML=html;
+    }
+
+    async function toggleFavorite(id, btn){
+      if(!currentTeacherId) return;
+      const isFav=!!favoritesCache[id];
+      try {
+        if(isFav){
+          await db.ref(`favorites/${currentTeacherId}/${id}`).remove();
+          favoritesCache[id]=null;
+          delete favoritesCache[id];
+          btn.classList.add("off");
+          btn.textContent="☆";
+        } else {
+          const student=await db.ref(`students/${id}`).get();
+          if(student.exists()){
+            await db.ref(`favorites/${currentTeacherId}/${id}`).set(student.val());
+            favoritesCache[id]=student.val();
+            btn.classList.remove("off");
+            btn.textContent="★";
+          }
+        }
+      } catch (err) {
+        console.error("Favori değiştirme hatası:", err);
+      }
+    }
+
+    function showTeacherSection(section){
+      document.querySelectorAll("#teacherTopTabs .pill").forEach(b=>b.classList.remove("active"));
+      document.getElementById(`tab${section.charAt(0).toUpperCase()+section.slice(1)}`).classList.add("active");
+      document.getElementById("classesSection").style.display=(section==="classes")?"block":"none";
+      document.getElementById("favoritesSection").style.display=(section==="favorites")?"block":"none";
+    }
+
+    /* ============ Öğrenci Detay & Raporlar ============ */
+    async function openStudentDetail(id){
+      currentDetailNum=id;
+      try {
+        const snap=await db.ref(`students/${id}`).get();
+        if(!snap.exists()){ setAlert("Öğrenci bulunamadı."); return; }
+        const student=snap.val();
+        currentDetailLessons=student;
+        document.getElementById("tsdTitle").textContent=`${student.name} — ${student.class}`;
+        document.getElementById("teacherStudentDetail").classList.add("asModal");
+        document.getElementById("teacherStudentDetail").style.display="block";
+        document.getElementById("reportOverlay").style.display="block";
+        showReportTab("daily");
+        loadStudentWeeks(id);
+        loadTeacherMonths(id);
+      } catch (err) {
+        console.error("Öğrenci detay hatası:", err);
+        setAlert("Öğrenci verisi yüklenemedi.");
+      }
+    }
+
+    function closeReportModal(){
+      document.getElementById("teacherStudentDetail").style.display="none";
+      document.getElementById("reportOverlay").style.display="none";
+      document.getElementById("teacherStudentDetail").classList.remove("asModal");
+    }
+
+    function showReportTab(tab){
+      document.querySelectorAll("#teacherStudentDetail .pill").forEach(b=>b.classList.remove("active"));
+      document.getElementById(`repTab${tab.charAt(0).toUpperCase()+tab.slice(1)}Btn`).classList.add("active");
+      document.querySelectorAll("#repTab-daily,#repTab-weekly,#repTab-monthly").forEach(el=>el.classList.remove("active"));
+      document.getElementById(`repTab-${tab}`).classList.add("active");
+      if(tab==="daily") loadTSDCalendar();
+      if(tab==="weekly") renderWeekList();
+      if(tab==="monthly") renderTeacherMonthSelector();
+    }
+
+    // --- Günlük Rapor: Takvim ---
+    async function loadTSDCalendar(){
+      if(!currentDetailNum) return;
+      const today=new Date();
+      const firstDay=new Date(today.getFullYear(), today.getMonth(), 1);
+      const lastDay=new Date(today.getFullYear(), today.getMonth()+1, 0);
+      const startDate=new Date(firstDay);
+      startDate.setDate(startDate.getDate()-startDate.getDay()+1); // Pazartesi
+      const endDate=new Date(lastDay);
+      endDate.setDate(endDate.getDate()+(6-lastDay.getDay())); // Pazar
+      const container=document.getElementById("tsdDays");
+      if(!container) return;
+      let html=`<div class="calendarWrap">
+        <div class="calHeader">
+          <div class="calTitle">${today.toLocaleDateString('tr-TR',{month:'long',year:'numeric'})}</div>
+          <div class="calNav">
+            <button class="calBtn" onclick="shiftTSDMonth(-1)">←</button>
+            <button class="calBtnToday" onclick="goTSDToday()">Bugün</button>
+            <button class="calBtn" onclick="shiftTSDMonth(1)">→</button>
+          </div>
         </div>
-        <!-- Yeni: Hedef butonu -->
-        <button class="targetFloat" title="Hedef belirle" data-role="target" data-num="${s.num}" data-name="${prettyName}">🎯</button>
-        <!-- Yeni: Silme tuşu yerine sağ üstte çöp kovası ikonu -->
-        <button class="delStuFloat" title="Öğrenciyi Sil" aria-label="Öğrenciyi Sil" data-role="delStudent" data-num="${s.num}" data-name="${prettyName}">
-          <img class="trashIcon" src="${TRASH_ICON}" alt="">
-        </button>
-      </div>`;
-    });
-    if(myToken === selectClassRenderToken){
-      list.innerHTML = html;
-    }
-  });
-}
-function favPath(){ return currentTeacherId ? "teacherData/"+currentTeacherId+"/favorites" : null; }
-function listenFavorites(){
-  const path=favPath(); if(!path) return;
-  if(favRef){ favRef.off(); }
-  favRef = db.ref(path);
-  favRef.on("value",(snap)=>{
-    const uniqueFavorites = new Map();
-    const list=[];
-    snap.forEach(ch=>{
-      const v=ch.val();
-      if(!v || !v.num) return;
-      const numStr = String(v.num);
-      uniqueFavorites.set(numStr, {num:numStr, name:v.name, sclass:v.sclass});
-    });
-    uniqueFavorites.forEach((value) => { list.push(value); });
-    favoritesCache={};
-    list.forEach(v=> favoritesCache[v.num]=true);
-    renderFavorites(list);
-    if(activeClassName){
-      selectClass(activeClassName);
-    }
-  });
-}
-document.addEventListener("click",function(e){
-  const el = e.target.closest("[data-role]");
-  if(!el) return;
-  const role = el.dataset.role;
-  if(role==="fav"){ const {num,name,sclass}=el.dataset; toggleFavorite(num,name,sclass); }
-  if(role==="target"){ const {num,name}=el.dataset; openTargetModal(num,name); }
-  if(role==="delStudent"){ const {num,name}=el.dataset; deleteStudent(num,name); }
-});
-function toggleFavorite(num,name,sclass){
-  const path=favPath(); if(!path){ setAlert("Öğretmen oturumu yok."); return; }
-  const ref=db.ref(path+"/"+num);
-  if(favoritesCache[num]) ref.remove().catch(e=>setAlert("Favoriden çıkarma hatası: "+e.message));
-  else ref.set({num,name,sclass,createdAt:firebase.database.ServerValue.TIMESTAMP}).catch(e=>setAlert("Favoriye ekleme hatası: "+e.message));
-}
-function deleteStudent(num,name){
-  if(!confirm(`"${name} (${num})" öğrencisini silmek istiyor musunuz?`)) return;
-  const updates={}; updates["students/"+num]=null;
-  db.ref("teacherData").get().then(snap=>{
-    if(snap.exists()){ snap.forEach(t=>{ updates["teacherData/"+t.key+"/favorites/"+num]=null; }); }
-    return db.ref().update(updates);
-  }).then(()=>{
-    setAlert("Öğrenci silindi.");
-    if(currentDetailNum===num){ currentDetailNum=null; document.getElementById("teacherStudentDetail").style.display="none"; }
-    if(activeClassName){ selectClass(activeClassName); }
-  }).catch(e=>setAlert("Öğrenci silme hatası: "+e.message));
-}
-function renderFavorites(items){
-  const box=document.getElementById("favoritesList");
-  if(!items || !items.length){ box.innerHTML="<div class='empty'>Henüz favori yok.</div>"; return; }
-  const uniqueMap = new Map();
-  items.forEach(item => {
-    if (item && item.num) uniqueMap.set(String(item.num), item);
-  });
-  const uniq = Array.from(uniqueMap.values());
-  uniq.sort((a,b)=> (a.sclass||"").localeCompare(b.sclass||"") || (a.name||"").localeCompare(b.name||""));
-  box.innerHTML = uniq.map(s=>{
-    const prettyName = toTitleCaseTR(s.name||"");
-    return `
-    <div class="studentItem" id="fav-row-${s.num}">
-      <div class="leftGroup">
-        <button class="studentNameBtn" title="Detay panelinde aç" onclick="teacherShowStudent('${s.num}')">${s.num} – ${prettyName} (${s.sclass||''})</button>
-        <button class="starBtn" title="Favoriden çıkar" data-role="fav" data-num="${s.num}" data-name="${prettyName}" data-sclass="${s.sclass}">★</button>
-      </div>
-      <button class="editBtn" style="min-width:100px" onclick="teacherShowStudent('${s.num}')">Detay Gör</button>
-    </div>
-  `;
-  }).join("");
-}
-function showTeacherSection(sec){
-  const classesSection = document.getElementById('classesSection');
-  const favoritesSection = document.getElementById('favoritesSection');
-  const tabClasses = document.getElementById('tabClasses');
-  const tabFavorites = document.getElementById('tabFavorites');
-  hideStudentDetail();
-  if(sec==='classes'){
-    classesSection.style.display='block';
-    favoritesSection.style.display='none';
-    tabClasses.classList.add('active');
-    tabFavorites.classList.remove('active');
-  } else {
-    classesSection.style.display='none';
-    favoritesSection.style.display='block';
-    tabClasses.classList.remove('active');
-    tabFavorites.classList.add('active');
-  }
-}
-function hideStudentDetail() {
-  document.getElementById('teacherStudentDetail').style.display = 'none';
-  currentDetailNum = null;
-}
-function teacherShowStudent(num){
-  currentDetailNum=num;
-  document.getElementById("teacherStudentDetail").style.display="block";
-  destroyWeekChart();
-  db.ref("students/"+num).get().then(snap=>{
-    if(!snap.exists()){ setAlert("Öğrenci bulunamadı."); return; }
-    const s=snap.val();
-    const prettyName = toTitleCaseTR(s.name||"");
-    document.getElementById("tsdTitle").textContent = `${prettyName} (${s.num}) – ${s.sclass}`;
-    const lessons=s.lessons||{};
-    currentDetailLessons = lessons;
-    const dayMap={}, totals={};
-    for(const l in lessons){
-      for(const k in lessons[l]){
-        const e=lessons[l][k]; const d=(e.time||"").split(" ")[0]||"";
-        if(!dayMap[d]) dayMap[d]={}; if(!dayMap[d][l]) dayMap[d][l]=0; dayMap[d][l]+=Number(e.count)||0;
-        if(!totals[l]) totals[l]=0; totals[l]+=Number(e.count)||0;
+        <div class="calGrid">`;
+      const days=["Pzt","Sal","Çar","Per","Cum","Cmt","Paz"];
+      days.forEach(d=>html+=`<div class="calWd">${d}</div>`);
+      const curr=new Date(startDate);
+      while(curr<=endDate){
+        const dstr=formatTR(curr);
+        const isToday=stuSameYMD(curr, today);
+        const isCurrMonth=curr.getMonth()===today.getMonth();
+        html+=`<div class="calCell ${isToday?'today':''} ${!isCurrMonth?'muted':''}" onclick="selectTSDDate('${dstr}')">
+          <div class="calDay">${curr.getDate()}</div>
+        </div>`;
+        curr.setDate(curr.getDate()+1);
       }
+      html+="</div></div>";
+      container.innerHTML=html;
+      // Bugünü seç
+      selectTSDDate(formatTR(today));
     }
-    const daysBox=document.getElementById("tsdDays");
-    const dayNames=Object.keys(dayMap).sort((a,b)=> a.split('.').reverse().join('').localeCompare(b.split('.').reverse().join('')) ).reverse();
-    daysBox.innerHTML = dayNames.length ? dayNames.map(d=>`<button class="dayBtn" onclick="teacherShowStudentDay('${num}','${d}')">${d}</button>`).join("") : "<div class='empty'>Gün bulunamadı.</div>";
-    try{
-      tsdBuildCtxFromLessons(dayMap);
-      renderTeacherCalendar();
-      const dayKeys = Object.keys(dayMap||{}).sort((a,b)=> a.split('.').reverse().join('').localeCompare(b.split('.').reverse().join('')) );
-      if(dayKeys.length){
-        tsdSelectDate(dayKeys[dayKeys.length-1]);
-      }else{
-        const t = document.getElementById("tsdDayTable");
-        if(t) t.innerHTML = "<div class='empty'>Gün bulunamadı.</div>";
-      }
-    }catch(_){}
-    renderTotalsTable(totals,"tsdTotals");
-    if(dayNames.length) teacherShowStudentDay(num,dayNames[0]); else document.getElementById("tsdDayTable").innerHTML="<div class='empty'>Gün seçiniz.</div>";
-    currentWeeks = buildWeeksFromLessons(lessons);
-    renderWeekList(currentWeeks);
-    if(currentWeeks.length){ selectWeek(currentWeeks[currentWeeks.length-1].key); } else { clearWeekArea(); }
-  });
-}
-function renderTotalsTable(totals,targetId){
-  const dersSirasi = ["Türkçe", "Sosyal Bilgiler", "Din Kültürü", "İngilizce", "Matematik", "Fen Bilimleri"];
-  let html="<table><tr><th>Ders</th><th>Toplam Soru</th></tr>";
-  dersSirasi.forEach(l => {
-    const value = totals[l] || 0;
-    html += `<tr><td>${l}</td><td>${value}</td></tr>`;
-  });
-  html+="</table>";
-  document.getElementById(targetId).innerHTML=html;
-}
-function teacherShowStudentDay(num,day){
-  db.ref("students/"+num+"/lessons").get().then(snap=>{
-    let perLesson={};
-    if(snap.exists()){
-      const data=snap.val();
-      for(const l in data){
-        for(const k in data[l]){
-          const e=data[l][k]; const d=(e.time||"").split(" ")[0]||"";
-          if(d===day){ if(!perLesson[l]) perLesson[l]=0; perLesson[l]+= Number(e.count)||0; }
+
+    async function selectTSDDate(dateStr){
+      document.querySelectorAll("#tsdDays .calCell").forEach(c=>c.classList.remove("selected"));
+      const cells=document.querySelectorAll("#tsdDays .calCell");
+      for(let cell of cells){
+        if(cell.querySelector(".calDay")?.textContent==parseTRDateStr(dateStr).getDate().toString()){
+          cell.classList.add("selected");
+          break;
         }
       }
+      const container=document.getElementById("tsdDayTable");
+      if(!container) return;
+      try {
+        const weekStart=mondayOf(parseTRDateStr(dateStr));
+        const weekKey=`${weekStart.getFullYear()}-${(weekStart.getMonth()+1).toString().padStart(2,'0')}-${weekStart.getDate().toString().padStart(2,'0')}`;
+        const snap=await db.ref(`students/${currentDetailNum}/weeks/${weekKey}/${dateStr}`).get();
+        const data=snap.exists()?snap.val():{};
+        if(Object.keys(data).length===0){
+          container.innerHTML=`<div class="empty">${dateStr} için kayıt yok.</div>`;
+          return;
+        }
+        let html=`<table><thead><tr><th>Ders</th><th>Soru</th></tr></thead><tbody>`;
+        const subjects=["Turkce","Sosyal","Din","Ingilizce","Matematik","Fen"];
+        const labels={"Turkce":"Türkçe","Sosyal":"Sosyal Bilgiler","Din":"Din Kültürü","Ingilizce":"İngilizce","Matematik":"Matematik","Fen":"Fen Bilimleri"};
+        let total=0;
+        subjects.forEach(subj=>{
+          const val=data[subj]||0;
+          total+=val;
+          html+=`<tr><td>${labels[subj]}</td><td>${val}</td></tr>`;
+        });
+        html+=`</tbody></table><div style="margin-top:8px;font-weight:700">Toplam: ${total} soru</div>`;
+        container.innerHTML=html;
+      } catch (err) {
+        console.error("Günlük veri yükleme hatası:", err);
+        container.innerHTML=`<div class="empty">Veri yüklenemedi.</div>`;
+      }
+      // Genel toplamları güncelle
+      loadTSDTotals();
     }
-    const dersSirasi = ["Türkçe", "Sosyal Bilgiler", "Din Kültürü", "İngilizce", "Matematik", "Fen Bilimleri"];
-    let html="<table><tr><th>Ders</th><th>O Gün Çözülen</th></tr>";
-    dersSirasi.forEach(l => {
-      const value = perLesson[l] || 0;
-      html += `<tr><td>${l}</td><td>${value}</td></tr>`;
-    });
-    html+="</table>";
-    document.getElementById("tsdDayTable").innerHTML=html;
-  });
-}
-/* ===== Haftalık çizgi grafiği + PDF ===== */
-function destroyWeekChart(){ if(weekChart){ weekChart.destroy(); weekChart=null; } }
-function buildWeeksFromLessons(lessons){
-  let minDate=null;
-  for(const l in lessons){
-    for(const k in lessons[l]){
-      const e=lessons[l][k];
-      const d=parseTRDateStr((e.time||"").split(" ")[0]||"");
-      if(isNaN(d)) continue;
-      if(!minDate||d<minDate) minDate=d;
-    }
-  }
-  if(!minDate) return [];
-  let curStart=mondayOf(minDate);
-  const lastStart=mondayOf(new Date());
-  const out=[];
-  while(curStart<=lastStart){
-    const curEnd=addDays(curStart,6);
-    out.push({ key: curStart.toISOString().slice(0,10), start: new Date(curStart), end: curEnd, label:"" });
-    curStart=addDays(curStart,7);
-  }
-  out.forEach((w,i)=>{ w.label=`${i+1}. Hafta (${formatTR(w.start)} - ${formatTR(w.end)})`; });
-  return out;
-}
-function renderWeekList(weeks){
-  const wrap=document.getElementById("weekList");
-  if(!weeks.length){ wrap.innerHTML="<span class='empty'>Haftalık veri yok.</span>"; document.getElementById("btnExportPDF").disabled=true; return; }
-  wrap.innerHTML="";
-  weeks.slice().reverse().forEach(w=>{
-    const b=document.createElement("button");
-    b.type="button"; b.className="weekBtn"; b.textContent=w.label;
-    b.onclick=()=>selectWeek(w.key);
-    wrap.appendChild(b);
-  });
-}
-function selectWeek(weekKey){
-  selectedWeekKey=weekKey;
-  document.querySelectorAll("#weekList button").forEach(b => {
-    const weekData = currentWeeks.find(w => w.key === weekKey);
-    b.style.background = weekData && b.textContent.includes(formatTR(weekData.start)) ? 'var(--accent1)' : 'var(--muted)';
-  });
-  document.getElementById("btnExportPDF").disabled=false;
-  drawWeek(currentDetailLessons, currentWeeks.find(w=>w.key===weekKey));
-}
-function clearWeekArea(){
-  destroyWeekChart();
-  document.getElementById("weekMatrix").innerHTML="";
-  const ctx=document.getElementById("weekChart").getContext('2d'); ctx.clearRect(0,0,9999,9999);
-  document.getElementById("btnExportPDF").disabled=true;
-}
-function aggregateWeekDetailed(lessons, week){
-  const dayLabels=["Pzt","Sal","Çar","Per","Cum","Cmt","Paz"];
-  const daily=[0,0,0,0,0,0,0];
-  const perLessonPerDay = {};
-  const allLessons=["Türkçe","Sosyal Bilgiler","Din Kültürü","İngilizce","Matematik","Fen Bilimleri"];
-  allLessons.forEach(l=>perLessonPerDay[l]=[0,0,0,0,0,0,0]);
-  if(!lessons) return {dayLabels,daily,perLessonPerDay};
-  for(const l in lessons){
-    for(const k in lessons[l]){
-      const e=lessons[l][k];
-      const dStr=(e.time||"").split(" ")[0]||"";
-      if(!dStr) continue;
-      const d=parseTRDateStr(dStr);
-      if(isNaN(d)) continue;
-      if(d>=week.start && d<=week.end){
-        const dow=(d.getDay()+6)%7;
-        const cnt=Number(e.count)||0;
-        daily[dow]+=cnt;
-        if(!perLessonPerDay[l]) perLessonPerDay[l]=[0,0,0,0,0,0,0];
-        perLessonPerDay[l][dow]+=cnt;
+
+    async function loadTSDTotals(){
+      if(!currentDetailNum) return;
+      const container=document.getElementById("tsdTotals");
+      if(!container) return;
+      try {
+        const snap=await db.ref(`students/${currentDetailNum}/weeks`).get();
+        const weeks=snap.exists()?snap.val():{};
+        const totals={};
+        Object.keys(weeks).forEach(wk=>{
+          Object.keys(weeks[wk]).forEach(date=>{
+            const day=weeks[wk][date];
+            Object.keys(day).forEach(subj=>{
+              if(!totals[subj]) totals[subj]=0;
+              totals[subj]+=day[subj];
+            });
+          });
+        });
+        const subjects=["Turkce","Sosyal","Din","Ingilizce","Matematik","Fen"];
+        const labels={"Turkce":"Türkçe","Sosyal":"Sosyal Bilgiler","Din":"Din Kültürü","Ingilizce":"İngilizce","Matematik":"Matematik","Fen":"Fen Bilimleri"};
+        let html=`<table><thead><tr><th>Ders</th><th>Toplam</th></tr></thead><tbody>`;
+        let grandTotal=0;
+        subjects.forEach(subj=>{
+          const val=totals[subj]||0;
+          grandTotal+=val;
+          html+=`<tr><td>${labels[subj]}</td><td>${val}</td></tr>`;
+        });
+        html+=`</tbody></table><div style="margin-top:8px;font-weight:700">Genel Toplam: ${grandTotal} soru</div>`;
+        container.innerHTML=html;
+      } catch (err) {
+        console.error("Toplam yükleme hatası:", err);
+        container.innerHTML=`<div class="empty">Toplamlar yüklenemedi.</div>`;
       }
     }
-  }
-  return {dayLabels,daily,perLessonPerDay};
-}
-function drawWeek(lessons, week){
-  if(!week){ clearWeekArea(); return; }
-  const {dayLabels,daily,perLessonPerDay}=aggregateWeekDetailed(lessons, week);
-  destroyWeekChart();
-  const ctx=document.getElementById("weekChart").getContext("2d");
-  weekChart=new Chart(ctx,{
-    type:"line",
-    data:{ labels:dayLabels, datasets:[{ label:`${week.label} Günlük Toplam`, data:daily, tension:0.35, pointRadius:3, borderWidth:2, fill:false }]},
-    options:{ responsive:true, maintainAspectRatio:false, scales:{ y:{ beginAtZero:true, ticks:{ precision:0 } } }, plugins:{ legend:{ labels:{ color:"#e2e8f0" } } } }
-  });
-  const matDiv=document.getElementById("weekMatrix");
-  matDiv.innerHTML = buildMatrixTableHTML(perLessonPerDay, dayLabels);
-  prepareExportDOM(week, dayLabels, daily, perLessonPerDay);
-}
-function buildMatrixTableHTML(perLessonPerDay, dayLabels){
-  const dersSirasi = ["Türkçe", "Sosyal Bilgiler", "Din Kültürü", "İngilizce", "Matematik", "Fen Bilimleri"];
-  let html = `<div class="sectionTitle" style="margin:0 0 6px">Ders × Gün Matrisi</div>`;
-  html += `<table><tr><th>Ders</th>${dayLabels.map(d=>`<th>${d}</th>`).join("")}</tr>`;
-  dersSirasi.forEach(lesson=>{
-    const row=perLessonPerDay[lesson] || [0,0,0,0,0,0,0];
-    html += `<tr><td>${lesson}</td>${row.map(v=>`<td>${v}</td>`).join("")}</tr>`;
-  });
-  html += `</table>`;
-  return html;
-}
-function prepareExportDOM(week, dayLabels, daily, perLessonPerDay){
-  const title=document.getElementById("tsdTitle").textContent;
-  document.getElementById("exportStudent").textContent = title;
-  document.getElementById("exportRange").textContent = week.label;
-  const ctx=document.getElementById("exportChart").getContext("2d");
-  if(window._exportChart) { window._exportChart.destroy(); }
-  window._exportChart = new Chart(ctx,{
-    type:"line",
-    data:{ labels:dayLabels, datasets:[{ label:`${week.label} Günlük Toplam`, data:daily, tension:0.35, pointRadius:3, borderWidth:2, fill:false }]},
-    options:{ responsive:true, maintainAspectRatio:false, scales:{ y:{ beginAtZero:true, ticks:{ precision:0 } } }, plugins:{ legend:{ labels:{ color:"#e2e8f0" } } } }
-  });
-  document.getElementById("exportTable").innerHTML = buildMatrixTableHTML(perLessonPerDay, dayLabels);
-}
-async function exportSelectedWeekPDF(){
-  if(!currentDetailNum || !selectedWeekKey) return;
-  const { jsPDF } = window.jspdf;
-  const exportEl=document.getElementById("exportArea");
-  const canvas=await html2canvas(exportEl, { backgroundColor:null, scale:2 });
-  const img=canvas.toDataURL("image/png",1.0);
-  const pdf=new jsPDF({orientation:"portrait", unit:"pt", format:"a4"});
-  const pageW=pdf.internal.pageSize.getWidth();
-  const margin=18;
-  const drawW=pageW - margin*2;
-  const drawH=drawW * (canvas.height/canvas.width);
-  pdf.addImage(img,"PNG", margin, 12, drawW, drawH);
-  const safeName = (document.getElementById("tsdTitle").textContent || "Rapor").replace(/[^\wğüşöçıİĞÜŞÖÇ\s\-().]/g,"").slice(0,60);
-  pdf.save(`${safeName} - ${document.getElementById("exportRange").textContent}.pdf`);
-}
-const TRASH_ICON = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBmaWxsPSIjZWY0NDQ0Ij4KICA8cGF0aCBkPSJNOSAyaDZ2Mmg1djJINFY0aDVWMnptLTMgNmgxMmwtMSAxMmEyIDIgMCAwIDEtMiAySDlhMiAyIDAgMCAxLTItMkw2IDh6bTQgM3Y3aDJ2LTdoLTJ6bTQgMHY3aDJ2LTdoLTJ6Ii8+Cjwvc3ZnPg==";
-const PARENT_PORTAL_URL = "veli.html"; // Örn: "veli-panel.html" veya tam URL
-function openReportModal(){
-  var ov = document.getElementById('reportOverlay');
-  var box = document.getElementById('teacherStudentDetail');
-  if(ov) ov.style.display='block';
-  if(box){ box.style.display='block'; showReportTab('daily'); }
-}
-function closeReportModal(){
-  try{ destroyWeekChart(); }catch(_){}
-  try{ destroyTeacherMonthChart(); }catch(_){}
-  var ov = document.getElementById('reportOverlay');
-  var box = document.getElementById('teacherStudentDetail');
-  if(box) box.style.display='none';
-  if(ov) ov.style.display='none';
-}
-function showReportTab(tab){
-  var tabs = ['daily','weekly','monthly'];
-  tabs.forEach(function(t){
-    var el = document.getElementById('repTab-' + t);
-    if(el) el.classList.toggle('active', t===tab);
-    var btn = document.getElementById('repTab' + (t.charAt(0).toUpperCase()+t.slice(1)) + 'Btn');
-    if(btn) btn.classList.toggle('active', t===tab);
-  });
-  if(tab==='weekly'){
-    // Haftalar zaten teacherShowStudent içinde hesaplanıyor
-  }
-  if(tab==='monthly'){
-    if(window.currentDetailLessons){
-      buildTeacherMonths(window.currentDetailLessons);
+
+    function shiftTSDMonth(dir){ /* Basit uygulama: şu anki ayı değiştir */ }
+    function goTSDToday(){ selectTSDDate(formatTR(new Date())); }
+
+    // --- Haftalık Rapor ---
+    async function loadStudentWeeks(id){
+      if(!id) return;
+      try {
+        const snap=await db.ref(`students/${id}/weeks`).get();
+        const weeks=snap.exists()?snap.val():{};
+        currentWeeks=Object.keys(weeks).sort().reverse();
+        renderWeekList();
+      } catch (err) {
+        console.error("Haftalar yüklenemedi:", err);
+      }
     }
-  }
-}
-if(typeof teacherShowStudent === 'function'){
-  const _origTeacherShowStudent = teacherShowStudent;
-  teacherShowStudent = function(num){
-    _origTeacherShowStudent(num);
-    openReportModal();
-  };
-}
-var tMonthChart = null;
-var _tMonths = [];
-function destroyTeacherMonthChart(){ if(tMonthChart){ try{tMonthChart.destroy();}catch(_){ } tMonthChart=null; } }
-function buildTeacherMonths(lessons){
-  _tMonths = buildWeeksFromLessons(lessons || {});
-  var sel = document.getElementById('tMonthSelect');
-  if(!sel) return;
-  sel.innerHTML = '';
-  _tMonths.forEach(function(w){
-    var opt = document.createElement('option');
-    opt.value = w.key;
-    opt.textContent = w.label;
-    sel.add(opt);
-  });
-  if(_tMonths.length){
-    sel.value = _tMonths[_tMonths.length-1].key;
-    selectTeacherMonth(sel.value);
-  }else{
-    destroyTeacherMonthChart();
-    var mt = document.getElementById('tMonthTotals');
-    if(mt) mt.innerHTML = "<div class='empty'>Aylık veri yok.</div>";
-    try{ var ctx = document.getElementById('tMonthChart').getContext('2d'); ctx.clearRect(0,0,9999,9999);}catch(_){}
-  }
-}
-function selectTeacherMonth(key){
-  var m = (_tMonths||[]).find(x=> x.key===key);
-  if(!m){ destroyTeacherMonthChart(); var mt=document.getElementById('tMonthTotals'); if(mt) mt.innerHTML=''; return; }
-  drawTeacherMonth(window.currentDetailLessons||{}, m);
-}
-function drawTeacherMonth(lessons, month){
-  var res = aggregateWeekDetailed(lessons, month); /* reuse weekly aggregator for daily (month scope) */
-  var labels = res.dayLabels, daily = res.daily, totals = {};
-  ["Türkçe","Sosyal Bilgiler","Din Kültürü","İngilizce","Matematik","Fen Bilimleri"].forEach(d=> totals[d]=0);
-  daily.forEach((val,i)=>{ Object.keys(res.perLessonPerDay).forEach(lesson=> totals[lesson] += res.perLessonPerDay[lesson][i]||0 ); });
-  destroyTeacherMonthChart();
-  try{
-    var ctx = document.getElementById('tMonthChart').getContext('2d');
-    tMonthChart = new Chart(ctx, {
-      type: 'line',
-      data: { labels: labels, datasets: [ { label: month.label + ' — Günlük Toplam', data: daily, tension: 0.35, pointRadius: 3, borderWidth: 2, fill:false } ] },
-      options: { responsive:true, maintainAspectRatio:false, scales:{ x:{ ticks:{ color:'#cbd5e1' }, grid:{ color:'rgba(148,163,184,.15)'} }, y:{ beginAtZero:true, ticks:{ color:'#cbd5e1' }, grid:{ color:'rgba(148,163,184,.12)'} } }, plugins:{ legend:{ labels:{ color:'#e2e8f0' } } } }
-    });
-  }catch(_){}
-  var order = ["Türkçe","Sosyal Bilgiler","Din Kültürü","İngilizce","Matematik","Fen Bilimleri"];
-  var html = "<table><tr><th>Ders</th><th>Toplam Soru</th></tr>";
-  order.forEach(function(d){ var v = totals[d]||0; html += "<tr><td>"+d+"</td><td>"+v+"</td></tr>"; });
-  html += "</table>";
-  var mt = document.getElementById('tMonthTotals'); if(mt) mt.innerHTML = html;
-}
-</script>
-<script>
-(function(){
-  // Track active role
-  window.activeRole = window.activeRole || 'student';
-  function setBodyRoleAttr(){
-    try{ document.body.setAttribute('data-role', (window.activeRole==='parent'?'parent':'student')); }catch(_){}
-  }
-  // UI sync across roles
-  window.applyRoleUi = (function(prev){
-    return function(){
-      try{
-        var isParent = (window.activeRole === 'parent');
-        // Titles
-        var title = document.getElementById('studentPanelTitle');
-        var barTitle = document.getElementById('studentPanelToolbarTitle');
-        if(title) title.textContent = isParent ? 'Veli Paneli' : 'Öğrenci Paneli';
-        if(barTitle) barTitle.textContent = isParent ? 'Veli Paneli' : 'Öğrenci Paneli';
-        // Tab name: Soru Girişi -> Günlük Rapor (parent only)
-        var entryBtn = document.getElementById('stuTabEntryBtn');
-        if(entryBtn){
-          entryBtn.textContent = isParent ? 'Günlük Rapor' : 'Soru Girişi';
+
+    function renderWeekList(){
+      const container=document.getElementById("weekList");
+      if(!container) return;
+      if(currentWeeks.length===0){
+        container.innerHTML=`<div class="empty">Henüz haftalık veri yok.</div>`;
+        return;
+      }
+      let html="";
+      currentWeeks.forEach(wk=>{
+        const start=parseTRDateStr(wk.replace(/-/g,'.'));
+        const end=addDays(start,6);
+        const label=`${formatTR(start)} – ${formatTR(end)}`;
+        html+=`<button class="weekBtn ${wk===selectedWeekKey?'active':''}" onclick="selectWeek('${wk}')">${label}</button>`;
+      });
+      container.innerHTML=html;
+      if(currentWeeks.length>0 && !selectedWeekKey) selectWeek(currentWeeks[0]);
+    }
+
+    async function selectWeek(wk){
+      selectedWeekKey=wk;
+      document.querySelectorAll("#weekList .weekBtn").forEach(b=>b.classList.remove("active"));
+      document.querySelectorAll("#weekList .weekBtn").forEach(b=>{
+        if(b.textContent.includes(wk.replace(/-/g,'.'))) b.classList.add("active");
+      });
+      try {
+        const snap=await db.ref(`students/${currentDetailNum}/weeks/${wk}`).get();
+        const weekData=snap.exists()?snap.val():{};
+        renderWeekMatrix(weekData, wk);
+        renderWeekChart(weekData, wk);
+        document.getElementById("btnExportPDF").disabled=false;
+      } catch (err) {
+        console.error("Hafta verisi yüklenemedi:", err);
+      }
+    }
+
+    function renderWeekMatrix(data, wk){
+      const container=document.getElementById("weekMatrix");
+      if(!container) return;
+      const start=parseTRDateStr(wk.replace(/-/g,'.'));
+      const days=[];
+      for(let i=0;i<7;i++) days.push(formatTR(addDays(start,i)));
+      const subjects=["Turkce","Sosyal","Din","Ingilizce","Matematik","Fen"];
+      const labels={"Turkce":"Türkçe","Sosyal":"Sosyal","Din":"Din","Ingilizce":"İngilizce","Matematik":"Matematik","Fen":"Fen"};
+      let html=`<table style="width:100%"><thead><tr><th>Ders</th>`;
+      days.forEach(d=>html+=`<th>${d}</th>`);
+      html+=`<th>Toplam</th></tr></thead><tbody>`;
+      let colTotals=Array(7).fill(0);
+      let rowTotals={};
+      subjects.forEach(subj=>{
+        rowTotals[subj]=0;
+        html+=`<tr><td>${labels[subj]}</td>`;
+        days.forEach((d,i)=>{
+          const val=data[d]?data[d][subj]||0:0;
+          html+=`<td>${val}</td>`;
+          colTotals[i]+=val;
+          rowTotals[subj]+=val;
+        });
+        html+=`<td><strong>${rowTotals[subj]}</strong></td></tr>`;
+      });
+      html+=`<tr><td><strong>Günlük Toplam</strong></td>`;
+      days.forEach((d,i)=>html+=`<td><strong>${colTotals[i]}</strong></td>`);
+      const weekTotal=colTotals.reduce((a,b)=>a+b,0);
+      html+=`<td><strong>${weekTotal}</strong></td></tr>`;
+      html+="</tbody></table>";
+      container.innerHTML=html;
+    }
+
+    function renderWeekChart(data, wk){
+      const start=parseTRDateStr(wk.replace(/-/g,'.'));
+      const days=[];
+      for(let i=0;i<7;i++) days.push(formatTR(addDays(start,i)));
+      const subjects=["Turkce","Sosyal","Din","Ingilizce","Matematik","Fen"];
+      const labels={"Turkce":"Türkçe","Sosyal":"Sosyal","Din":"Din","Ingilizce":"İngilizce","Matematik":"Matematik","Fen":"Fen"};
+      const datasets=subjects.map((subj,i)=>{
+        const colors=["#3b82f6","#6366f1","#10b981","#0ea5e9","#f43f5e","#14b8a6"];
+        return {
+          label:labels[subj],
+          data:days.map(d=>data[d]?data[d][subj]||0:0),
+          backgroundColor:colors[i],
+          borderColor:colors[i],
+          borderWidth:2
+        };
+      });
+      const ctx=document.getElementById("weekChart").getContext("2d");
+      if(weekChart) weekChart.destroy();
+      weekChart=new Chart(ctx,{
+        type:"bar",
+        data:{ labels:days, datasets },
+        options:{
+          responsive:true,
+          scales:{
+            x:{ stacked:true },
+            y:{ stacked:true, beginAtZero:true }
+          }
         }
-        // Ensure correct data-role on body
-        setBodyRoleAttr();
-      }catch(_){}
-      try{ if(typeof prev === 'function') prev(); }catch(_){}
-    };
-  })(window.applyRoleUi);
-  // Give IDs to existing titles if they aren't present
-  try{
-    var h3 = document.querySelector('#studentPanel h3');
-    if(h3 && !h3.id && h3.textContent.trim().toUpperCase().includes('ÖĞRENCİ')){ h3.id = 'studentPanelTitle'; }
-    var strong = document.querySelector('#studentTab-entry .student-toolbar strong');
-    if(strong && !strong.id && strong.textContent.trim().toUpperCase().includes('ÖĞRENCİ')){ strong.id = 'studentPanelToolbarTitle'; }
-  }catch(_){}
-  // Wrap enterAsStudent to set role + update UI
-  if (typeof window.enterAsStudent === 'function'){
-    var __orig_enterAsStudent = window.enterAsStudent;
-    window.enterAsStudent = function(){
-      window.activeRole = 'student';
-      __orig_enterAsStudent();
-      window.applyRoleUi();
-    };
-  }
-  // Parent entry mirrors student panel; keeps daily calendar & table
-  window.enterAsParent = function(){
-    window.activeRole = 'parent';
-    var rc = document.getElementById('roleChoice'); if(rc) rc.style.display='none';
-    var lp = document.getElementById('loginPanel'); if(lp) lp.style.display='none';
-    var sp = document.getElementById('studentPanel'); if(sp) sp.style.display='block';
-    try{ window.showStudentTab('entry'); }catch(_){}
-    try{ window.loadStudentData(); }catch(_){}
-    window.applyRoleUi();
-  };
-  // Ensure logout resets role back to student
-  if (typeof window.logout === 'function'){
-    var __orig_logout = window.logout;
-    window.logout = function(){
-      __orig_logout();
-      window.activeRole = 'student';
-      window.applyRoleUi();
-    };
-  }
-  // Initialize
-  setBodyRoleAttr();
-  window.applyRoleUi();
-})();
-</script>
+      });
+    }
+
+    // --- Aylık Rapor (Öğretmen) ---
+    async function loadTeacherMonths(id){
+      if(!id) return;
+      try {
+        const snap=await db.ref(`students/${id}/weeks`).get();
+        const weeks=snap.exists()?snap.val():{};
+        const months={};
+        Object.keys(weeks).forEach(wk=>{
+          const [y,m]=wk.split("-").slice(0,2);
+          const key=`${y}-${m}`;
+          if(!months[key]) months[key]={};
+          Object.keys(weeks[wk]).forEach(date=>{
+            const day=weeks[wk][date];
+            Object.keys(day).forEach(subj=>{
+              if(!months[key][subj]) months[key][subj]=0;
+              months[key][subj]+=day[subj];
+            });
+          });
+        });
+        _tMonths=Object.keys(months).sort().reverse();
+        renderTeacherMonthSelector();
+      } catch (err) {
+        console.error("Aylar yüklenemedi:", err);
+      }
+    }
+
+    function renderTeacherMonthSelector(){
+      const select=document.getElementById("tMonthSelect");
+      if(!select) return;
+      select.innerHTML="<option value=''>Ay Seçin</option>";
+      _tMonths.forEach(m=>{
+        const [y,mo]=m.split("-");
+        const label=new Date(y,mo-1).toLocaleDateString("tr-TR",{month:"long",year:"numeric"});
+        select.innerHTML+=`<option value="${m}">${label}</option>`;
+      });
+      if(_tMonths.length>0) selectTeacherMonth(_tMonths[0]);
+    }
+
+    async function selectTeacherMonth(monthKey){
+      if(!currentDetailNum) return;
+      try {
+        const snap=await db.ref(`students/${currentDetailNum}/weeks`).get();
+        const weeks=snap.exists()?snap.val():{};
+        const monthData={};
+        Object.keys(weeks).forEach(wk=>{
+          if(wk.startsWith(monthKey)){
+            Object.keys(weeks[wk]).forEach(date=>{
+              const day=weeks[wk][date];
+              Object.keys(day).forEach(subj=>{
+                if(!monthData[subj]) monthData[subj]=0;
+                monthData[subj]+=day[subj];
+              });
+            });
+          }
+        });
+        renderTeacherMonthChart(monthData, monthKey);
+        renderTeacherMonthTotals(monthData, monthKey);
+      } catch (err) {
+        console.error("Ay verisi yüklenemedi:", err);
+      }
+    }
+
+    function renderTeacherMonthChart(data, monthKey){
+      const subjects=["Turkce","Sosyal","Din","Ingilizce","Matematik","Fen"];
+      const labels={"Turkce":"Türkçe","Sosyal":"Sosyal","Din":"Din","Ingilizce":"İngilizce","Matematik":"Matematik","Fen":"Fen"};
+      const values=subjects.map(s=>data[s]||0);
+      const ctx=document.getElementById("tMonthChart").getContext("2d");
+      if(tMonthChart) tMonthChart.destroy();
+      tMonthChart=new Chart(ctx,{
+        type:"bar",
+        data:{
+          labels:subjects.map(s=>labels[s]),
+          datasets:[{
+            label:"Soru Sayısı",
+            data:values,
+            backgroundColor:["#3b82f6","#6366f1","#10b981","#0ea5e9","#f43f5e","#14b8a6"],
+            borderWidth:1
+          }]
+        },
+        options:{
+          responsive:true,
+          scales:{ y:{ beginAtZero:true } }
+        }
+      });
+    }
+
+    function renderTeacherMonthTotals(data, monthKey){
+      const container=document.getElementById("tMonthTotals");
+      if(!container) return;
+      const subjects=["Turkce","Sosyal","Din","Ingilizce","Matematik","Fen"];
+      const labels={"Turkce":"Türkçe","Sosyal":"Sosyal Bilgiler","Din":"Din Kültürü","Ingilizce":"İngilizce","Matematik":"Matematik","Fen":"Fen Bilimleri"};
+      let html=`<table><thead><tr><th>Ders</th><th>Toplam</th></tr></thead><tbody>`;
+      let total=0;
+      subjects.forEach(subj=>{
+        const val=data[subj]||0;
+        total+=val;
+        html+=`<tr><td>${labels[subj]}</td><td>${val}</td></tr>`;
+      });
+      html+=`</tbody></table><div style="margin-top:8px;font-weight:700">Aylık Toplam: ${total} soru</div>`;
+      container.innerHTML=html;
+    }
+
+    /* ============ PDF Dışa Aktar ============ */
+    async function exportSelectedWeekPDF(){
+      if(!selectedWeekKey||!currentDetailNum) return;
+      try {
+        const snap=await db.ref(`students/${currentDetailNum}`).get();
+        const student=snap.exists()?snap.val():{};
+        const weekSnap=await db.ref(`students/${currentDetailNum}/weeks/${selectedWeekKey}`).get();
+        const weekData=weekSnap.exists()?weekSnap.val():{};
+        const start=parseTRDateStr(selectedWeekKey.replace(/-/g,'.'));
+        const end=addDays(start,6);
+        const rangeText=`${formatTR(start)} – ${formatTR(end)}`;
+        document.getElementById("exportStudent").textContent=`${student.name} — ${student.class}`;
+        document.getElementById("exportRange").textContent=rangeText;
+        // Grafik
+        const ctx=document.getElementById("exportChart").getContext("2d");
+        const days=[];
+        for(let i=0;i<7;i++) days.push(formatTR(addDays(start,i)));
+        const subjects=["Turkce","Sosyal","Din","Ingilizce","Matematik","Fen"];
+        const labels={"Turkce":"Türkçe","Sosyal":"Sosyal","Din":"Din","Ingilizce":"İngilizce","Matematik":"Matematik","Fen":"Fen"};
+        const datasets=subjects.map((subj,i)=>{
+          const colors=["#3b82f6","#6366f1","#10b981","#0ea5e9","#f43f5e","#14b8a6"];
+          return {
+            label:labels[subj],
+            data:days.map(d=>weekData[d]?weekData[d][subj]||0:0),
+            backgroundColor:colors[i],
+            borderColor:colors[i],
+            borderWidth:2
+          };
+        });
+        const expChart=new Chart(ctx,{
+          type:"bar",
+          data:{ labels:days, datasets },
+          options:{
+            responsive:true,
+            scales:{
+              x:{ stacked:true },
+              y:{ stacked:true, beginAtZero:true }
+            }
+          }
+        });
+        // Tablo
+        const tableContainer=document.getElementById("exportTable");
+        let html=`<table style="width:100%"><thead><tr><th>Ders</th>`;
+        days.forEach(d=>html+=`<th>${d}</th>`);
+        html+=`<th>Toplam</th></tr></thead><tbody>`;
+        let colTotals=Array(7).fill(0);
+        let rowTotals={};
+        subjects.forEach(subj=>{
+          rowTotals[subj]=0;
+          html+=`<tr><td>${labels[subj]}</td>`;
+          days.forEach((d,i)=>{
+            const val=weekData[d]?weekData[d][subj]||0:0;
+            html+=`<td>${val}</td>`;
+            colTotals[i]+=val;
+            rowTotals[subj]+=val;
+          });
+          html+=`<td><strong>${rowTotals[subj]}</strong></td></tr>`;
+        });
+        html+=`<tr><td><strong>Günlük Toplam</strong></td>`;
+        days.forEach((d,i)=>html+=`<td><strong>${colTotals[i]}</strong></td>`);
+        const weekTotal=colTotals.reduce((a,b)=>a+b,0);
+        html+=`<td><strong>${weekTotal}</strong></td></tr>`;
+        html+="</tbody></table>";
+        tableContainer.innerHTML=html;
+        // PDF oluştur
+        const { jsPDF }=window.jspdf;
+        const pdf=new jsPDF("p","mm","a4");
+        const pageW=pdf.internal.pageSize.getWidth();
+        await new Promise(resolve=>setTimeout(resolve,500));
+        const canvas=await html2canvas(document.getElementById("exportArea"),{ scale:2 });
+        const imgData=canvas.toDataURL("image/png");
+        pdf.addImage(imgData,"PNG",0,0,pageW,0,null,"FAST");
+        pdf.save(`${student.name}_${selectedWeekKey}.pdf`);
+        expChart.destroy();
+      } catch (err) {
+        console.error("PDF hatası:", err);
+        setAlert("PDF oluşturulamadı.");
+      }
+    }
+
+    /* ============ Öğrenci Haftalık & Aylık Rapor ============ */
+    async function loadStuWeeks(){
+      if(!currentStudent) return;
+      try {
+        const snap=await db.ref(`students/${currentStudent}/weeks`).get();
+        const weeks=snap.exists()?snap.val():{};
+        _stuWeeks=Object.keys(weeks).sort().reverse();
+        renderStuWeekSelector();
+      } catch (err) {
+        console.error("Öğrenci haftaları yüklenemedi:", err);
+      }
+    }
+
+    function renderStuWeekSelector(){
+      const select=document.getElementById("stuWeekSelect");
+      if(!select) return;
+      select.innerHTML="<option value=''>Hafta Seçin</option>";
+      _stuWeeks.forEach(wk=>{
+        const start=parseTRDateStr(wk.replace(/-/g,'.'));
+        const end=addDays(start,6);
+        const label=`${formatTR(start)} – ${formatTR(end)}`;
+        select.innerHTML+=`<option value="${wk}">${label}</option>`;
+      });
+      if(_stuWeeks.length>0) selectStuWeek(_stuWeeks[0]);
+    }
+
+    async function selectStuWeek(wk){
+      if(!currentStudent) return;
+      try {
+        const snap=await db.ref(`students/${currentStudent}/weeks/${wk}`).get();
+        const weekData=snap.exists()?snap.val():{};
+        renderStuWeekMatrix(weekData, wk);
+        renderStuWeekChart(weekData, wk);
+      } catch (err) {
+        console.error("Öğrenci hafta verisi yüklenemedi:", err);
+      }
+    }
+
+    function renderStuWeekMatrix(data, wk){
+      const container=document.getElementById("stuWeekMatrix");
+      if(!container) return;
+      const start=parseTRDateStr(wk.replace(/-/g,'.'));
+      const days=[];
+      for(let i=0;i<7;i++) days.push(formatTR(addDays(start,i)));
+      const subjects=["Turkce","Sosyal","Din","Ingilizce","Matematik","Fen"];
+      const labels={"Turkce":"Türkçe","Sosyal":"Sosyal","Din":"Din","Ingilizce":"İngilizce","Matematik":"Matematik","Fen":"Fen"};
+      let html=`<table style="width:100%"><thead><tr><th>Ders</th>`;
+      days.forEach(d=>html+=`<th>${d}</th>`);
+      html+=`<th>Toplam</th></tr></thead><tbody>`;
+      let colTotals=Array(7).fill(0);
+      let rowTotals={};
+      subjects.forEach(subj=>{
+        rowTotals[subj]=0;
+        html+=`<tr><td>${labels[subj]}</td>`;
+        days.forEach((d,i)=>{
+          const val=data[d]?data[d][subj]||0:0;
+          html+=`<td>${val}</td>`;
+          colTotals[i]+=val;
+          rowTotals[subj]+=val;
+        });
+        html+=`<td><strong>${rowTotals[subj]}</strong></td></tr>`;
+      });
+      html+=`<tr><td><strong>Günlük Toplam</strong></td>`;
+      days.forEach((d,i)=>html+=`<td><strong>${colTotals[i]}</strong></td>`);
+      const weekTotal=colTotals.reduce((a,b)=>a+b,0);
+      html+=`<td><strong>${weekTotal}</strong></td></tr>`;
+      html+="</tbody></table>";
+      container.innerHTML=html;
+    }
+
+    function renderStuWeekChart(data, wk){
+      const start=parseTRDateStr(wk.replace(/-/g,'.'));
+      const days=[];
+      for(let i=0;i<7;i++) days.push(formatTR(addDays(start,i)));
+      const subjects=["Turkce","Sosyal","Din","Ingilizce","Matematik","Fen"];
+      const labels={"Turkce":"Türkçe","Sosyal":"Sosyal","Din":"Din","Ingilizce":"İngilizce","Matematik":"Matematik","Fen":"Fen"};
+      const datasets=subjects.map((subj,i)=>{
+        const colors=["#3b82f6","#6366f1","#10b981","#0ea5e9","#f43f5e","#14b8a6"];
+        return {
+          label:labels[subj],
+          data:days.map(d=>data[d]?data[d][subj]||0:0),
+          backgroundColor:colors[i],
+          borderColor:colors[i],
+          borderWidth:2
+        };
+      });
+      const ctx=document.getElementById("stuWeekChart").getContext("2d");
+      if(stuWeekChart) stuWeekChart.destroy();
+      stuWeekChart=new Chart(ctx,{
+        type:"bar",
+        data:{ labels:days, datasets },
+        options:{
+          responsive:true,
+          scales:{
+            x:{ stacked:true },
+            y:{ stacked:true, beginAtZero:true }
+          }
+        }
+      });
+    }
+
+    // --- Öğrenci Aylık Rapor ---
+    async function loadStuMonths(){
+      if(!currentStudent) return;
+      try {
+        const snap=await db.ref(`students/${currentStudent}/weeks`).get();
+        const weeks=snap.exists()?snap.val():{};
+        const months={};
+        Object.keys(weeks).forEach(wk=>{
+          const [y,m]=wk.split("-").slice(0,2);
+          const key=`${y}-${m}`;
+          if(!months[key]) months[key]={};
+          Object.keys(weeks[wk]).forEach(date=>{
+            const day=weeks[wk][date];
+            Object.keys(day).forEach(subj=>{
+              if(!months[key][subj]) months[key][subj]=0;
+              months[key][subj]+=day[subj];
+            });
+          });
+        });
+        _stuMonths=Object.keys(months).sort().reverse();
+        renderStuMonthSelector();
+      } catch (err) {
+        console.error("Öğrenci ayları yüklenemedi:", err);
+      }
+    }
+
+    function renderStuMonthSelector(){
+      const select=document.getElementById("stuMonthSelect");
+      if(!select) return;
+      select.innerHTML="<option value=''>Ay Seçin</option>";
+      _stuMonths.forEach(m=>{
+        const [y,mo]=m.split("-");
+        const label=new Date(y,mo-1).toLocaleDateString("tr-TR",{month:"long",year:"numeric"});
+        select.innerHTML+=`<option value="${m}">${label}</option>`;
+      });
+      if(_stuMonths.length>0) selectStuMonth(_stuMonths[0]);
+    }
+
+    async function selectStuMonth(monthKey){
+      if(!currentStudent) return;
+      try {
+        const snap=await db.ref(`students/${currentStudent}/weeks`).get();
+        const weeks=snap.exists()?snap.val():{};
+        const monthData={};
+        Object.keys(weeks).forEach(wk=>{
+          if(wk.startsWith(monthKey)){
+            Object.keys(weeks[wk]).forEach(date=>{
+              const day=weeks[wk][date];
+              Object.keys(day).forEach(subj=>{
+                if(!monthData[subj]) monthData[subj]=0;
+                monthData[subj]+=day[subj];
+              });
+            });
+          }
+        });
+        renderStuMonthChart(monthData, monthKey);
+        renderStuMonthTotals(monthData, monthKey);
+      } catch (err) {
+        console.error("Öğrenci ay verisi yüklenemedi:", err);
+      }
+    }
+
+    function renderStuMonthChart(data, monthKey){
+      const subjects=["Turkce","Sosyal","Din","Ingilizce","Matematik","Fen"];
+      const labels={"Turkce":"Türkçe","Sosyal":"Sosyal","Din":"Din","Ingilizce":"İngilizce","Matematik":"Matematik","Fen":"Fen"};
+      const values=subjects.map(s=>data[s]||0);
+      const ctx=document.getElementById("stuMonthChart").getContext("2d");
+      if(stuMonthChart) stuMonthChart.destroy();
+      stuMonthChart=new Chart(ctx,{
+        type:"bar",
+        data:{
+          labels:subjects.map(s=>labels[s]),
+          datasets:[{
+            label:"Soru Sayısı",
+            data:values,
+            backgroundColor:["#3b82f6","#6366f1","#10b981","#0ea5e9","#f43f5e","#14b8a6"],
+            borderWidth:1
+          }]
+        },
+        options:{
+          responsive:true,
+          scales:{ y:{ beginAtZero:true } }
+        }
+      });
+    }
+
+    function renderStuMonthTotals(data, monthKey){
+      const container=document.getElementById("stuMonthTotals");
+      if(!container) return;
+      const subjects=["Turkce","Sosyal","Din","Ingilizce","Matematik","Fen"];
+      const labels={"Turkce":"Türkçe","Sosyal":"Sosyal Bilgiler","Din":"Din Kültürü","Ingilizce":"İngilizce","Matematik":"Matematik","Fen":"Fen Bilimleri"};
+      let html=`<table><thead><tr><th>Ders</th><th>Toplam</th></tr></thead><tbody>`;
+      let total=0;
+      subjects.forEach(subj=>{
+        const val=data[subj]||0;
+        total+=val;
+        html+=`<tr><td>${labels[subj]}</td><td>${val}</td></tr>`;
+      });
+      html+=`</tbody></table><div style="margin-top:8px;font-weight:700">Aylık Toplam: ${total} soru</div>`;
+      container.innerHTML=html;
+    }
+
+    /* ============ Öğrenci Sekme Yönetimi ============ */
+    function showStudentTab(tab){
+      document.querySelectorAll("#studentTabs .pill").forEach(b=>b.classList.remove("active"));
+      document.getElementById(`stuTab${tab.charAt(0).toUpperCase()+tab.slice(1)}Btn`).classList.add("active");
+      document.querySelectorAll("#studentTab-entry,#studentTab-week,#studentTab-month").forEach(el=>el.style.display="none");
+      document.getElementById(`studentTab-${tab}`).style.display="block";
+      if(tab==="week"){ loadStuWeeks(); }
+      if(tab==="month"){ loadStuMonths(); }
+    }
+
+    /* ============ Hedef Yönetimi ============ */
+    function openTargetModal(id, name){
+      currentTargetStudent=id;
+      document.getElementById("targetStudentName").textContent=name;
+      document.getElementById("targetModal").style.display="block";
+      document.getElementById("reportOverlay").style.display="block";
+      // Mevcut hedefi yükle
+      db.ref(`students/${id}/dailyTarget`).get().then(snap=>{
+        const target=snap.exists()?snap.val():100;
+        document.getElementById("targetInput").value=target;
+      });
+    }
+
+    function openTargetForCurrent(){
+      openTargetModal(currentStudent, currentStudentName);
+    }
+
+    function closeTargetModal(){
+      document.getElementById("targetModal").style.display="none";
+      document.getElementById("reportOverlay").style.display="none";
+      currentTargetStudent=null;
+    }
+
+    async function saveTarget(){
+      const target=parseInt(document.getElementById("targetInput").value,10);
+      if(isNaN(target)||target<0){ setAlert("Geçerli bir hedef girin."); return; }
+      try {
+        await db.ref(`students/${currentTargetStudent}/dailyTarget`).set(target);
+        setAlert("✅ Hedef kaydedildi.");
+        if(currentTargetStudent===currentStudent){
+          document.getElementById("studentTargetValue").textContent=target;
+        }
+        closeTargetModal();
+      } catch (err) {
+        console.error("Hedef kaydetme hatası:", err);
+        setAlert("Hedef kaydedilemedi.");
+      }
+    }
+
+    /* ============ Haftanın Yıldızı ============ */
+    async function calculateAndDisplaySOTW(){
+      try {
+        const snap=await db.ref("students").get();
+        if(!snap.exists()) return;
+        const students=snap.val();
+        const today=new Date();
+        const weekStart=mondayOf(today);
+        const weekKey=`${weekStart.getFullYear()}-${(weekStart.getMonth()+1).toString().padStart(2,'0')}-${weekStart.getDate().toString().padStart(2,'0')}`;
+        let bestStudent=null, bestTotal=0;
+        for(const id in students){
+          const weekSnap=await db.ref(`students/${id}/weeks/${weekKey}`).get();
+          if(!weekSnap.exists()) continue;
+          const weekData=weekSnap.val();
+          let total=0;
+          Object.keys(weekData).forEach(date=>{
+            const day=weekData[date];
+            Object.keys(day).forEach(subj=>{
+              total+=day[subj];
+            });
+          });
+          if(total>bestTotal){ bestTotal=total; bestStudent=students[id].name; }
+        }
+        const sotwContainerStudent=document.getElementById("sotwContainerStudent");
+        const sotwContainerTeacher=document.getElementById("sotwContainerTeacher");
+        if(bestStudent&&bestTotal>0){
+          const html=`🏆 <span>${bestStudent}</span> bu hafta ${bestTotal} soru çözerek haftanın yıldızı oldu!`;
+          if(sotwContainerStudent) sotwContainerStudent.innerHTML=html;
+          if(sotwContainerTeacher) sotwContainerTeacher.innerHTML=html;
+        } else {
+          if(sotwContainerStudent) sotwContainerStudent.innerHTML="🏆 Bu hafta henüz yıldız öğrenci yok.";
+          if(sotwContainerTeacher) sotwContainerTeacher.innerHTML="🏆 Bu hafta henüz yıldız öğrenci yok.";
+        }
+      } catch (err) {
+        console.error("Haftanın yıldızı hesaplanamadı:", err);
+      }
+    }
+
+    /* ============ Öğrenci İstatistikleri ============ */
+    async function calculateAndDisplayStudentStats(){
+      if(!currentStudent) return;
+      const container=document.getElementById("studentStatsContainer");
+      if(!container) return;
+      try {
+        const snap=await db.ref(`students/${currentStudent}/weeks`).get();
+        const weeks=snap.exists()?snap.val():{};
+        const today=new Date();
+        const weekStart=mondayOf(today);
+        const weekKey=`${weekStart.getFullYear()}-${(weekStart.getMonth()+1).toString().padStart(2,'0')}-${weekStart.getDate().toString().padStart(2,'0')}`;
+        const thisWeek=weeks[weekKey]||{};
+        let weekTotal=0;
+        Object.keys(thisWeek).forEach(date=>{
+          const day=thisWeek[date];
+          Object.keys(day).forEach(subj=>{
+            weekTotal+=day[subj];
+          });
+        });
+        let monthTotal=0;
+        const monthKey=`${today.getFullYear()}-${(today.getMonth()+1).toString().padStart(2,'0')}`;
+        Object.keys(weeks).forEach(wk=>{
+          if(wk.startsWith(monthKey)){
+            Object.keys(weeks[wk]).forEach(date=>{
+              const day=weeks[wk][date];
+              Object.keys(day).forEach(subj=>{
+                monthTotal+=day[subj];
+              });
+            });
+          }
+        });
+        let allTimeTotal=0;
+        Object.keys(weeks).forEach(wk=>{
+          Object.keys(weeks[wk]).forEach(date=>{
+            const day=weeks[wk][date];
+            Object.keys(day).forEach(subj=>{
+              allTimeTotal+=day[subj];
+            });
+          });
+        });
+        const html=`<div class="studentStats">
+          <div class="statBox">
+            <div class="label">Bu Hafta</div>
+            <table><tr><td>Toplam Soru</td><td>${weekTotal}</td></tr></table>
+          </div>
+          <div class="statBox">
+            <div class="label">Bu Ay</div>
+            <table><tr><td>Toplam Soru</td><td>${monthTotal}</td></tr></table>
+          </div>
+          <div class="statBox">
+            <div class="label">Tüm Zamanlar</div>
+            <table><tr><td>Toplam Soru</td><td>${allTimeTotal}</td></tr></table>
+          </div>
+        </div>`;
+        container.innerHTML=html;
+      } catch (err) {
+        console.error("İstatistikler yüklenemedi:", err);
+        container.innerHTML="";
+      }
+    }
+
+    /* ============ Ders Hedefleri (Goals Page) ============ */
+    function openGoalsPage(){
+      document.getElementById("studentPanel").style.display="none";
+      document.getElementById("goalsPage").style.display="block";
+      loadLessonGoals();
+    }
+
+    function backFromGoalsPage(){
+      document.getElementById("goalsPage").style.display="none";
+      document.getElementById("studentPanel").style.display="block";
+    }
+
+    async function loadLessonGoals(){
+      if(!currentStudent) return;
+      try {
+        const snap=await db.ref(`students/${currentStudent}/goals`).get();
+        const goals=snap.exists()?snap.val():{};
+        ["Turkce","Sosyal","Din","Ingilizce","Matematik","Fen"].forEach(subj=>{
+          const inp=document.getElementById(`lg-${subj}`);
+          if(inp) inp.value=goals[subj]||"";
+        });
+      } catch (err) {
+        console.error("Hedefler yüklenemedi:", err);
+      }
+    }
+
+    async function saveLessonGoals(){
+      if(!currentStudent) return;
+      const goals={};
+      ["Turkce","Sosyal","Din","Ingilizce","Matematik","Fen"].forEach(subj=>{
+        const inp=document.getElementById(`lg-${subj}`);
+        const val=parseInt(inp?.value||0,10)||0;
+        if(val>0) goals[subj]=val;
+      });
+      if(Object.keys(goals).length===0){
+        setAlert("En az bir ders için hedef girin."); return;
+      }
+      try {
+        await db.ref(`students/${currentStudent}/goals`).set(goals);
+        setAlert("✅ Hedefler kaydedildi.");
+        // Günlük formdaki hedefleri güncelle
+        Object.keys(goals).forEach(subj=>{
+          const inp=document.getElementById(`goal-${subj}`);
+          if(inp) inp.value=goals[subj];
+        });
+        updateProgressBars();
+        backFromGoalsPage();
+      } catch (err) {
+        console.error("Hedef kaydetme hatası:", err);
+        setAlert("Hedefler kaydedilemedi.");
+      }
+    }
+
+    function resetGoalsInputs(){
+      ["Turkce","Sosyal","Din","Ingilizce","Matematik","Fen"].forEach(subj=>{
+        const inp=document.getElementById(`lg-${subj}`);
+        if(inp) inp.value="";
+      });
+    }
+
+    /* ============ Başlangıç ============ */
+    document.addEventListener("DOMContentLoaded",()=>{
+      // Sınıf seçimini doldur
+      const classSelect=document.getElementById("rClass");
+      if(classSelect){
+        for(let i=5;i<=8;i++){
+          for(let j=1;j<=4;j++) classSelect.innerHTML+=`<option value="${i}/${String.fromCharCode(64+j)}">${i}/${String.fromCharCode(64+j)}</option>`;
+        }
+      }
+      // Yoğun mod toggle
+      const toggleBtn=document.getElementById("densityToggleBtn");
+      if(toggleBtn){
+        toggleBtn.addEventListener("click",()=>{
+          const list=document.querySelector(".lessonList.dense");
+          if(list){
+            list.classList.toggle("ultra-dense");
+            toggleBtn.textContent=list.classList.contains("ultra-dense")?"Normal Mod":"Yoğun Mod";
+          }
+        });
+      }
+      // Şifre eşleşmesini kontrol et
+      const rPass=document.getElementById("rPass"), rPass2=document.getElementById("rPass2");
+      const passMismatchError=document.getElementById("passMismatchError");
+      if(rPass&&rPass2&&passMismatchError){
+        const checkMatch=()=>{
+          if(rPass.value&&rPass2.value&&rPass.value!==rPass2.value){
+            passMismatchError.style.display="block";
+          } else {
+            passMismatchError.style.display="none";
+          }
+        };
+        rPass.addEventListener("input",checkMatch);
+        rPass2.addEventListener("input",checkMatch);
+      }
+      // Hedef sayfalarına geçiş butonları
+      const targetBtn=document.createElement("button");
+      targetBtn.className="pill";
+      targetBtn.textContent="🎯 Hedefler";
+      targetBtn.onclick=openGoalsPage;
+      document.querySelector("#studentPanel .pillTabs").appendChild(targetBtn);
+    });
+  </script>
 </body>
 </html>
