@@ -974,6 +974,10 @@ button.exitSmall .label{line-height:1}
 <h3>Öğrenci-Veli Giriş</h3>
 <input autocomplete="off" id="lNumber" placeholder="Okul Numarası" type="text"/>
 <input autocomplete="current-password" id="lPass" placeholder="Şifre" type="password"/>
+<div style="display: flex; align-items: center; margin: 10px 0;">
+  <input type="checkbox" id="rememberMe" style="width: auto; margin-right: 8px;">
+  <label for="rememberMe" style="font-weight: 600;">Beni Hatırla</label>
+</div>
 <button class="action" onclick="studentLogin()" type="button">Giriş Yap</button>
 </div>
 <!-- Giriş Türü Seçimi -->
@@ -1201,6 +1205,7 @@ button.exitSmall .label{line-height:1}
 <div class="pillTabs" id="teacherTopTabs">
 <button class="pill active" id="tabClasses" onclick="showTeacherSection('classes')">Sınıflar</button>
 <button class="pill" id="tabFavorites" onclick="showTeacherSection('favorites')">Favorilerim</button>
+      <button class="pill" id="tabModeration" onclick="showTeacherSection('moderation')" style="display:none;">Moderasyon</button>
 </div>
 <!-- Sınıflar -->
 <div id="classesSection">
@@ -1213,6 +1218,24 @@ button.exitSmall .label{line-height:1}
 <div class="sectionTitle">Öğrenciler</div>
 <div id="studentsContainer"></div>
 </div>
+</div>
+<!-- Moderasyon -->
+<div id="moderationSection" style="display:none; margin-top:14px">
+  <h3>Moderasyon Paneli</h3>
+  <!-- Bad Words Management -->
+  <div class="list">
+    <h4>Yasaklı Kelimeler</h4>
+    <div class="row" style="margin-bottom: 10px;">
+      <input type="text" id="newBadWord" placeholder="Yeni yasaklı kelime" class="grow">
+      <button class="action" onclick="addBadWord()" style="max-width: 150px;">Ekle</button>
+    </div>
+    <ul id="badWordsList"></ul>
+  </div>
+  <!-- Flagged Messages -->
+  <div class="list" style="margin-top: 20px;">
+    <h4>İşaretlenmiş Mesajlar</h4>
+    <div id="flaggedMessagesList"></div>
+  </div>
 </div>
 <!-- Favoriler -->
 <div id="favoritesSection" style="display:none; margin-top:14px">
@@ -1479,6 +1502,18 @@ function openTargetForCurrent(){
       return low(currentTeacherName) === low("Emre Demirbaş");
     }
 
+    /* ============ Otomatik Giriş ve Yönlendirme ============ */
+    document.addEventListener('DOMContentLoaded', function() {
+      const savedNum = localStorage.getItem('student_num');
+      const savedPass = localStorage.getItem('student_pass');
+      if (savedNum && savedPass) {
+        // Otomatik giriş için bilgileri forma doldur ve giriş yap
+        document.getElementById("lNumber").value = savedNum;
+        document.getElementById("lPass").value = savedPass;
+        studentLogin();
+      }
+    });
+
     /* ============ Öğrenci kayıt & giriş ============ */
     function studentRegister(){
       const name=document.getElementById("rName").value.trim();
@@ -1510,13 +1545,24 @@ function openTargetForCurrent(){
     function studentLogin(){
       const num=document.getElementById("lNumber").value.trim();
       const pass=document.getElementById("lPass").value;
+      const rememberMe = document.getElementById("rememberMe").checked;
+
       db.ref("students/"+num).get().then(snap=>{
         if(snap.exists() && snap.val().pass===pass){
+          if (rememberMe) {
+            localStorage.setItem('student_num', num);
+            localStorage.setItem('student_pass', pass);
+          } else {
+            localStorage.removeItem('student_num');
+            localStorage.removeItem('student_pass');
+          }
           currentStudent = num;
           document.getElementById("lPass").value="";
           showRoleChoice(snap.val());
         }else{
           setAlert("Numara veya şifre hatalı.");
+          localStorage.removeItem('student_num');
+          localStorage.removeItem('student_pass');
         }
       });
     }
@@ -1554,10 +1600,28 @@ function openTargetForCurrent(){
       document.getElementById("studentPanel").style.display="block";
       setWelcomeStudentBanner();
       loadStudentTarget();
-  try{ loadLessonGoals(); }catch(_){}
+      try{ loadLessonGoals(); }catch(_){}
+      listenForGoalUpdates(); // Hedef güncellemelerini dinle
 
       showStudentTab('entry');
       loadStudentData();
+    }
+
+    function listenForGoalUpdates() {
+      if (!currentStudent) return;
+      const goalRef = db.ref('students/' + currentStudent + '/lessonGoals');
+      goalRef.on('value', (snapshot) => {
+        if (snapshot.exists()) {
+          const goals = snapshot.val();
+          if (goals._updatedBy === 'teacher' && goals._notified === false) {
+            // Show a pop-up notification
+            alert("Öğretmeniniz hedeflerinizi güncelledi. Lütfen kontrol ediniz.");
+
+            // Update the _notified flag to true
+            goalRef.child('_notified').set(true);
+          }
+        }
+      });
     }
 
     // Veli olarak devam et – farklı sayfaya yönlendir
@@ -1575,6 +1639,8 @@ function openTargetForCurrent(){
     }
 
     function logout(){
+      localStorage.removeItem('student_num');
+      localStorage.removeItem('student_pass');
       const rc=document.getElementById('roleChoice'); if(rc) rc.style.display='none';
       if(classesRef){ classesRef.off(); classesRef=null; }
       if(favRef){ favRef.off(); favRef=null; }
@@ -1717,6 +1783,12 @@ function openTargetForCurrent(){
       document.getElementById("teacherWelcome").textContent = `Hoş geldiniz, ${toTitleCaseTR(currentTeacherName)}`;
       document.getElementById("loginPanel").style.display="none";
       document.getElementById("teacherPanel").style.display="block";
+
+      // Show moderation tab for Uğur Yaşayan
+      if (currentTeacherName.trim().toLowerCase() === 'uğur yaşayan') {
+          document.getElementById('tabModeration').style.display = 'block';
+          listenForModerationData();
+      }
 
       listenClasses();
       listenFavorites();
@@ -2001,19 +2073,85 @@ function openTargetForCurrent(){
       });
     }
 
+    /* ============ Moderasyon Paneli Fonksiyonları ============ */
+    function addBadWord() {
+        const wordInput = document.getElementById('newBadWord');
+        const word = wordInput.value.trim().toLowerCase();
+        if (word) {
+            db.ref('moderation/badWords').child(word).set(true);
+            wordInput.value = '';
+        }
+    }
+
+    function deleteBadWord(word) {
+        if (confirm(`"${word}" kelimesini silmek istediğinizden emin misiniz?`)) {
+            db.ref('moderation/badWords').child(word).remove();
+        }
+    }
+
+    function listenForModerationData() {
+        const badWordsRef = db.ref('moderation/badWords');
+        const flaggedMessagesRef = db.ref('moderation/flagged_messages');
+
+        badWordsRef.on('value', (snapshot) => {
+            const list = document.getElementById('badWordsList');
+            list.innerHTML = '';
+            if (snapshot.exists()) {
+                snapshot.forEach((child) => {
+                    const li = document.createElement('li');
+                    li.textContent = child.key;
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.textContent = 'Sil';
+                    deleteBtn.className = 'delBtn';
+                    deleteBtn.style.marginLeft = '10px';
+                    deleteBtn.onclick = () => deleteBadWord(child.key);
+                    li.appendChild(deleteBtn);
+                    list.appendChild(li);
+                });
+            }
+        });
+
+        flaggedMessagesRef.on('value', (snapshot) => {
+            const list = document.getElementById('flaggedMessagesList');
+            list.innerHTML = '';
+            if (snapshot.exists()) {
+                snapshot.forEach((child) => {
+                    const msg = child.val();
+                    const item = document.createElement('div');
+                    item.className = 'studentItem';
+                    item.innerHTML = `
+                        <div>
+                            <strong>${msg.studentName} (${msg.sclass || 'N/A'})</strong>:
+                            <em>"${msg.message}"</em>
+                            <div style="font-size: 12px; color: #999;">${new Date(msg.timestamp).toLocaleString()}</div>
+                        </div>`;
+                    list.appendChild(item);
+                });
+            } else {
+                list.innerHTML = '<div class="empty">İşaretlenmiş mesaj yok.</div>';
+            }
+        });
+    }
+
+
     /* ============ Sekme geçişleri ============ */
     function showTeacherSection(sec){
-      const tabClasses = document.getElementById('tabClasses');
-      const tabFavorites = document.getElementById('tabFavorites');
-      const classesSection = document.getElementById('classesSection');
-      const favoritesSection = document.getElementById('favoritesSection');
-      if(sec==='classes'){
-        classesSection.style.display='block'; favoritesSection.style.display='none';
-        tabClasses.classList.add('active'); tabFavorites.classList.remove('active');
-      }else{
-        classesSection.style.display='none'; favoritesSection.style.display='block';
-        tabFavorites.classList.add('active'); tabClasses.classList.remove('active');
-      }
+        const sections = ['classes', 'favorites', 'moderation'];
+        const tabs = {
+            classes: document.getElementById('tabClasses'),
+            favorites: document.getElementById('tabFavorites'),
+            moderation: document.getElementById('tabModeration')
+        };
+
+        sections.forEach(s => {
+            const sectionEl = document.getElementById(s + 'Section');
+            if (sectionEl) {
+                sectionEl.style.display = (s === sec) ? 'block' : 'none';
+            }
+            if (tabs[s]) {
+                tabs[s].classList.toggle('active', s === sec);
+            }
+        });
     }
 
     /* ============ Öğrenci Detay + Haftalık ============ */
@@ -3008,17 +3146,36 @@ function renderTeacherCalendar(){
     try{
       if(typeof db !== 'undefined' && typeof currentStudent !== 'undefined' && currentStudent){
         var ref = db.ref('students/' + currentStudent + '/lessonGoals');
-        ref.set(null)
-          .then(function(){ return ref.set(Object.assign({}, payload, {_updatedAt: Date.now(), _updatedBy: (typeof role !== 'undefined' ? role : 'student')})); })
+
+        // Determine who is updating
+        const updaterRole = currentTeacherId ? 'teacher' : 'student';
+        const updateData = Object.assign({}, payload, {
+            _updatedAt: Date.now(),
+            _updatedBy: updaterRole
+        });
+
+        // If teacher is updating, add notification flag
+        if (updaterRole === 'teacher') {
+            updateData._notified = false;
+        }
+
+        ref.set(updateData)
           .then(function(){
             try { if (typeof setAlert === 'function') setAlert('Hedef soru sayısı kaydedildi.'); } catch(_){}
+            // If teacher saves, go back to teacher panel
+            if (updaterRole === 'teacher' && typeof backFromGoalsPage === 'function') {
+                backFromGoalsPage();
+            }
           })
           .catch(function(e){
             try { if (typeof setAlert === 'function') setAlert('Kayıt hatası: ' + e.message); } catch(_){}
           });
       }else{
+         setAlert('Hedefleri kaydetmek için bir öğrenci seçilmelidir.');
       }
-    }catch(_){
+    }catch(e){
+        console.error("Error saving lesson goals:", e);
+        setAlert('Bir hata oluştu: ' + e.message);
     }
   };
 
@@ -3118,6 +3275,173 @@ body[data-role="parent"] #studentTab-entry .addBtn { display:none !important; }
 /* Optional: keep layout tidy when form is hidden */
 body[data-role="parent"] #studentTab-entry .student-toolbar { margin-bottom: 8px; }
 </style>
+
+<style>
+  /* Chat Bubble */
+  #chatBubble {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(90deg, var(--accent1), var(--accent2));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    z-index: 1000;
+    color: white;
+    display: none; /* Initially hidden until user logs in */
+  }
+
+  /* Chat Window */
+  #chatWindow {
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    width: 500px;
+    height: 600px;
+    background: var(--panel);
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+    display: none; /* Initially hidden */
+    flex-direction: column;
+    z-index: 1001;
+    border: 1px solid var(--cardBorder);
+  }
+  #chatHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background: var(--bg);
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    border-bottom: 1px solid var(--cardBorder);
+    font-weight: 800;
+    cursor: move;
+  }
+  #closeChat {
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-size: 24px;
+    cursor: pointer;
+  }
+  #chatBody {
+    display: flex;
+    flex-grow: 1;
+    overflow: hidden;
+  }
+  #userList {
+    width: 150px;
+    border-right: 1px solid var(--cardBorder);
+    padding: 10px;
+    overflow-y: auto;
+    background: var(--bg);
+  }
+  #userListHeader {
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #93c5fd;
+  }
+  #onlineUsers {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    color: var(--text);
+  }
+   #onlineUsers li {
+    padding: 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+   }
+   #onlineUsers li:hover {
+    background-color: var(--muted);
+   }
+  #chatArea {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  #messages {
+    flex-grow: 1;
+    padding: 10px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column-reverse; /* Newest messages at the bottom */
+  }
+  #chatInputArea {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid var(--cardBorder);
+  }
+  #chatInput {
+    flex-grow: 1;
+    margin-right: 10px;
+  }
+  #banContextMenu {
+    position: absolute;
+    display: none;
+    background-color: var(--card);
+    border: 1px solid var(--cardBorder);
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    z-index: 1002;
+    padding: 5px 0;
+  }
+  .context-menu-item {
+    padding: 8px 15px;
+    cursor: pointer;
+    color: var(--text);
+  }
+  .context-menu-item:hover {
+    background-color: var(--muted);
+  }
+</style>
+
+<!-- Ban Context Menu -->
+<div id="banContextMenu">
+  <div class="context-menu-item" data-duration="600">10 Dakika Banla</div>
+  <div class="context-menu-item" data-duration="3600">1 Saat Banla</div>
+  <div class="context-menu-item" data-duration="86400">1 Gün Banla</div>
+  <div class="context-menu-item" data-duration="-1">Kalıcı Banla</div>
+  <hr>
+  <div class="context-menu-item" id="customBan">Özel Süre...</div>
+</div>
+
+<!-- Floating Chat Bubble -->
+<div id="chatBubble">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="32" height="32">
+    <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/>
+  </svg>
+</div>
+
+<!-- Chat Window -->
+<div id="chatWindow">
+  <div id="chatHeader">
+    <span>Sohbet</span>
+    <button id="closeChat">×</button>
+  </div>
+  <div id="chatBody">
+    <div id="userList">
+      <div id="userListHeader">Çevrimiçi Kullanıcılar</div>
+      <ul id="onlineUsers"></ul>
+    </div>
+    <div id="chatArea">
+      <div id="messages"></div>
+      <div id="chatInputArea">
+        <input type="text" id="chatInput" placeholder="Mesajınızı yazın...">
+        <button id="sendMessage">Gönder</button>
+      </div>
+    </div>
+  </div>
+</div>
 <script>
 (function(){
   // Track active role
@@ -3194,6 +3518,316 @@ body[data-role="parent"] #studentTab-entry .student-toolbar { margin-bottom: 8px
   // Initialize
   setBodyRoleAttr();
   window.applyRoleUi();
+})();
+
+/* ============ Chat & Presence System ============ */
+(function() {
+    const chatBubble = document.getElementById('chatBubble');
+    const chatWindow = document.getElementById('chatWindow');
+    const closeChat = document.getElementById('closeChat');
+    const onlineUsersList = document.getElementById('onlineUsers');
+    const messagesContainer = document.getElementById('messages');
+    const chatInput = document.getElementById('chatInput');
+    const sendMessageBtn = document.getElementById('sendMessage');
+
+    let presenceRef;
+    let badWords = [];
+    let currentUserType = null; // 'student' or 'teacher'
+    let currentUserId = null;
+    let currentUserName = null;
+
+    function initChatAndPresence() {
+        if (!currentStudent && !currentTeacherId) {
+            return; // No one is logged in
+        }
+
+        // Determine user type and details
+        if (currentStudent) {
+            currentUserType = 'student';
+            currentUserId = currentStudent;
+            // Fetch student name if not already available
+            if (!currentStudentName) {
+                db.ref('students/' + currentUserId).get().then(snap => {
+                    if (snap.exists()) {
+                        currentUserName = snap.val().name;
+                        setupPresence();
+                    }
+                });
+            } else {
+                currentUserName = currentStudentName;
+                setupPresence();
+            }
+        } else if (currentTeacherId) {
+            currentUserType = 'teacher';
+            currentUserId = currentTeacherId;
+            currentUserName = currentTeacherName;
+            setupPresence();
+        }
+    }
+
+    function setupPresence() {
+        if (!currentUserId || !currentUserName) return;
+
+        presenceRef = db.ref('presence/' + currentUserId);
+        const amOnline = db.ref('.info/connected');
+
+        amOnline.on('value', (snapshot) => {
+            if (snapshot.val() === true) {
+                presenceRef.onDisconnect().remove();
+                presenceRef.set({
+                    name: currentUserName,
+                    type: currentUserType,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                });
+                chatBubble.style.display = 'flex';
+            }
+        });
+
+        listenForOnlineUsers();
+        fetchBadWords();
+        listenForMessages();
+    }
+
+    function listenForOnlineUsers() {
+        const presenceListRef = db.ref('presence');
+        presenceListRef.on('value', (snapshot) => {
+            onlineUsersList.innerHTML = '';
+            if (snapshot.exists()) {
+                snapshot.forEach((childSnapshot) => {
+                    const user = childSnapshot.val();
+                    const userId = childSnapshot.key;
+                    const li = document.createElement('li');
+                    li.textContent = user.name;
+                    li.dataset.userId = userId;
+                    li.dataset.userName = user.name;
+
+                    if (user.type === 'teacher') {
+                        li.textContent += ' (Öğretmen)';
+                        li.style.color = 'var(--accent1)';
+                    } else {
+                        // Allow banning only for students
+                        li.addEventListener('contextmenu', (e) => {
+                            if (currentUserType === 'teacher') {
+                                e.preventDefault();
+                                showBanMenu(e.pageX, e.pageY, userId, user.name);
+                            }
+                        });
+                    }
+                    onlineUsersList.appendChild(li);
+                });
+            }
+        });
+    }
+
+    function showBanMenu(x, y, userId, userName) {
+        const menu = document.getElementById('banContextMenu');
+        menu.style.left = x + 'px';
+        menu.style.top = y + 'px';
+        menu.style.display = 'block';
+
+        const clickHandler = (e) => {
+            if (!menu.contains(e.target)) {
+                menu.style.display = 'none';
+                document.removeEventListener('click', clickHandler);
+            }
+        };
+        document.addEventListener('click', clickHandler);
+
+        menu.onclick = (e) => {
+            const duration = e.target.dataset.duration;
+            if (duration) {
+                banStudent(userId, userName, parseInt(duration));
+            } else if (e.target.id === 'customBan') {
+                const customMinutes = prompt(`"${userName}" için özel ban süresi (dakika olarak) girin:`);
+                if (customMinutes && !isNaN(customMinutes)) {
+                    banStudent(userId, userName, parseInt(customMinutes) * 60);
+                }
+            }
+            menu.style.display = 'none';
+        };
+    }
+
+    function banStudent(studentId, studentName, durationInSeconds) {
+        const banUntil = (durationInSeconds === -1) ? 'permanent' : Date.now() + (durationInSeconds * 1000);
+        db.ref('students/' + studentId + '/chat_ban').set({
+            bannedBy: currentUserName,
+            until: banUntil,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        }).then(() => {
+            alert(`"${studentName}" başarıyla banlandı.`);
+        });
+    }
+
+    function checkBanStatus() {
+        if (!currentStudent) return;
+        const banRef = db.ref('students/' + currentStudent + '/chat_ban');
+        banRef.on('value', (snapshot) => {
+            const chatInput = document.getElementById('chatInput');
+            const sendButton = document.getElementById('sendMessage');
+            if (snapshot.exists()) {
+                const banInfo = snapshot.val();
+                const now = Date.now();
+
+                if (banInfo.until === 'permanent' || banInfo.until > now) {
+                    chatInput.disabled = true;
+                    sendButton.disabled = true;
+                    chatInput.placeholder = "Sohbetten banlandınız.";
+
+                    let banMessage = `Sohbetten banlandınız.`;
+                    if (banInfo.until !== 'permanent') {
+                        const remaining = new Date(banInfo.until - now).toISOString().substr(11, 8);
+                        banMessage += ` Kalan süre: ${remaining}`;
+                    }
+                    alert(banMessage);
+                } else {
+                    // Ban expired, remove it
+                    banRef.remove();
+                    chatInput.disabled = false;
+                    sendButton.disabled = false;
+                    chatInput.placeholder = "Mesajınızı yazın...";
+                }
+            } else {
+                chatInput.disabled = false;
+                sendButton.disabled = false;
+                chatInput.placeholder = "Mesajınızı yazın...";
+            }
+        });
+    }
+
+    function cleanupChatAndPresence() {
+        if (presenceRef) {
+            presenceRef.remove();
+            presenceRef.off();
+        }
+        db.ref('presence').off(); // Detach all presence listeners
+        chatBubble.style.display = 'none';
+        chatWindow.style.display = 'none';
+        onlineUsersList.innerHTML = '';
+        currentUserId = null;
+        currentUserName = null;
+        currentUserType = null;
+    }
+
+    function fetchBadWords() {
+        const badWordsRef = db.ref('moderation/badWords');
+        badWordsRef.on('value', (snapshot) => {
+            if (snapshot.exists()) {
+                badWords = Object.keys(snapshot.val());
+            } else {
+                badWords = [];
+            }
+        });
+    }
+
+    function sendMessage() {
+        const messageText = chatInput.value.trim();
+        if (messageText === '') return;
+
+        // Moderation check
+        const containsBadWord = badWords.some(word => messageText.toLowerCase().includes(word.toLowerCase()));
+
+        if (containsBadWord) {
+            // Log to moderation queue
+            const flaggedMessageRef = db.ref('moderation/flagged_messages').push();
+            flaggedMessageRef.set({
+                studentId: currentUserId,
+                studentName: currentUserName,
+                sclass: window.currentStudent ? (db.ref('students/' + currentStudent).get().then(s => s.val().sclass)) : 'N/A',
+                message: messageText,
+                timestamp: firebase.database.ServerValue.TIMESTAMP
+            });
+            alert('Mesajınızda uygunsuz kelimeler bulunduğu için gönderilmedi ve yöneticiye iletildi.');
+            chatInput.value = '';
+            return;
+        }
+
+        // Send to public chat
+        const messagesRef = db.ref('chat/messages').push();
+        messagesRef.set({
+            userId: currentUserId,
+            userName: currentUserName,
+            userType: currentUserType,
+            text: messageText,
+            timestamp: firebase.database.ServerValue.TIMESTAMP
+        });
+
+        chatInput.value = '';
+    }
+
+    function listenForMessages() {
+        const messagesRef = db.ref('chat/messages').limitToLast(100);
+        messagesRef.on('child_added', (snapshot) => {
+            const msg = snapshot.val();
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message');
+
+            const sender = document.createElement('strong');
+            sender.textContent = msg.userName;
+            if (msg.userType === 'teacher') {
+                sender.style.color = 'var(--accent1)';
+            }
+
+            const content = document.createElement('span');
+            content.textContent = `: ${msg.text}`;
+
+            messageElement.appendChild(sender);
+            messageElement.appendChild(content);
+
+            messagesContainer.insertBefore(messageElement, messagesContainer.firstChild);
+        });
+    }
+
+    // UI Event Listeners
+    chatBubble.addEventListener('click', () => {
+        chatWindow.style.display = 'flex';
+    });
+
+    closeChat.addEventListener('click', () => {
+        chatWindow.style.display = 'none';
+    });
+
+    sendMessageBtn.addEventListener('click', sendMessage);
+    chatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+
+    // Hook into existing login/logout functions
+    const originalStudentLogin = window.studentLogin;
+    window.studentLogin = function() {
+        originalStudentLogin();
+        // The rest of init will be called inside enterAsStudent or enterAsParent
+    };
+
+    const originalTeacherLogin = window.teacherLogin;
+    window.teacherLogin = function() {
+        originalTeacherLogin();
+        // We need to wait for the teacherLogin to fully complete
+        setTimeout(initChatAndPresence, 500);
+    };
+
+    const originalEnterAsStudent = window.enterAsStudent;
+    window.enterAsStudent = function() {
+        originalEnterAsStudent();
+        setTimeout(() => {
+            initChatAndPresence();
+            checkBanStatus();
+        }, 500);
+    }
+
+    const originalEnterAsParent = window.enterAsParent;
+    window.enterAsParent = function() {
+        originalEnterAsParent();
+        // Parents don't join chat for now.
+    }
+
+    const originalLogout = window.logout;
+    window.logout = function() {
+        cleanupChatAndPresence();
+        originalLogout();
+    };
+
 })();
 </script>
 </body>
