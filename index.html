@@ -869,6 +869,14 @@ button.exitSmall .label{line-height:1}
 #favoritesSection .editBtn{ display: none !important; }
 </style>
 <!-- === /HIDE 'GÖSTER' BUTTON IN FAVORITES === -->
+<style>
+/* Hide form elements in parent mode */
+body[data-role="parent"] #lessonForm,
+body[data-role="parent"] .totalBar,
+body[data-role="parent"] .addBtn {
+  display: none !important;
+}
+</style>
 </head>
 <style>
 /* ===== Ders Hedefleri (Goals Page) — Modern görünüm ===== */
@@ -1303,13 +1311,6 @@ button.exitSmall .label{line-height:1}
     
     const TRASH_ICON = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBmaWxsPSIjZWY0NDQ0Ij4KICA8cGF0aCBkPSJNOSAyaDZ2Mmg1djJINFY0aDVWMnptLTMgNmgxMmwtMSAxMmEyIDIgMCAwIDEtMiAySDlhMiAyIDAgMCAxLTItMkw2IDh6bTQgM3Y3aDJ2LTdoLTJ6bTQgMHY3aDJ2LTdoLTJ6Ii8+Cjwvc3ZnPg==";
 
-    /* ===== Veli paneli yönlendirme adresi (gerekirse değiştirin) ===== */
-    const PARENT_PORTAL_URL = "veli.html"; // Örn: "veli-panel.html" veya tam URL
-    
-
-
-
-
     /* ============ Firebase Config ============ */
     const firebaseConfig = {
       apiKey: "AIzaSyD-D-Jp8GDuoc2b-My7cOpSViRyrcAypX0",
@@ -1428,6 +1429,46 @@ function openTargetForCurrent(){
     let favRef = null;
     let classesRef = null;
 
+    // --- YENİ: Veli/Öğrenci rol yönetimi ---
+    window.activeRole = 'student';
+
+    function setBodyRoleAttr(){
+      try{ document.body.setAttribute('data-role', (window.activeRole==='parent'?'parent':'student')); }catch(_){}
+    }
+
+    function applyRoleUi(){
+      try{
+        var isParent = (window.activeRole === 'parent');
+        // Titles
+        var title = document.getElementById('studentPanelTitle');
+        var barTitle = document.getElementById('studentPanelToolbarTitle');
+        if(title) title.textContent = isParent ? 'Veli Paneli' : 'Öğrenci Paneli';
+        if(barTitle) barTitle.textContent = isParent ? 'Veli Paneli' : 'Öğrenci Paneli';
+        // Tab name: Soru Girişi -> Günlük Rapor (parent only)
+        var entryBtn = document.getElementById('stuTabEntryBtn');
+        if(entryBtn){
+          entryBtn.textContent = isParent ? 'Günlük Rapor' : 'Soru Girişi';
+        }
+        // Ensure correct data-role on body
+        setBodyRoleAttr();
+      }catch(_){}
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // Add IDs to panel titles for role-based UI updates
+      try {
+        var h3 = document.querySelector('#studentPanel h3');
+        if (h3 && !h3.id) { h3.id = 'studentPanelTitle'; }
+        var strong = document.querySelector('#studentTab-entry .student-toolbar strong');
+        if (strong && !strong.id) { strong.id = 'studentPanelToolbarTitle'; }
+      } catch(e) {}
+
+      // Initialize UI based on default role
+      try {
+        setBodyRoleAttr();
+        applyRoleUi();
+      } catch(e) {}
+    });
     /* ============ Yardımcılar ============ */
     function setAlert(msg){
       const a=document.getElementById('alert');
@@ -1549,22 +1590,31 @@ function openTargetForCurrent(){
 
     // Öğrenci olarak devam et – mevcut sayfadaki öğrenci paneli
     function enterAsStudent(){
+      window.activeRole = 'student';
       document.getElementById("roleChoice").style.display="none";
       document.getElementById("loginPanel").style.display="none";
       document.getElementById("studentPanel").style.display="block";
       setWelcomeStudentBanner();
       loadStudentTarget();
-  try{ loadLessonGoals(); }catch(_){}
+      try{ loadLessonGoals(); }catch(_){}
+      try{ listenForNotifications(); }catch(_){}
 
       showStudentTab('entry');
       loadStudentData();
+      applyRoleUi();
     }
 
     // Veli olarak devam et – farklı sayfaya yönlendir
     function enterAsParent(){
-      const base = (typeof PARENT_PORTAL_URL==='string' && PARENT_PORTAL_URL) ? PARENT_PORTAL_URL : "veli.html";
-      const target = currentStudent ? (base + (base.includes('?')?'&':'?') + 'num=' + encodeURIComponent(currentStudent)) : base;
-      window.location.href = target;
+      window.activeRole = 'parent';
+      var rc = document.getElementById('roleChoice'); if(rc) rc.style.display='none';
+      var lp = document.getElementById('loginPanel'); if(lp) lp.style.display='none';
+      var sp = document.getElementById('studentPanel'); if(sp) sp.style.display='block';
+      // make sure "entry" tab is active
+      try{ window.showStudentTab('entry'); }catch(_){}
+      // load data so calendar + daily table render in #studentRecords
+      try{ window.loadStudentData(); }catch(_){}
+      applyRoleUi();
     }
 
     // Seçim ekranından geri dön
@@ -1588,6 +1638,8 @@ function openTargetForCurrent(){
       document.getElementById("loginPanel").style.display="block";
       showTab("studentLogin");
       destroyWeekChart();
+      window.activeRole = 'student';
+      applyRoleUi();
     }
 
     /* ============ Öğrenci Paneli ============ */
@@ -3109,92 +3161,5 @@ function renderTeacherCalendar(){
   line-height: 1.3 !important;
 }
 </style>
-<!-- === Parent Mode Patch v2: Mirror student panel for parents, keep daily calendar; hide entry form in parent mode === -->
-<style>
-/* Hide only in parent mode */
-body[data-role="parent"] #studentTab-entry #lessonForm { display:none !important; }
-body[data-role="parent"] #studentTab-entry .totalBar { display:none !important; }
-body[data-role="parent"] #studentTab-entry .addBtn { display:none !important; }
-/* Optional: keep layout tidy when form is hidden */
-body[data-role="parent"] #studentTab-entry .student-toolbar { margin-bottom: 8px; }
-</style>
-<script>
-(function(){
-  // Track active role
-  window.activeRole = window.activeRole || 'student';
-
-  function setBodyRoleAttr(){
-    try{ document.body.setAttribute('data-role', (window.activeRole==='parent'?'parent':'student')); }catch(_){}
-  }
-
-  // UI sync across roles
-  window.applyRoleUi = (function(prev){
-    return function(){
-      try{
-        var isParent = (window.activeRole === 'parent');
-        // Titles
-        var title = document.getElementById('studentPanelTitle');
-        var barTitle = document.getElementById('studentPanelToolbarTitle');
-        if(title) title.textContent = isParent ? 'Veli Paneli' : 'Öğrenci Paneli';
-        if(barTitle) barTitle.textContent = isParent ? 'Veli Paneli' : 'Öğrenci Paneli';
-        // Tab name: Soru Girişi -> Günlük Rapor (parent only)
-        var entryBtn = document.getElementById('stuTabEntryBtn');
-        if(entryBtn){
-          entryBtn.textContent = isParent ? 'Günlük Rapor' : 'Soru Girişi';
-        }
-        // Ensure correct data-role on body
-        setBodyRoleAttr();
-      }catch(_){}
-      // Call any previous implementation if existed
-      try{ if(typeof prev === 'function') prev(); }catch(_){}
-    };
-  })(window.applyRoleUi);
-
-  // Give IDs to existing titles if they aren't present
-  try{
-    var h3 = document.querySelector('#studentPanel h3');
-    if(h3 && !h3.id && h3.textContent.trim().toUpperCase().includes('ÖĞRENCİ')){ h3.id = 'studentPanelTitle'; }
-    var strong = document.querySelector('#studentTab-entry .student-toolbar strong');
-    if(strong && !strong.id && strong.textContent.trim().toUpperCase().includes('ÖĞRENCİ')){ strong.id = 'studentPanelToolbarTitle'; }
-  }catch(_){}
-
-  // Wrap enterAsStudent to set role + update UI
-  if (typeof window.enterAsStudent === 'function'){
-    var __orig_enterAsStudent = window.enterAsStudent;
-    window.enterAsStudent = function(){
-      window.activeRole = 'student';
-      __orig_enterAsStudent();
-      window.applyRoleUi();
-    };
-  }
-
-  // Parent entry mirrors student panel; keeps daily calendar & table
-  window.enterAsParent = function(){
-    window.activeRole = 'parent';
-    var rc = document.getElementById('roleChoice'); if(rc) rc.style.display='none';
-    var lp = document.getElementById('loginPanel'); if(lp) lp.style.display='none';
-    var sp = document.getElementById('studentPanel'); if(sp) sp.style.display='block';
-    // make sure "entry" tab is active
-    try{ window.showStudentTab('entry'); }catch(_){}
-    // load data so calendar + daily table render in #studentRecords
-    try{ window.loadStudentData(); }catch(_){}
-    window.applyRoleUi();
-  };
-
-  // Ensure logout resets role back to student
-  if (typeof window.logout === 'function'){
-    var __orig_logout = window.logout;
-    window.logout = function(){
-      __orig_logout();
-      window.activeRole = 'student';
-      window.applyRoleUi();
-    };
-  }
-
-  // Initialize
-  setBodyRoleAttr();
-  window.applyRoleUi();
-})();
-</script>
 </body>
 </html>
