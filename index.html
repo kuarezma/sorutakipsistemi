@@ -869,6 +869,107 @@ button.exitSmall .label{line-height:1}
 #favoritesSection .editBtn{ display: none !important; }
 </style>
 <!-- === /HIDE 'GÖSTER' BUTTON IN FAVORITES === -->
+
+<!-- YENİ: Yüzen Sohbet Balonu ve Pop-up Stilleri -->
+<style>
+    #chatBubble {
+        position: fixed;
+        bottom: 25px;
+        right: 25px;
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, var(--accent1), var(--accent2));
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        z-index: 9990;
+        transition: transform 0.2s ease;
+    }
+    #chatBubble:hover {
+        transform: scale(1.1);
+    }
+    #chatBubble svg {
+        width: 32px;
+        height: 32px;
+        color: white;
+    }
+    #chatPopup {
+        position: fixed;
+        bottom: 100px;
+        right: 25px;
+        width: 350px;
+        max-width: 90vw;
+        height: 500px;
+        max-height: 70vh;
+        background: var(--panel);
+        border: 1px solid var(--cardBorder);
+        border-radius: 16px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        z-index: 9991;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+    .chat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        background: var(--bg);
+        border-bottom: 1px solid var(--cardBorder);
+        font-weight: 800;
+    }
+    .chat-header button {
+        background: none;
+        border: none;
+        color: var(--text);
+        font-size: 20px;
+        cursor: pointer;
+        opacity: 0.8;
+    }
+     #chatPopupOnlineUsers {
+        padding: 8px 16px;
+        font-size: 12px;
+        background: var(--bg);
+        border-bottom: 1px solid var(--cardBorder);
+        color: #9ca3af;
+        flex-shrink: 0;
+    }
+    #chatPopupMessages {
+        flex: 1;
+        padding: 12px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column-reverse;
+    }
+    #chatPopupMessages div {
+        margin-bottom: 8px;
+        line-height: 1.4;
+    }
+    .chat-input-area {
+        display: flex;
+        padding: 12px;
+        border-top: 1px solid var(--cardBorder);
+        gap: 8px;
+        background: var(--bg);
+    }
+    .chat-input-area input {
+        flex: 1;
+        margin: 0;
+    }
+    .chat-input-area button {
+        padding: 10px 16px;
+        border: 0;
+        border-radius: 10px;
+        background: var(--accent1);
+        color: white;
+        font-weight: 700;
+        cursor: pointer;
+    }
+</style>
 </head>
 <style>
 /* ===== Ders Hedefleri (Goals Page) — Modern görünüm ===== */
@@ -945,6 +1046,15 @@ button.exitSmall .label{line-height:1}
 }
 </style>
 <body>
+<!-- === YENİ: Bildirim Pop-up === -->
+<div id="notificationOverlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 10000; display: flex; align-items: center; justify-content: center;">
+    <div style="background: var(--panel); padding: 20px 24px; border-radius: 12px; max-width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,.3);">
+        <h3 style="margin-top: 0; color: var(--accent1);">Bildirim</h3>
+        <p id="notificationMessage" style="margin: 8px 0 16px; line-height: 1.5;"></p>
+        <button class="action" onclick="closeNotificationPopup()">Tamam</button>
+    </div>
+</div>
+
 <div id="reportOverlay" onclick="closeReportModal()"></div>
 <div class="header">ÖĞRENCİ TAKİP PROGRAMI
     <div class="subheader">Alparslan Ortaokulu</div>
@@ -974,6 +1084,11 @@ button.exitSmall .label{line-height:1}
 <h3>Öğrenci-Veli Giriş</h3>
 <input autocomplete="off" id="lNumber" placeholder="Okul Numarası" type="text"/>
 <input autocomplete="current-password" id="lPass" placeholder="Şifre" type="password"/>
+<!-- YENİ: Beni Hatırla Kutucuğu -->
+<div style="display: flex; align-items: center; margin: 12px 0; justify-content: center; user-select: none;">
+    <input id="rememberMe" type="checkbox" style="width: auto; height: auto; margin-right: 8px; cursor: pointer;"/>
+    <label for="rememberMe" style="cursor: pointer;">Beni Hatırla</label>
+</div>
 <button class="action" onclick="studentLogin()" type="button">Giriş Yap</button>
 </div>
 <!-- Giriş Türü Seçimi -->
@@ -1159,6 +1274,8 @@ button.exitSmall .label{line-height:1}
 <span class="totalBadge" id="globalTotal">0</span>
 </div>
 <button class="action addBtn" onclick="addAll()" type="button">Ekle</button>
+<!-- YENİ: Hedefleri Kaydet Butonu -->
+<button class="action" onclick="saveGoalsFromEntryPage()" type="button" style="margin-top: 8px; background: var(--ok);">Hedefleri Kaydet</button>
 </form>
 <div class="list" id="studentRecords"></div>
 </div> <!-- /studentTab-entry -->
@@ -1201,6 +1318,8 @@ button.exitSmall .label{line-height:1}
 <div class="pillTabs" id="teacherTopTabs">
 <button class="pill active" id="tabClasses" onclick="showTeacherSection('classes')">Sınıflar</button>
 <button class="pill" id="tabFavorites" onclick="showTeacherSection('favorites')">Favorilerim</button>
+<!-- YENİ: Moderasyon Sekmesi (Sadece Uğur Yaşayan için) -->
+<button class="pill" id="tabModeration" onclick="showTeacherSection('moderation')" style="display:none;">Moderasyon</button>
 </div>
 <!-- Sınıflar -->
 <div id="classesSection">
@@ -1219,6 +1338,22 @@ button.exitSmall .label{line-height:1}
 <div class="list">
 <div class="sectionTitle">Favori Öğrencilerim</div>
 <div id="favoritesList"></div>
+</div>
+</div>
+<!-- YENİ: Moderasyon Bölümü -->
+<div id="moderationSection" style="display:none; margin-top:14px">
+    <div class="list">
+        <div class="sectionTitle">Yasaklı Kelimeler</div>
+        <div id="badWordsList" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
+        <div class="row" style="margin-top:10px;">
+            <input autocomplete="off" class="grow" id="newBadWord" placeholder="Yeni kelime ekle" type="text"/>
+            <button class="action" onclick="addBadWord()" style="max-width:160px" type="button">Kelime Ekle</button>
+        </div>
+    </div>
+    <div class="list" style="margin-top:14px">
+        <div class="sectionTitle">İncelenecek Mesajlar</div>
+        <div id="flaggedMessagesList"></div>
+    </div>
 </div>
 <button class="action logout" onclick="logout()" style="margin:18px auto 8px; display:block; max-width:220px" type="button">Çıkış Yap</button>
 </div>
@@ -1279,6 +1414,27 @@ button.exitSmall .label{line-height:1}
 <div class="exportCard" id="exportTable"></div>
 <div id="exportLegend">Ders × Gün matrisi (Pzt–Paz). Renkler ve tipografi PDF için optimize edilmiştir.</div>
 </div>
+
+<!-- === YENİ: Yüzen Sohbet Balonu ve Pop-up HTML === -->
+<div id="chatBubble" style="display: none;" onclick="openChatPopup()">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+    </svg>
+</div>
+
+<div id="chatPopup" style="display: none;">
+    <div class="chat-header">
+        <span>Sohbet</span>
+        <button onclick="closeChatPopup()">×</button>
+    </div>
+    <div id="chatPopupOnlineUsers"><strong>Çevrimiçi:</strong> Yükleniyor...</div>
+    <div id="chatPopupMessages"></div>
+    <div class="chat-input-area">
+        <input id="chatPopupInput" type="text" placeholder="Mesajınızı yazın..." onkeydown="if(event.key==='Enter') sendPopupMessage()"/>
+        <button onclick="sendPopupMessage()">Gönder</button>
+    </div>
+</div>
+
 <script>
     // Çıkış: anasayfaya yönlendirir (src'li <script> içinde yazılan inline kod çalışmaz)
     function exitToHome(){
@@ -1298,18 +1454,11 @@ button.exitSmall .label{line-height:1}
 }
 
     /* ===== Silme ikonu (çöp tenekesi SVG) ===== */
-    
-    
-    
     const TRASH_ICON = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBmaWxsPSIjZWY0NDQ0Ij4KICA8cGF0aCBkPSJNOSAyaDZ2Mmg1djJINFY0aDVWMnptLTMgNmgxMmwtMSAxMmEyIDIgMCAwIDEtMiAySDlhMiAyIDAgMCAxLTItMkw2IDh6bTQgM3Y3aDJ2LTdoLTJ6bTQgMHY3aDJ2LTdoLTJ6Ii8+Cjwvc3ZnPg==";
 
     /* ===== Veli paneli yönlendirme adresi (gerekirse değiştirin) ===== */
     const PARENT_PORTAL_URL = "veli.html"; // Örn: "veli-panel.html" veya tam URL
     
-
-
-
-
     /* ============ Firebase Config ============ */
     const firebaseConfig = {
       apiKey: "AIzaSyD-D-Jp8GDuoc2b-My7cOpSViRyrcAypX0",
@@ -1325,15 +1474,12 @@ button.exitSmall .label{line-height:1}
     const db = firebase.database();
 
     /* ============ Global Durum ============ */
-
-/* === Günlük hedef (student daily target) === */
 let currentTargetEditNum = null;
 
 
 function openTargetModal(num, name){
   try{ currentTargetEditNum = String(num||""); }catch(_){}
   try{ currentStudent = String(num||""); }catch(_){}
-  // Öğrenci sayfasına geç ve Ders Hedefleri sayfasını aç
   try{ enterAsStudent(); }catch(_){}
   try{ if(typeof openLessonGoalsPage === 'function') openLessonGoalsPage(); }catch(_){}
 }
@@ -1349,7 +1495,6 @@ function saveTarget(){
   if(!currentTargetEditNum){ setAlert("Öğrenci bulunamadı."); return; }
   db.ref("students/"+currentTargetEditNum+"/dailyTarget").set(val).then(()=>{
     setAlert("Hedef güncellendi.");
-    // Eğer güncellediğimiz mevcut öğrenci ise ekranda göster
     if(currentStudent && String(currentStudent)===String(currentTargetEditNum)){
       setStudentTargetInfo(val);
     }
@@ -1375,7 +1520,6 @@ function loadStudentTarget(){
 }
 function openTargetForCurrent(){
   if(!currentStudent){ setAlert("Öğrenci oturumu yok."); return; }
-  // get student name for title
   db.ref("students/"+currentStudent).get().then(s=>{
     const name=(s.exists() && s.val().name) ? s.val().name : currentStudentName || "";
     openTargetModal(currentStudent, name);
@@ -1398,7 +1542,6 @@ function openTargetForCurrent(){
           }
         }
         if(name){ apply(name); return; }
-        // Eğer isim henüz yoksa, öğrenciyi DB'den çek
         if(currentStudent){
           firebase.database().ref('students/' + currentStudent).get().then(function(snap){
             if(snap && snap.exists()){
@@ -1415,16 +1558,12 @@ function openTargetForCurrent(){
     }
 
     let currentStudent=null;
-    let currentStudentName=null; // Öğrenci adı (hoşgeldin için)
+    let currentStudentName=null; 
     let currentTeacherId=null, currentTeacherName=null;
     let stuWeekChart=null, stuMonthChart=null, _stuWeeks=[], _stuMonths=[];
     let favoritesCache={}, classesMap={}, activeClassName=null, currentDetailNum=null;
     let currentDetailLessons=null, currentWeeks=[], selectedWeekKey=null, weekChart=null;
-
-    // --- Yeni: render çakışmalarını engellemek için ---
     let selectClassRenderToken = 0;
-
-    // --- Yeni: dinleyicileri kapatmak için referanslar ---
     let favRef = null;
     let classesRef = null;
 
@@ -1436,10 +1575,8 @@ function openTargetForCurrent(){
       setTimeout(()=>{ a.style.display='none'; }, 3500);
     }
     function showTab(tab){
-      // Sekme değiştirirken 'Giriş Türünü Seçin' panelini kapat ve öğrenci oturumunu sıfırla
       const rc = document.getElementById('roleChoice');
       if (rc) rc.style.display = 'none';
-      // Öğrenci oturumunu sıfırla (numara bilgisini temizle)
       if (typeof currentStudent !== 'undefined') currentStudent = null;
 
       ["register","studentLogin","teacherLogin"].forEach(id=>{
@@ -1458,11 +1595,8 @@ function openTargetForCurrent(){
         .replace(/[^a-z0-9]+/g,'-')
         .replace(/^-+|-+$/g,'');
     }
-    // Basit HTML kaçışları (güvenli veri yazımı için)
     function escHTML(s){ return String(s||"").replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
     function escAttr(s){ return escHTML(s); }
-
-    // Türkçe baş harfleri büyüt (Ad Soyad -> Ad Soyad)
     function toTitleCaseTR(str){
       if(!str) return "";
       return String(str).toLocaleLowerCase('tr-TR')
@@ -1493,7 +1627,6 @@ function openTargetForCurrent(){
       if(pass!==pass2){
         setAlert("Şifreler eşleşmiyor. Lütfen şifreyi iki kez aynı girin."); return;
       }
-      // Aynı numara ile ikinci kayıt engeli
       db.ref("students/"+num).get().then(snap=>{
         if(snap.exists()){
           setAlert("Bu üye sisteme kayıtlıdır");
@@ -1507,11 +1640,42 @@ function openTargetForCurrent(){
         if(e!=="duplicate") setAlert("Hata: "+e.message);
       });
     }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      try {
+        const remembered = localStorage.getItem('rememberedStudent');
+        if (remembered) {
+          const { num, pass } = JSON.parse(remembered);
+          if (num && pass) {
+            db.ref("students/"+num).get().then(snap=>{
+              if(snap.exists() && snap.val().pass===pass){
+                currentStudent = num;
+                showRoleChoice(snap.val());
+              } else {
+                localStorage.removeItem('rememberedStudent');
+              }
+            }).catch(() => {
+              localStorage.removeItem('rememberedStudent');
+            });
+          }
+        }
+      } catch(e) {
+        try { localStorage.removeItem('rememberedStudent'); } catch(e2){}
+      }
+    });
+
     function studentLogin(){
       const num=document.getElementById("lNumber").value.trim();
       const pass=document.getElementById("lPass").value;
+      const remember = document.getElementById("rememberMe").checked;
+
       db.ref("students/"+num).get().then(snap=>{
         if(snap.exists() && snap.val().pass===pass){
+          if(remember){
+            try { localStorage.setItem('rememberedStudent', JSON.stringify({num: num, pass: pass})); } catch(e){}
+          } else {
+            try { localStorage.removeItem('rememberedStudent'); } catch(e){}
+          }
           currentStudent = num;
           document.getElementById("lPass").value="";
           showRoleChoice(snap.val());
@@ -1521,10 +1685,8 @@ function openTargetForCurrent(){
       });
     }
 
-    // Giriş başarılı ise tür seçimi panelini göster
     function showRoleChoice(student){
       try{ currentStudentName = (student && student.name) ? student.name : null; }catch(_){}
-      // Kayıt ve diğer giriş panellerini gizle, sadece seçim panelini göster
       const reg=document.getElementById("register");
       const stu=document.getElementById("studentLogin");
       const tea=document.getElementById("teacherLogin");
@@ -1533,9 +1695,7 @@ function openTargetForCurrent(){
       if(stu) stu.style.display="none";
       if(tea) tea.style.display="none";
       if(rc)  rc.style.display="block";
-      // Sekmelerde aktiflik kaldır
       document.querySelectorAll(".tabs button").forEach(b=>b.classList.remove("active"));
-      // Selamlama
       const prettyName = toTitleCaseTR((student && student.name) ? student.name : "");
       const hello = document.getElementById("roleChoiceHello");
       if(hello){
@@ -1547,27 +1707,26 @@ function openTargetForCurrent(){
       }
     }
 
-    // Öğrenci olarak devam et – mevcut sayfadaki öğrenci paneli
     function enterAsStudent(){
       document.getElementById("roleChoice").style.display="none";
       document.getElementById("loginPanel").style.display="none";
       document.getElementById("studentPanel").style.display="block";
+      document.getElementById('chatBubble').style.display = 'flex';
       setWelcomeStudentBanner();
       loadStudentTarget();
-  try{ loadLessonGoals(); }catch(_){}
-
+      try{ loadLessonGoals(); }catch(_){}
+      try{ listenForNotifications(); }catch(_){}
+      try { setupPresence(); } catch(e) { console.error("Presence setup failed:", e); }
       showStudentTab('entry');
       loadStudentData();
     }
 
-    // Veli olarak devam et – farklı sayfaya yönlendir
     function enterAsParent(){
       const base = (typeof PARENT_PORTAL_URL==='string' && PARENT_PORTAL_URL) ? PARENT_PORTAL_URL : "veli.html";
       const target = currentStudent ? (base + (base.includes('?')?'&':'?') + 'num=' + encodeURIComponent(currentStudent)) : base;
       window.location.href = target;
     }
 
-    // Seçim ekranından geri dön
     function backToLogin(){
       currentStudent = null;
       const rc=document.getElementById("roleChoice"); if(rc) rc.style.display="none";
@@ -1575,6 +1734,14 @@ function openTargetForCurrent(){
     }
 
     function logout(){
+      try { localStorage.removeItem('rememberedStudent'); } catch(e){}
+      
+      const userId = currentStudent || currentTeacherId;
+      if (userId) {
+          db.ref('/status/' + userId).remove();
+      }
+      if(onlineUsersListener) onlineUsersListener.off();
+
       const rc=document.getElementById('roleChoice'); if(rc) rc.style.display='none';
       if(classesRef){ classesRef.off(); classesRef=null; }
       if(favRef){ favRef.off(); favRef=null; }
@@ -1584,7 +1751,7 @@ function openTargetForCurrent(){
       try{ setStudentTargetInfo(null); }catch(_){ }
       currentTeacherId=null; currentTeacherName=null; favoritesCache={};
       ["rName","rNumber","rPass","rPass2","lNumber","lPass","tName","tCode","newClass"].forEach(id=>{const el=document.getElementById(id); if(el) el.value="";});
-      ["studentPanel","teacherPanel","teacherStudentDetail"].forEach(id=>document.getElementById(id).style.display="none");
+      ["studentPanel","teacherPanel","teacherStudentDetail","chatBubble", "chatPopup"].forEach(id=>document.getElementById(id).style.display="none");
       document.getElementById("loginPanel").style.display="block";
       showTab("studentLogin");
       destroyWeekChart();
@@ -1605,8 +1772,6 @@ function openTargetForCurrent(){
       document.getElementById("lessonForm").reset();
       loadStudentData();
     }
-
-    // Gün × ders bazında toplamları ve anahtar listesini hazırla
     
     function loadStudentData(){
       const box=document.getElementById("studentRecords");
@@ -1626,7 +1791,6 @@ function openTargetForCurrent(){
           }
         }
 
-        // Kapsayıcıyı hazırla: takvim + gün tablosu
         box.innerHTML = `
           <div id="calendarWrap" class="calendarWrap"></div>
           <div id="selDayBlock" style="margin-top:12px">
@@ -1635,14 +1799,13 @@ function openTargetForCurrent(){
           </div>
         `;
 
-        // takvim bağlamını kur
         const allDays = Object.keys(grouped).map(parseTRDateStr).filter(d=>!isNaN(d));
         const latest = allDays.length ? allDays.sort((a,b)=>a-b)[allDays.length-1] : new Date();
         window._calCtx = {
           grouped,
           selectedDate: latest,
           viewMonthStart: new Date(latest.getFullYear(), latest.getMonth(), 1),
-          hasSet: new Set(Object.keys(grouped)) // "dd.mm.yyyy"
+          hasSet: new Set(Object.keys(grouped))
         };
 
         renderStudentCalendar();
@@ -1650,16 +1813,12 @@ function openTargetForCurrent(){
         if(grouped[dayStr]) showDay(dayStr);
         else document.getElementById("stuDayTable").innerHTML = "<div class='empty'>Henüz veri yok.</div>";
 
-      // Öğrenci haftalık/aylık rapor verilerini hazırla
       window._studentLessons = snap.exists() ? (snap.val() || {}) : {};
       prepareStudentReports(window._studentLessons);
 
       });
     }
 
-
-    // Seçilen gün toplamlarını (tek satır) göster
-    
     function showDay(day){
       const detailsObj = (window._calCtx.grouped && window._calCtx.grouped[day]) ? window._calCtx.grouped[day].totalPerLesson : {};
       const dersSirasi = ["Türkçe", "Sosyal Bilgiler", "Din Kültürü", "İngilizce", "Matematik", "Fen Bilimleri"];
@@ -1677,9 +1836,6 @@ function openTargetForCurrent(){
       el.innerHTML=html;
     }
 
-
-    // Toplam düzenleme: o günün tüm eski kayıtları silinir, tek toplam kayıt yazılır
-    
     function editAggregated(day, lesson, oldTotal){
       let nv = prompt(`${day} günü "${lesson}" dersi için yeni toplam değeri girin:`, oldTotal);
       if(nv===null) return;
@@ -1698,12 +1854,49 @@ function openTargetForCurrent(){
 
       db.ref().update(updates).then(()=>{
         setAlert("Güncellendi.");
-        loadStudentData(); // takvimi ve tabloyu tazele
+        loadStudentData(); 
       }).catch(e=>setAlert("Hata: "+e.message));
     }
 
 
     /* ============ Öğretmen Giriş ============ */
+    function isModerator() {
+        return currentTeacherName && currentTeacherName.trim().toLowerCase() === "uğur yaşayan";
+    }
+
+    function saveGoalsFromEntryPage() {
+        if (!currentStudent) {
+            setAlert("Lütfen önce giriş yapın.");
+            return;
+        }
+        const payload = {};
+        const lessons = ["Turkce", "Sosyal", "Din", "Ingilizce", "Matematik", "Fen"];
+        lessons.forEach(id => {
+            const input = document.getElementById('goal-' + id);
+            let val = parseInt(input ? input.value : '0', 10);
+            if (isNaN(val) || val <= 0) val = 0; 
+            payload[id] = val;
+        });
+    
+        const ref = db.ref('students/' + currentStudent + '/lessonGoals');
+        const finalPayload = Object.assign({}, payload, {
+            _updatedAt: firebase.database.ServerValue.TIMESTAMP, 
+            _updatedBy: 'student'
+        });
+    
+        ref.set(finalPayload)
+            .then(() => {
+                setAlert('Ders hedefleri başarıyla kaydedildi.');
+                lessons.forEach(id => {
+                    const modalInput = document.getElementById('lg-' + id);
+                    if(modalInput) modalInput.value = payload[id] > 0 ? payload[id] : "";
+                });
+            })
+            .catch(e => {
+                setAlert('Hedefleri kaydederken bir hata oluştu: ' + e.message);
+            });
+    }
+    
     function teacherLogin(){
       const name=document.getElementById("tName").value.trim();
       const code=document.getElementById("tCode").value;
@@ -1717,6 +1910,13 @@ function openTargetForCurrent(){
       document.getElementById("teacherWelcome").textContent = `Hoş geldiniz, ${toTitleCaseTR(currentTeacherName)}`;
       document.getElementById("loginPanel").style.display="none";
       document.getElementById("teacherPanel").style.display="block";
+      document.getElementById('chatBubble').style.display = 'flex';
+      
+      if(isModerator()) {
+          document.getElementById('tabModeration').style.display = 'inline-flex';
+          setupInitialBadWords();
+      }
+      try { setupPresence(); } catch(e) { console.error("Presence setup failed:", e); }
 
       listenClasses();
       listenFavorites();
@@ -1732,7 +1932,6 @@ function openTargetForCurrent(){
       }).then(()=>{ document.getElementById("newClass").value=""; });
     }
     function deleteClassByName(name){
-      // Güvenlik: sadece Emre Demirbaş silebilir
       if(!isPrivilegedTeacher()){
         setAlert("Bu işlemi yapma yetkiniz yok.");
         return;
@@ -1768,7 +1967,6 @@ function openTargetForCurrent(){
             selectClass(name);
           };
 
-          // Sınıf silme ikonu: yalnızca Emre Demirbaş görsün
           if(isPrivilegedTeacher()){
             const del=document.createElement("button"); 
             del.className="delFloat"; 
@@ -1798,7 +1996,6 @@ function openTargetForCurrent(){
 
     function clearChildren(node){ while(node.firstChild) node.removeChild(node.firstChild); }
 
-    // --- Öğrenciler listesi tekilleştirme + race guard ---
     function selectClass(name){
       const list=document.getElementById("studentsContainer");
       document.getElementById("classStudents").style.display="block";
@@ -1846,9 +2043,7 @@ function openTargetForCurrent(){
                       data-name="${escAttr(prettyName)}"
                       data-sclass="${escAttr(s.sclass||"")}">${isFav ? "★" : "☆"}</button>
             </div>
-            <!-- Yeni: Hedef butonu (çöp kovasının solu) -->
             <button class="targetFloat" title="Hedef belirle" data-role="target" data-num="${escAttr(s.num)}" data-name="${escAttr(prettyName)}">🎯</button>
-            <!-- Yeni: Silme tuşu yerine sağ üstte çöp kovası ikonu -->
             <button class="delStuFloat"
                     title="Öğrenciyi Sil"
                     aria-label="Öğrenciyi Sil"
@@ -1892,7 +2087,6 @@ function openTargetForCurrent(){
       });
     }
 
-    // Daha sağlam event yakalama (ikon içine tıklamalar dahil)
     document.addEventListener("click",function(e){
       const el = e.target.closest("[data-role]");
       if(!el) return;
@@ -2001,18 +2195,95 @@ function openTargetForCurrent(){
       });
     }
 
+    function addBadWord() {
+        const input = document.getElementById('newBadWord');
+        const word = input.value.trim().toLowerCase();
+        if (!word) return;
+        const safeWord = word.replace(/[.#$[\]]/g, '_');
+        db.ref('moderation/badWords/' + safeWord).set(true).then(() => {
+            input.value = '';
+            loadModerationData();
+        });
+    }
+
+    function deleteBadWord(word) {
+        if (!confirm(`"${word}" kelimesini silmek istediğinizden emin misiniz?`)) return;
+        const safeWord = word.replace(/[.#$[\]]/g, '_');
+        db.ref('moderation/badWords/' + safeWord).remove().then(() => {
+            loadModerationData();
+        });
+    }
+    
+    function deleteFlaggedMessage(key) {
+        if (!confirm(`Bu mesajı silmek istediğinizden emin misiniz?`)) return;
+        db.ref('moderation/flagged_messages/' + key).remove().then(() => {
+            loadModerationData();
+        });
+    }
+
+    function loadModerationData() {
+        const badWordsList = document.getElementById('badWordsList');
+        const flaggedMessagesList = document.getElementById('flaggedMessagesList');
+        badWordsList.innerHTML = 'Yükleniyor...';
+        flaggedMessagesList.innerHTML = 'Yükleniyor...';
+
+        db.ref('moderation/badWords').get().then(snap => {
+            badWordsList.innerHTML = '';
+            if (snap.exists()) {
+                Object.keys(snap.val()).forEach(word => {
+                    const wordEl = document.createElement('div');
+                    wordEl.style.cssText = 'background: #444; padding: 5px 10px; border-radius: 5px; display: flex; align-items: center; gap: 8px;';
+                    wordEl.innerHTML = `<span>${escHTML(word)}</span><button onclick="deleteBadWord('${escHTML(word)}')" style="background:none; border:none; color: #f87171; cursor:pointer; font-weight: bold;">×</button>`;
+                    badWordsList.appendChild(wordEl);
+                });
+            } else {
+                badWordsList.innerHTML = '<div class="empty">Yasaklı kelime yok.</div>';
+            }
+        });
+
+        db.ref('moderation/flagged_messages').get().then(snap => {
+            flaggedMessagesList.innerHTML = '';
+            if (snap.exists()) {
+                snap.forEach(childSnap => {
+                    const key = childSnap.key;
+                    const msg = childSnap.val();
+                    const msgEl = document.createElement('div');
+                    msgEl.className = 'studentItem';
+                    const date = new Date(msg.timestamp).toLocaleString('tr-TR');
+                    msgEl.innerHTML = `
+                        <div>
+                            <strong>${escHTML(msg.studentName)} (${escHTML(msg.studentClass)}, ${escHTML(msg.studentNum)})</strong> - <small>${date}</small>
+                            <p style="margin: 5px 0 0; padding: 5px; background: #222; border-radius: 5px;">${escHTML(msg.message)}</p>
+                        </div>
+                        <button class="delBtn" onclick="deleteFlaggedMessage('${key}')">Sil</button>
+                    `;
+                    flaggedMessagesList.appendChild(msgEl);
+                });
+            } else {
+                flaggedMessagesList.innerHTML = '<div class="empty">İncelenecek mesaj yok.</div>';
+            }
+        });
+    }
+
     /* ============ Sekme geçişleri ============ */
     function showTeacherSection(sec){
-      const tabClasses = document.getElementById('tabClasses');
-      const tabFavorites = document.getElementById('tabFavorites');
-      const classesSection = document.getElementById('classesSection');
-      const favoritesSection = document.getElementById('favoritesSection');
-      if(sec==='classes'){
-        classesSection.style.display='block'; favoritesSection.style.display='none';
-        tabClasses.classList.add('active'); tabFavorites.classList.remove('active');
-      }else{
-        classesSection.style.display='none'; favoritesSection.style.display='block';
-        tabFavorites.classList.add('active'); tabClasses.classList.remove('active');
+      const sections = ['classes', 'favorites', 'moderation'];
+      sections.forEach(s => {
+          const el = document.getElementById(s + 'Section');
+          if(el) el.style.display = (s === sec) ? 'block' : 'none';
+      });
+
+      const tabs = ['tabClasses', 'tabFavorites', 'tabModeration'];
+      tabs.forEach(t => {
+          const el = document.getElementById(t);
+          if(el) el.classList.remove('active');
+      });
+      
+      const activeTab = document.getElementById('tab' + sec.charAt(0).toUpperCase() + sec.slice(1));
+      if(activeTab) activeTab.classList.add('active');
+
+      if(sec === 'moderation' && isModerator()){
+          loadModerationData();
       }
     }
 
@@ -2040,11 +2311,9 @@ function openTargetForCurrent(){
         const daysBox=document.getElementById("tsdDays");
         const dayNames=Object.keys(dayMap).sort((a,b)=> a.split('.').reverse().join('').localeCompare(b.split('.').reverse().join('')) ).reverse();
         daysBox.innerHTML = dayNames.length ? dayNames.map(d=>`<button class="dayBtn" onclick="teacherShowStudentDay('${num}','${d}')">${d}</button>`).join("") : "<div class='empty'>Gün bulunamadı.</div>";
-    // === UI override: Günlük liste yerine takvim render et ===
     try{
       tsdBuildCtxFromLessons(dayMap);
       renderTeacherCalendar();
-      // İlk seçili gün (varsa) tabloyu doldur
       const dayKeys = Object.keys(dayMap||{}).sort((a,b)=> a.split('.').reverse().join('').localeCompare(b.split('.').reverse().join('')) );
       if(dayKeys.length){
         tsdSelectDate(dayKeys[dayKeys.length-1]);
@@ -2053,7 +2322,6 @@ function openTargetForCurrent(){
         if(t) t.innerHTML = "<div class='empty'>Gün bulunamadı.</div>";
       }
     }catch(_){ /* no-op */ }
-    // === /override ===
     
         renderTotalsTable(totals,"tsdTotals");
         if(dayNames.length) teacherShowStudentDay(num,dayNames[0]); else document.getElementById("tsdDayTable").innerHTML="<div class='empty'>Gün seçiniz.</div>";
@@ -2103,11 +2371,9 @@ function openTargetForCurrent(){
     function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
 
     
-    // === Takvim yardımcıları ve denetimleri (Eklendi) ===
     function stuAddMonths(d,n){ return new Date(d.getFullYear(), d.getMonth()+n, 1); }
     function stuSameYMD(a,b){ return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
 
-    // Öğrenci takvimi için global bağlam
     window._calCtx = { grouped:{}, selectedDate:new Date(), viewMonthStart:new Date(), hasSet:new Set() };
 
     function renderStudentCalendar(){
@@ -2116,7 +2382,6 @@ function openTargetForCurrent(){
       const ctx = window._calCtx;
       const monthLabel = ctx.viewMonthStart.toLocaleDateString('tr-TR', {month:'long', year:'numeric'});
 
-      // Başlık
       let html = `
         <div class="calHeader">
           <div class="calTitle">${monthLabel}</div>
@@ -2130,7 +2395,6 @@ function openTargetForCurrent(){
           ${['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'].map(d=>`<div class="calWd">${d}</div>`).join('')}
       `;
 
-      // 6 hafta * 7 gün = 42 hücre
       const startGrid = mondayOf(new Date(ctx.viewMonthStart.getFullYear(), ctx.viewMonthStart.getMonth(), 1));
       for(let i=0;i<42;i++){
         const d = addDays(startGrid, i);
@@ -2151,7 +2415,6 @@ function openTargetForCurrent(){
       html += `</div>`;
       wrap.innerHTML = html + `<div class='calFab'><button type='button' onclick='stuGoToday()'>Bugün</button></div>`;
 
-      // "Bugün" butonunu duruma göre devre dışı bırak
       (function(){
         try{
           const td = new Date();
@@ -2186,7 +2449,6 @@ function openTargetForCurrent(){
       }
     }
 
-    // Basit mobil swipe: sola -> sonraki ay, sağa -> önceki ay
     (function attachSwipe(){
       const r = () => document.getElementById('calendarWrap');
       let tsX=null,tsY=null;
@@ -2385,9 +2647,83 @@ if(latest){
     }
 
     
-    /* ===== Öğrenci Sekmeleri (Soru Girişi / Haftalık / Aylık) ===== */
+    let chatListenerActive = false;
+    const initialBadWords = ["kötü", "çirkin", "argo", "küfür", "lan", "aptal", "salak", "enay", "keriz", "damn", "hell", "bitch"];
+
+    function setupInitialBadWords() {
+        const badWordsRef = db.ref('moderation/badWords');
+        badWordsRef.get().then(snap => {
+            if (!snap.exists() || Object.keys(snap.val()).length === 0) {
+                const updates = {};
+                initialBadWords.forEach(word => {
+                    updates[word.toLowerCase()] = true;
+                });
+                badWordsRef.set(updates);
+            }
+        });
+    }
+    
+    // YENİ: Pop-up için Mesaj Gönderme
+    function sendPopupMessage() {
+        const chatInput = document.getElementById('chatPopupInput');
+        const message = chatInput.value.trim();
+        if (!message) return;
+    
+        const senderId = currentStudent || currentTeacherId;
+        const senderName = currentStudentName || currentTeacherName;
+
+        if (!senderId || !senderName) {
+            setAlert("Sohbet için giriş yapmalısınız.");
+            return;
+        }
+    
+        db.ref('moderation/badWords').get().then(snap => {
+            const badWords = snap.exists() ? Object.keys(snap.val()) : initialBadWords;
+            const isDirty = badWords.some(word => message.toLowerCase().includes(word));
+    
+            if (isDirty) {
+                 db.ref('students/' + currentStudent).get().then(studentSnap => {
+                    const studentData = studentSnap.val();
+                    db.ref('moderation/flagged_messages').push({
+                        studentNum: currentStudent,
+                        studentName: currentStudentName,
+                        studentClass: studentData ? studentData.sclass : 'Bilinmiyor',
+                        message: message,
+                        timestamp: firebase.database.ServerValue.TIMESTAMP
+                    });
+                     setAlert("Mesajınız uygunsuz kelimeler içerdiği için gönderilmedi ve incelenmek üzere yöneticiye iletildi.");
+                });
+            } else {
+                db.ref('chat').push({
+                    senderId: senderId,
+                    senderName: senderName,
+                    message: message,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                });
+            }
+            chatInput.value = '';
+        });
+    }
+    
+    // GÜNCELLENDİ: Pop-up için mesajları yükleme
+    function loadChatMessages() {
+        if (chatListenerActive) return;
+    
+        const chatMessages = document.getElementById('chatPopupMessages');
+        const chatRef = db.ref('chat').limitToLast(50);
+    
+        chatRef.on('child_added', snap => {
+            const msg = snap.val();
+            const msgDiv = document.createElement('div');
+            msgDiv.innerHTML = `<strong>${escHTML(msg.senderName)}:</strong> ${escHTML(msg.message)}`;
+            chatMessages.insertBefore(msgDiv, chatMessages.firstChild);
+        });
+        chatListenerActive = true;
+    }
+
+    /* ===== Öğrenci Sekmeleri ===== */
     function showStudentTab(tab){
-      const tabs = ['entry','week','month'];
+      const tabs = ['entry','week','month']; // Sohbet sekmesi kaldırıldı
       tabs.forEach(t=>{
         const el = document.getElementById('studentTab-' + t);
         if(el) el.style.display = (t===tab) ? 'block' : 'none';
@@ -2395,12 +2731,11 @@ if(latest){
       const btns = {
         entry: document.getElementById('stuTabEntryBtn'),
         week:  document.getElementById('stuTabWeekBtn'),
-        month: document.getElementById('stuTabMonthBtn')
+        month: document.getElementById('stuTabMonthBtn'),
       };
       Object.keys(btns).forEach(k=>{
         if(btns[k]) btns[k].classList.toggle('active', k===tab);
       });
-      // İlk gösterimde grafikleri hazırla
       if(tab==='week' && (!_stuWeeks || !_stuWeeks.length) && window._studentLessons){
         prepareStudentReports(window._studentLessons);
       }
@@ -2410,7 +2745,6 @@ if(latest){
     }
 
     function prepareStudentReports(lessons){
-      // Haftalar
       _stuWeeks = buildWeeksFromLessons(lessons || {});
       renderStuWeekList(_stuWeeks);
       if(_stuWeeks.length){
@@ -2421,7 +2755,6 @@ if(latest){
         if(m) m.innerHTML = "<div class='empty'>Haftalık veri yok.</div>";
       }
 
-      // Aylar
       _stuMonths = buildMonthsFromLessons(lessons || {});
       renderStuMonthList(_stuMonths);
       if(_stuMonths.length){
@@ -2548,7 +2881,6 @@ if(latest){
           options: { responsive:true, maintainAspectRatio:false, scales:{ y:{ beginAtZero:true, ticks:{ precision:0 } } }, plugins:{ legend:{ labels:{ color:'#e2e8f0' } } } }
         });
       }catch(_){}
-      // Totals table
       const dersSirasi = ["Türkçe", "Sosyal Bilgiler", "Din Kültürü", "İngilizce", "Matematik", "Fen Bilimleri"];
       let html = "<table><tr><th>Ders</th><th>Toplam Soru</th></tr>";
       dersSirasi.forEach(d=>{
@@ -2560,7 +2892,7 @@ if(latest){
       if(tgt) tgt.innerHTML = html;
     }
 
-/* ============ Kayıt sekmesi: sınıfları canlı dinle ============ */
+    /* ============ Kayıt sekmesi: sınıfları canlı dinle ============ */
     db.ref("classes").on("value",snap=>{
       const names=[]; snap.forEach(ch=>{const v=ch.val(); if(v&&v.name) names.push(v.name);});
       const sel=document.getElementById("rClass"); const keep=sel.value;
@@ -2568,6 +2900,48 @@ if(latest){
       names.sort().forEach(n=>{const o=document.createElement("option"); o.value=n;o.text=n; sel.add(o);});
       if(names.includes(keep)) sel.value=keep;
     });
+
+    // YENİ: Sohbet Pop-up fonksiyonları
+    function openChatPopup() {
+        document.getElementById('chatPopup').style.display = 'flex';
+        loadChatMessages();
+    }
+    function closeChatPopup() {
+        document.getElementById('chatPopup').style.display = 'none';
+    }
+
+    // YENİ: Çevrimiçi kullanıcıları takip etme (Presence)
+    let onlineUsersListener = null;
+    function setupPresence() {
+        const userId = currentStudent || currentTeacherId;
+        const userName = currentStudentName || currentTeacherName;
+        if (!userId || !userName) return;
+
+        const userStatusRef = db.ref('/status/' + userId);
+        userStatusRef.onDisconnect().remove();
+        userStatusRef.set({ name: userName });
+        listenForOnlineUsers();
+    }
+    function listenForOnlineUsers() {
+        if(onlineUsersListener) onlineUsersListener.off();
+        const ref = db.ref('/status');
+        onlineUsersListener = ref;
+        ref.on('value', snap => {
+            const onlineUsersList = document.getElementById('chatPopupOnlineUsers');
+            if(!onlineUsersList) return;
+            let users = [];
+            if(snap.exists()){
+                snap.forEach(childSnap => {
+                    users.push(escHTML(childSnap.val().name));
+                });
+            }
+            if(users.length > 0) {
+                 onlineUsersList.innerHTML = `<strong>Çevrimiçi (${users.length}):</strong> ${users.join(', ')}`;
+            } else {
+                 onlineUsersList.innerHTML = '<strong>Çevrimiçi:</strong> Kimse yok.';
+            }
+        });
+    }
   </script>
 <script>
     function getGoalFor(id){
@@ -2625,7 +2999,6 @@ if(latest){
       }
     });
 
-    // Density toggle with persistence
     (function(){
       const denseKey = 'lesson-density-enabled';
       function setDense(enabled){
@@ -2668,7 +3041,6 @@ if(latest){
     if (p1) p1.addEventListener('input', checkPassMatch);
     if (p2) p2.addEventListener('input', checkPassMatch);
 
-    // Guard register flow
     var regForm = document.getElementById('registerForm');
     if (regForm){
       regForm.addEventListener('submit', function(ev){
@@ -2682,7 +3054,6 @@ if(latest){
       });
     }
 
-    // If the register button is not inside a form, intercept its click
     var btn = document.getElementById('registerBtn');
     if (btn){
       btn.addEventListener('click', function(ev){
@@ -2700,7 +3071,6 @@ if(latest){
 })();
 </script>
 <script>
-// ---- Rapor Modal Aç/Kapat + Sekmeler ----
 function openReportModal(){
   var ov = document.getElementById('reportOverlay');
   var box = document.getElementById('teacherStudentDetail');
@@ -2724,10 +3094,6 @@ function showReportTab(tab){
     var btn = document.getElementById('repTab' + (t.charAt(0).toUpperCase()+t.slice(1)) + 'Btn');
     if(btn) btn.classList.toggle('active', t===tab);
   });
-  // Grafikleri ilk geçişte hazırla
-  if(tab==='weekly'){
-    // haftalar zaten teacherShowStudent içinde hesaplanıyor; sadece chart görünür olacak
-  }
   if(tab==='monthly'){
     if(window.currentDetailLessons){
       buildTeacherMonths(window.currentDetailLessons);
@@ -2735,7 +3101,6 @@ function showReportTab(tab){
   }
 }
 
-// ---- teacherShowStudent içine modal açma entegrasyonu ----
 if(typeof teacherShowStudent === 'function'){
   const _origTeacherShowStudent = teacherShowStudent;
   teacherShowStudent = function(num){
@@ -2744,13 +3109,11 @@ if(typeof teacherShowStudent === 'function'){
   };
 }
 
-// ---- Aylık (Öğretmen Modal) ----
 var tMonthChart = null;
 var _tMonths = [];
 function destroyTeacherMonthChart(){ if(tMonthChart){ try{tMonthChart.destroy();}catch(_){ } tMonthChart=null; } }
 
 function buildTeacherMonths(lessons){
-  // buildMonthsFromLessons zaten var
   _tMonths = buildMonthsFromLessons(lessons||{});
   var sel = document.getElementById('tMonthSelect');
   if(!sel) return;
@@ -2797,11 +3160,9 @@ function drawTeacherMonth(lessons, month){
 }
 
 
-/* === Teacher Modal: Günlük sekmesi için takvim (UI Override) === */
 window._tsdCalCtx = { grouped:{}, selectedDate:new Date(), viewMonthStart:new Date(), hasSet:new Set() };
 
 function tsdBuildCtxFromLessons(dayMap){
-  // dayMap: { "dd.mm.yyyy": { perLesson... } }
   const keys = Object.keys(dayMap || {}).map(parseTRDateStr).filter(d=>!isNaN(d));
   const latest = keys.length ? keys.sort((a,b)=>a-b)[keys.length-1] : new Date();
   window._tsdCalCtx = {
@@ -2828,7 +3189,6 @@ function tsdSelectDate(dayStr){
   const d = parseTRDateStr(dayStr);
   if(isNaN(d)) return;
   ctx.selectedDate = d;
-  // Öğrenci numarası globalde tutuluyor
   try{
     if (typeof currentDetailNum !== 'undefined' && currentDetailNum){
       teacherShowStudentDay(currentDetailNum, dayStr);
@@ -2844,8 +3204,8 @@ function renderTeacherCalendar(){
   const monthLabel = ctx.viewMonthStart.toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' });
   const startGrid = (function(){
     const first = new Date(ctx.viewMonthStart.getFullYear(), ctx.viewMonthStart.getMonth(), 1);
-    const day = first.getDay(); // 0=Sun
-    const shift = (day === 0 ? 6 : day-1); // Pazartesi başlangıç
+    const day = first.getDay(); 
+    const shift = (day === 0 ? 6 : day-1); 
     const s = new Date(first);
     s.setDate(first.getDate() - shift);
     return s;
@@ -2885,8 +3245,6 @@ function renderTeacherCalendar(){
   html += `</div></div>`;
   wrapBox.innerHTML = html;
 }
-/* === /Teacher Modal Takvim === */
-
 </script>
 <!-- Hedef Soru Modalı -->
 <div class="list asModal" id="targetModal" style="display:none; max-width:420px">
@@ -2909,7 +3267,6 @@ function renderTeacherCalendar(){
 <div class="gp-left">
 <button class="pill gp-btn gp-back" onclick="backFromGoalsPage()" title="Öğrenci Paneline Dön" type="button">
 <span aria-hidden="true" class="icon">
-<!-- back -->
 <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24"><path d="M15 18l-6-6 6-6"></path><path d="M21 12H9"></path></svg>
 </span>
         Geri
@@ -2919,21 +3276,18 @@ function renderTeacherCalendar(){
 <div class="gp-actions">
 <button class="pill gp-btn gp-clear" onclick="resetGoalsInputs()" type="button">
 <span aria-hidden="true" class="icon">
-<!-- temizle (broom) -->
 <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24"><path d="M3 20l1-5 11-11 3 3L7 18l-4 2z"></path><path d="M14 6l4 4"></path></svg>
 </span>
         Temizle
       </button>
 <button class="action gp-btn" onclick="saveLessonGoals()" type="button">
 <span aria-hidden="true" class="icon">
-<!-- kaydet (check) -->
 <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg>
 </span>
         Kaydet
       </button>
 </div>
 </div>
-<!-- Tablo kutusu -->
 <div class="gp-table">
 <div class="gp-row">
 <label class="gp-label turkce"><span class="dot"></span>Türkçe</label>
@@ -2964,7 +3318,6 @@ function renderTeacherCalendar(){
 </div>
 <script>
 (function(){
-  // list of main panels to toggle between
   window._MAIN_PANELS = (window._MAIN_PANELS || ['teacherPanel','studentPanel','loginPanel','goalsPage']);
 
   function showMainPanel(id){
@@ -2974,7 +3327,6 @@ function renderTeacherCalendar(){
     });
   }
   window.openLessonGoalsPage = function(){
-    // Prefill from inline inputs if present
     try{
       ["Turkce","Sosyal","Din","Ingilizce","Matematik","Fen"].forEach(function(id){
         var main = document.getElementById('goal-' + id);
@@ -2992,43 +3344,77 @@ function renderTeacherCalendar(){
     });
   };
 
-  // Save (last-write-wins): delete old then write new, optionally go back
+  window.showNotificationPopup = function(message) {
+    const overlay = document.getElementById('notificationOverlay');
+    if (!overlay) return;
+    document.getElementById('notificationMessage').textContent = message;
+    overlay.style.display = 'flex';
+  }
+
+  window.closeNotificationPopup = function() {
+    const overlay = document.getElementById('notificationOverlay');
+    if (overlay) overlay.style.display = 'none';
+  }
+
+  let notificationListener = null;
+  function listenForNotifications() {
+      if (!currentStudent) return;
+      if (notificationListener) {
+          notificationListener.off(); 
+      }
+      const notificationRef = db.ref('students/' + currentStudent + '/notification');
+      notificationListener = notificationRef;
+      notificationRef.on('value', snap => {
+          if (snap.exists() && snap.val() && !snap.val().read) {
+              const notification = snap.val();
+              showNotificationPopup(notification.message);
+              snap.ref.update({ read: true });
+          }
+      });
+  }
+
   window.saveLessonGoals = function(goBack){
     goBack = false; var payload = {};
-    ["Turkce","Sosyal","Din","Ingilizce","Matematik","Fen"].forEach(function(id){
+    const lessons = ["Turkce","Sosyal","Din","Ingilizce","Matematik","Fen"];
+    lessons.forEach(function(id){
       var v = parseInt((document.getElementById('lg-' + id)?.value || "0"), 10);
       if(isNaN(v) || v <= 0) v = 0;
       payload[id] = v;
       var main = document.getElementById('goal-' + id);
-      if(main){ main.value = v || ""; }
+      if(main){ main.value = v > 0 ? v : ""; }
     });
     try { if (typeof updateGlobalAndProgress === 'function') updateGlobalAndProgress(); } catch(_){}
 
-    // Last-write-wins to Firebase
     try{
       if(typeof db !== 'undefined' && typeof currentStudent !== 'undefined' && currentStudent){
         var ref = db.ref('students/' + currentStudent + '/lessonGoals');
-        ref.set(null)
-          .then(function(){ return ref.set(Object.assign({}, payload, {_updatedAt: Date.now(), _updatedBy: (typeof role !== 'undefined' ? role : 'student')})); })
+        var actor = (currentTeacherId) ? 'teacher' : 'student';
+        var studentIdForNotification = currentStudent;
+
+        ref.set(Object.assign({}, payload, {_updatedAt: firebase.database.ServerValue.TIMESTAMP, _updatedBy: actor}))
           .then(function(){
-            try { if (typeof setAlert === 'function') setAlert('Hedef soru sayısı kaydedildi.'); } catch(_){}
+            setAlert('Hedef soru sayısı kaydedildi.');
+            if (actor === 'teacher') {
+              const notificationRef = db.ref('students/' + studentIdForNotification + '/notification');
+              notificationRef.set({
+                message: 'Öğretmeniniz, ders hedeflerinizi güncelledi.',
+                timestamp: firebase.database.ServerValue.TIMESTAMP,
+                read: false 
+              });
+            }
           })
           .catch(function(e){
-            try { if (typeof setAlert === 'function') setAlert('Kayıt hatası: ' + e.message); } catch(_){}
+            setAlert('Kayıt hatası: ' + e.message);
           });
-      }else{
       }
-    }catch(_){
-    }
+    }catch(e){}
   };
 
-  // Click handler: 🎯 icon opens the page
   document.addEventListener('click', function(e){
     var icon = e.target.closest && e.target.closest('.goalWrap .goalIcon');
     if(icon){ openLessonGoalsPage(); }
   });
 
-  // Load on student entry
   window.loadLessonGoals = function(){
     try{
       if(typeof db === 'undefined' || typeof currentStudent === 'undefined' || !currentStudent) return;
@@ -3045,7 +3431,6 @@ function renderTeacherCalendar(){
     }catch(_){}
   };
 
-  // Ensure cursor:pointer on goal icon
   try{
     var styleAdded=false;
     if(!styleAdded){
@@ -3058,7 +3443,6 @@ function renderTeacherCalendar(){
 })();
 </script>
 <style>
-/* === Goals Page header buttons: same size + custom colors === */
 #goalsPage .gp-header .gp-btn{
   min-height: 40px;
   min-width: 120px;
@@ -3072,7 +3456,6 @@ function renderTeacherCalendar(){
 }
 #goalsPage .gp-header .gp-btn .icon{ width:16px; height:16px; }
 
-/* Back = red */
 #goalsPage .gp-header .gp-back{
   background: linear-gradient(180deg,#ef4444,#dc2626) !important;
   color:#fff !important;
@@ -3080,7 +3463,6 @@ function renderTeacherCalendar(){
   box-shadow:0 6px 16px rgba(239,68,68,.25), inset 0 1px 0 rgba(255,255,255,.08);
 }
 
-/* Clear = green */
 #goalsPage .gp-header .gp-clear{
   background: linear-gradient(180deg,#10b981,#059669) !important;
   color:#fff !important;
@@ -3089,7 +3471,6 @@ function renderTeacherCalendar(){
 }
 </style>
 <style>
-/* Center goals page title */
 #goalsPage .gp-header{ position: relative; }
 #goalsPage .gp-header .gp-title{
   position: absolute;
@@ -3099,58 +3480,47 @@ function renderTeacherCalendar(){
   font-weight: 800;
 }
 </style><style>
-/* Override: goals title left-aligned and larger */
 #goalsPage .gp-header .gp-title{
   position: static !important;
   left: auto !important;
   transform: none !important;
   text-align: left !important;
-  font-size: 1.5rem !important; /* biraz büyütüldü */
+  font-size: 1.5rem !important; 
   line-height: 1.3 !important;
 }
 </style>
-<!-- === Parent Mode Patch v2: Mirror student panel for parents, keep daily calendar; hide entry form in parent mode === -->
 <style>
-/* Hide only in parent mode */
 body[data-role="parent"] #studentTab-entry #lessonForm { display:none !important; }
 body[data-role="parent"] #studentTab-entry .totalBar { display:none !important; }
 body[data-role="parent"] #studentTab-entry .addBtn { display:none !important; }
-/* Optional: keep layout tidy when form is hidden */
 body[data-role="parent"] #studentTab-entry .student-toolbar { margin-bottom: 8px; }
 </style>
 <script>
 (function(){
-  // Track active role
   window.activeRole = window.activeRole || 'student';
 
   function setBodyRoleAttr(){
     try{ document.body.setAttribute('data-role', (window.activeRole==='parent'?'parent':'student')); }catch(_){}
   }
 
-  // UI sync across roles
   window.applyRoleUi = (function(prev){
     return function(){
       try{
         var isParent = (window.activeRole === 'parent');
-        // Titles
         var title = document.getElementById('studentPanelTitle');
         var barTitle = document.getElementById('studentPanelToolbarTitle');
         if(title) title.textContent = isParent ? 'Veli Paneli' : 'Öğrenci Paneli';
         if(barTitle) barTitle.textContent = isParent ? 'Veli Paneli' : 'Öğrenci Paneli';
-        // Tab name: Soru Girişi -> Günlük Rapor (parent only)
         var entryBtn = document.getElementById('stuTabEntryBtn');
         if(entryBtn){
           entryBtn.textContent = isParent ? 'Günlük Rapor' : 'Soru Girişi';
         }
-        // Ensure correct data-role on body
         setBodyRoleAttr();
       }catch(_){}
-      // Call any previous implementation if existed
       try{ if(typeof prev === 'function') prev(); }catch(_){}
     };
   })(window.applyRoleUi);
 
-  // Give IDs to existing titles if they aren't present
   try{
     var h3 = document.querySelector('#studentPanel h3');
     if(h3 && !h3.id && h3.textContent.trim().toUpperCase().includes('ÖĞRENCİ')){ h3.id = 'studentPanelTitle'; }
@@ -3158,7 +3528,6 @@ body[data-role="parent"] #studentTab-entry .student-toolbar { margin-bottom: 8px
     if(strong && !strong.id && strong.textContent.trim().toUpperCase().includes('ÖĞRENCİ')){ strong.id = 'studentPanelToolbarTitle'; }
   }catch(_){}
 
-  // Wrap enterAsStudent to set role + update UI
   if (typeof window.enterAsStudent === 'function'){
     var __orig_enterAsStudent = window.enterAsStudent;
     window.enterAsStudent = function(){
@@ -3168,20 +3537,16 @@ body[data-role="parent"] #studentTab-entry .student-toolbar { margin-bottom: 8px
     };
   }
 
-  // Parent entry mirrors student panel; keeps daily calendar & table
   window.enterAsParent = function(){
     window.activeRole = 'parent';
     var rc = document.getElementById('roleChoice'); if(rc) rc.style.display='none';
     var lp = document.getElementById('loginPanel'); if(lp) lp.style.display='none';
     var sp = document.getElementById('studentPanel'); if(sp) sp.style.display='block';
-    // make sure "entry" tab is active
     try{ window.showStudentTab('entry'); }catch(_){}
-    // load data so calendar + daily table render in #studentRecords
     try{ window.loadStudentData(); }catch(_){}
     window.applyRoleUi();
   };
 
-  // Ensure logout resets role back to student
   if (typeof window.logout === 'function'){
     var __orig_logout = window.logout;
     window.logout = function(){
@@ -3191,7 +3556,6 @@ body[data-role="parent"] #studentTab-entry .student-toolbar { margin-bottom: 8px
     };
   }
 
-  // Initialize
   setBodyRoleAttr();
   window.applyRoleUi();
 })();
