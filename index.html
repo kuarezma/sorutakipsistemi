@@ -953,6 +953,13 @@ body[data-role="parent"] .addBtn {
 }
 </style>
 <body>
+<div id="notificationOverlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 10000; align-items: center; justify-content: center;">
+    <div style="background: var(--panel); padding: 20px 24px; border-radius: 12px; max-width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,.3);">
+        <h3 style="margin-top: 0; color: var(--accent1);">Bildirim</h3>
+        <p id="notificationMessage" style="margin: 8px 0 16px; line-height: 1.5;"></p>
+        <button class="action" onclick="closeNotificationPopup()">Tamam</button>
+    </div>
+</div>
 <div id="reportOverlay" onclick="closeReportModal()"></div>
 <div class="header">ÖĞRENCİ TAKİP PROGRAMI
     <div class="subheader">Alparslan Ortaokulu</div>
@@ -1028,6 +1035,7 @@ body[data-role="parent"] .addBtn {
 <button class="pill active" id="stuTabEntryBtn" onclick="showStudentTab('entry')">Soru Girişi</button>
 <button class="pill" id="stuTabWeekBtn" onclick="showStudentTab('week')">Haftalık Rapor</button>
 <button class="pill" id="stuTabMonthBtn" onclick="showStudentTab('month')">Aylık Rapor</button>
+<button class="pill" id="stuTabChatBtn" onclick="showStudentTab('chat')">Sohbet</button>
 </div>
 <div id="studentTab-entry">
 <div class="student-toolbar">
@@ -1189,6 +1197,15 @@ body[data-role="parent"] .addBtn {
 <div class="sectionTitle" style="margin-top:10px">Aylık Toplam (Ders Bazlı)</div>
 <div class="exportCard" id="stuMonthTotals"></div>
 </div>
+<!-- === STUDENT CHAT TAB === -->
+<div id="studentTab-chat" style="display:none;">
+  <div class="sectionTitle">Sohbet</div>
+  <div id="chatMessages" style="height: 300px; overflow-y: scroll; border: 1px solid var(--muted); border-radius: 10px; padding: 10px; margin-bottom: 10px; background: var(--bg); display: flex; flex-direction: column-reverse;"></div>
+  <div style="display:flex; gap:10px;">
+    <input id="chatInput" placeholder="Mesajınızı yazın..." type="text" style="flex:1;" onkeydown="if(event.key==='Enter') sendMessage()"/>
+    <button class="action" onclick="sendMessage()" style="max-width:120px;">Gönder</button>
+  </div>
+</div>
 <button class="action logout" onclick="logout()" type="button">Çıkış Yap</button>
 </div>
 <!-- ÖĞRETMEN PANELİ -->
@@ -1327,36 +1344,104 @@ body[data-role="parent"] .addBtn {
 
     /* ============ Global Durum ============ */
 
-/* === Günlük hedef (student daily target) === */
-let currentTargetEditNum = null;
+/* === Günlük hedef (student daily target) & Ders Hedefleri (lesson goals) === */
+let currentGoalEditInfo = { id: null, name: null }; // student being edited
+let currentBanInfo = { id: null, name: null };
 
-
-function openTargetModal(num, name){
-  try{ currentTargetEditNum = String(num||""); }catch(_){}
-  try{ currentStudent = String(num||""); }catch(_){}
-  // Öğrenci sayfasına geç ve Ders Hedefleri sayfasını aç
-  try{ enterAsStudent(); }catch(_){}
-  try{ if(typeof openLessonGoalsPage === 'function') openLessonGoalsPage(); }catch(_){}
+function openBanModal(id, name) {
+  currentBanInfo = { id, name };
+  const modal = document.getElementById('banModal');
+  const studentNameEl = document.getElementById('banModalStudentName');
+  if (studentNameEl) {
+    studentNameEl.textContent = `Öğrenci: ${name}`;
+  }
+  if (modal) {
+    modal.style.display = 'block';
+  }
 }
-function closeTargetModal(){ try{ /* no-op: legacy */ }catch(_){} }
-function saveTarget(){ try{ /* no-op: legacy */ }catch(_){} }
+
+function closeBanModal() {
+  const modal = document.getElementById('banModal');
+  if (modal) {
+    modal.style.display = 'none';
+  }
+  currentBanInfo = { id: null, name: null };
+}
+
+function confirmBan(minutes) {
+  if (!currentBanInfo.id) {
+    setAlert("Yasaklanacak öğrenci seçilmedi.");
+    return;
+  }
+
+  let banUntil;
+  if (minutes === -1) {
+    // Permanent ban
+    banUntil = 'permanent';
+  } else {
+    banUntil = Date.now() + minutes * 60 * 1000;
+  }
+
+  db.ref(`students/${currentBanInfo.id}/chat_ban`).set({
+    bannedBy: currentTeacherName,
+    until: banUntil,
+    createdAt: firebase.database.ServerValue.TIMESTAMP
+  }).then(() => {
+    setAlert(`${currentBanInfo.name} adlı öğrenci sohbetten yasaklandı.`);
+    closeBanModal();
+  }).catch(e => {
+    setAlert("Yasaklama sırasında bir hata oluştu: " + e.message);
+  });
+}
+
+function confirmBanWithCustomDuration() {
+  const input = document.getElementById('customBanDuration');
+  const minutes = parseInt(input.value, 10);
+  if (isNaN(minutes) || minutes <= 0) {
+    setAlert("Lütfen geçerli bir süre girin (dakika cinsinden).");
+    return;
+  }
+  confirmBan(minutes);
+}
+
+
+// Teacher clicks on a student's target icon
+function openTargetModal(num, name) {
+  currentGoalEditInfo = { id: String(num || ""), name: name || "" };
+  // DO NOT switch user, just open the goals page
+  if (typeof openLessonGoalsPage === 'function') {
+    openLessonGoalsPage();
+  }
+}
+
+// Student clicks on their own "edit target" button
+function openTargetForCurrent() {
+  if (!currentStudent) { setAlert("Öğrenci oturumu yok."); return; }
+  currentGoalEditInfo = { id: currentStudent, name: currentStudentName || "" };
+  if (typeof openLessonGoalsPage === 'function') {
+    openLessonGoalsPage();
+  }
+}
+
+// Legacy functions (no longer used by modern UI, but keep for safety)
 function closeTargetModal(){
-  const m = document.getElementById('targetModal');
-  if(m) m.style.display='none';
+  const m = document.getElementById('targetModal'); if(m) m.style.display='none';
 }
 function saveTarget(){
   const input = document.getElementById('targetInput');
   const val = Number(input && input.value ? input.value : 0);
-  if(!currentTargetEditNum){ setAlert("Öğrenci bulunamadı."); return; }
-  db.ref("students/"+currentTargetEditNum+"/dailyTarget").set(val).then(()=>{
+  const studentId = currentGoalEditInfo.id || currentStudent;
+  if(!studentId){ setAlert("Öğrenci bulunamadı."); return; }
+  db.ref("students/"+studentId+"/dailyTarget").set(val).then(()=>{
     setAlert("Hedef güncellendi.");
-    // Eğer güncellediğimiz mevcut öğrenci ise ekranda göster
-    if(currentStudent && String(currentStudent)===String(currentTargetEditNum)){
+    if(currentStudent && String(currentStudent)===String(studentId)){
       setStudentTargetInfo(val);
     }
     closeTargetModal();
   }).catch(e=> setAlert("Kayıt hatası: "+e.message));
 }
+
+// These functions manage the simple daily target display on the student panel
 function setStudentTargetInfo(val){
   const box = document.getElementById('studentTargetInfo');
   const span = document.getElementById('studentTargetValue');
@@ -1373,14 +1458,6 @@ function loadStudentTarget(){
   db.ref("students/"+currentStudent+"/dailyTarget").get().then(snap=>{
     setStudentTargetInfo(snap.exists()? Number(snap.val())||0 : null);
   }).catch(()=> setStudentTargetInfo(null));
-}
-function openTargetForCurrent(){
-  if(!currentStudent){ setAlert("Öğrenci oturumu yok."); return; }
-  // get student name for title
-  db.ref("students/"+currentStudent).get().then(s=>{
-    const name=(s.exists() && s.val().name) ? s.val().name : currentStudentName || "";
-    openTargetModal(currentStudent, name);
-  }).catch(()=> openTargetModal(currentStudent, currentStudentName||""));
 }
 
 
@@ -1597,6 +1674,7 @@ function openTargetForCurrent(){
       setWelcomeStudentBanner();
       loadStudentTarget();
       try{ loadLessonGoals(); }catch(_){}
+      try{ listenForNotifications(); }catch(_){}
       try{ listenForNotifications(); }catch(_){}
 
       showStudentTab('entry');
@@ -1898,6 +1976,8 @@ function openTargetForCurrent(){
                       data-name="${escAttr(prettyName)}"
                       data-sclass="${escAttr(s.sclass||"")}">${isFav ? "★" : "☆"}</button>
             </div>
+            <!-- Yeni: Sohbet Yasaklama Butonu -->
+            <button class="targetFloat" style="right: 96px;" title="Sohbetten Yasakla" onclick="openBanModal('${escAttr(s.num)}', '${escAttr(prettyName)}')">🚫</button>
             <!-- Yeni: Hedef butonu (çöp kovasının solu) -->
             <button class="targetFloat" title="Hedef belirle" data-role="target" data-num="${escAttr(s.num)}" data-name="${escAttr(prettyName)}">🎯</button>
             <!-- Yeni: Silme tuşu yerine sağ üstte çöp kovası ikonu -->
@@ -2437,9 +2517,98 @@ if(latest){
     }
 
     
-    /* ===== Öğrenci Sekmeleri (Soru Girişi / Haftalık / Aylık) ===== */
+    let chatListenerActive = false;
+    const initialBadWords = ["kötü", "çirkin", "argo", "küfür", "lan", "aptal", "salak", "enay", "keriz", "damn", "hell", "bitch"];
+
+    function setupInitialBadWords() {
+        const badWordsRef = db.ref('moderation/badWords');
+        badWordsRef.get().then(snap => {
+            if (!snap.exists() || Object.keys(snap.val()).length === 0) {
+                const updates = {};
+                initialBadWords.forEach(word => {
+                    updates[word.toLowerCase()] = true;
+                });
+                badWordsRef.set(updates);
+            }
+        });
+    }
+
+    function sendMessage() {
+        const chatInput = document.getElementById('chatInput');
+        const message = chatInput.value.trim();
+        if (!message) return;
+
+        if (!currentStudent || !currentStudentName) {
+            setAlert("Sohbet için giriş yapmalısınız.");
+            return;
+        }
+
+        // Check for ban status first
+        db.ref(`students/${currentStudent}/chat_ban`).get().then(banSnap => {
+            if (banSnap.exists()) {
+                const banInfo = banSnap.val();
+                if (banInfo.until === 'permanent' || banInfo.until > Date.now()) {
+                    let expiryMessage;
+                    if (banInfo.until === 'permanent') {
+                        expiryMessage = "Kalıcı olarak sohbetten yasaklandınız.";
+                    } else {
+                        const expiryDate = new Date(banInfo.until).toLocaleString('tr-TR');
+                        expiryMessage = `Sohbetten yasaklandınız. Yasağınız ${expiryDate} tarihinde sona erecektir.`;
+                    }
+                    setAlert(expiryMessage);
+                    return;
+                }
+            }
+
+            // If not banned, proceed with message sending logic
+            db.ref('moderation/badWords').get().then(snap => {
+                const badWords = snap.exists() ? Object.keys(snap.val()) : initialBadWords;
+                const isDirty = badWords.some(word => message.toLowerCase().includes(word));
+
+                if (isDirty) {
+                    db.ref('students/' + currentStudent).get().then(studentSnap => {
+                        const studentData = studentSnap.val();
+                        db.ref('moderation/flagged_messages').push({
+                            studentNum: currentStudent,
+                            studentName: currentStudentName,
+                            studentClass: studentData ? studentData.sclass : 'Bilinmiyor',
+                            message: message,
+                            timestamp: firebase.database.ServerValue.TIMESTAMP
+                        });
+                        setAlert("Mesajınız uygunsuz kelimeler içerdiği için gönderilmedi ve incelenmek üzere yöneticiye iletildi.");
+                    });
+                } else {
+                    db.ref('chat').push({
+                        studentNum: currentStudent,
+                        studentName: currentStudentName,
+                        message: message,
+                        timestamp: firebase.database.ServerValue.TIMESTAMP
+                    });
+                }
+                chatInput.value = '';
+            });
+        });
+    }
+
+    function loadChatMessages() {
+        if (chatListenerActive) return;
+
+        const chatMessages = document.getElementById('chatMessages');
+        const chatRef = db.ref('chat').limitToLast(50);
+
+        chatRef.on('child_added', snap => {
+            const msg = snap.val();
+            const msgDiv = document.createElement('div');
+            msgDiv.style.marginBottom = '8px';
+            msgDiv.innerHTML = `<strong>${escHTML(msg.studentName)}:</strong> ${escHTML(msg.message)}`;
+            chatMessages.insertBefore(msgDiv, chatMessages.firstChild);
+        });
+        chatListenerActive = true;
+    }
+
+    /* ===== Öğrenci Sekmeleri (Soru Girişi / Haftalık / Aylık / Sohbet) ===== */
     function showStudentTab(tab){
-      const tabs = ['entry','week','month'];
+      const tabs = ['entry','week','month', 'chat'];
       tabs.forEach(t=>{
         const el = document.getElementById('studentTab-' + t);
         if(el) el.style.display = (t===tab) ? 'block' : 'none';
@@ -2447,17 +2616,21 @@ if(latest){
       const btns = {
         entry: document.getElementById('stuTabEntryBtn'),
         week:  document.getElementById('stuTabWeekBtn'),
-        month: document.getElementById('stuTabMonthBtn')
+        month: document.getElementById('stuTabMonthBtn'),
+        chat: document.getElementById('stuTabChatBtn')
       };
       Object.keys(btns).forEach(k=>{
         if(btns[k]) btns[k].classList.toggle('active', k===tab);
       });
-      // İlk gösterimde grafikleri hazırla
+      // İlk gösterimde grafikleri veya sohbeti hazırla
       if(tab==='week' && (!_stuWeeks || !_stuWeeks.length) && window._studentLessons){
         prepareStudentReports(window._studentLessons);
       }
       if(tab==='month' && (!_stuMonths || !_stuMonths.length) && window._studentLessons){
         prepareStudentReports(window._studentLessons);
+      }
+      if(tab==='chat'){
+        loadChatMessages();
       }
     }
 
@@ -3026,17 +3199,14 @@ function renderTeacherCalendar(){
     });
   }
   window.openLessonGoalsPage = function(){
-    // Prefill from inline inputs if present
-    try{
-      ["Turkce","Sosyal","Din","Ingilizce","Matematik","Fen"].forEach(function(id){
-        var main = document.getElementById('goal-' + id);
-        var modal = document.getElementById('lg-' + id);
-        if(modal){ modal.value = main && main.value ? main.value : ""; }
-      });
-    }catch(_){}
+    loadLessonGoals(); // Load the correct student's data
     showMainPanel('goalsPage');
   };
-  window.backFromGoalsPage = function(){ showMainPanel('teacherPanel'); };
+  window.backFromGoalsPage = function(){
+    // Return to the correct panel based on who is logged in
+    var panel = (currentTeacherId) ? 'teacherPanel' : 'studentPanel';
+    showMainPanel(panel);
+  };
   window.resetGoalsInputs = function(){
     ["Turkce","Sosyal","Din","Ingilizce","Matematik","Fen"].forEach(function(id){
       var modal = document.getElementById('lg-' + id);
@@ -3044,57 +3214,118 @@ function renderTeacherCalendar(){
     });
   };
 
-  // Save (last-write-wins): delete old then write new, optionally go back
-  window.saveLessonGoals = function(goBack){
-    goBack = false; var payload = {};
+  window.backFromGoalsPage = function(){
+    // Return to the correct panel based on who is logged in
+    var panel = (currentTeacherId) ? 'teacherPanel' : 'studentPanel';
+    showMainPanel(panel);
+  };
+  window.resetGoalsInputs = function(){
     ["Turkce","Sosyal","Din","Ingilizce","Matematik","Fen"].forEach(function(id){
+      var modal = document.getElementById('lg-' + id);
+      if(modal) modal.value = "";
+    });
+  };
+
+  window.showNotificationPopup = function(message) {
+    const el = document.getElementById('notificationOverlay');
+    if (!el) return;
+    document.getElementById('notificationMessage').textContent = message;
+    el.style.display = 'flex';
+  }
+
+  window.closeNotificationPopup = function() {
+    const el = document.getElementById('notificationOverlay');
+    if (el) el.style.display = 'none';
+  }
+
+  let notificationListener = null;
+  function listenForNotifications() {
+      if (!currentStudent) return;
+      if (notificationListener) {
+          notificationListener.off(); // Detach old listener
+      }
+      const notificationRef = db.ref('students/' + currentStudent + '/notification');
+      notificationListener = notificationRef;
+      notificationRef.on('value', snap => {
+          if (snap.exists() && snap.val() && !snap.val().read) {
+              const notification = snap.val();
+              showNotificationPopup(notification.message);
+              snap.ref.update({ read: true });
+          }
+      });
+  }
+
+  window.saveLessonGoals = function(){
+    var studentId = currentGoalEditInfo.id;
+    if (!studentId) {
+      setAlert("Kaydedilecek öğrenci bulunamadı.");
+      return;
+    }
+
+    var payload = {};
+    const lessons = ["Turkce", "Sosyal", "Din", "Ingilizce", "Matematik", "Fen"];
+    lessons.forEach(function(id){
       var v = parseInt((document.getElementById('lg-' + id)?.value || "0"), 10);
       if(isNaN(v) || v <= 0) v = 0;
       payload[id] = v;
-      var main = document.getElementById('goal-' + id);
-      if(main){ main.value = v || ""; }
     });
-    try { if (typeof updateGlobalAndProgress === 'function') updateGlobalAndProgress(); } catch(_){}
 
-    // Last-write-wins to Firebase
-    try{
-      if(typeof db !== 'undefined' && typeof currentStudent !== 'undefined' && currentStudent){
-        var ref = db.ref('students/' + currentStudent + '/lessonGoals');
-        ref.set(null)
-          .then(function(){ return ref.set(Object.assign({}, payload, {_updatedAt: Date.now(), _updatedBy: (typeof role !== 'undefined' ? role : 'student')})); })
-          .then(function(){
-            try { if (typeof setAlert === 'function') setAlert('Hedef soru sayısı kaydedildi.'); } catch(_){}
-          })
-          .catch(function(e){
-            try { if (typeof setAlert === 'function') setAlert('Kayıt hatası: ' + e.message); } catch(_){}
+    var actor = (currentTeacherId) ? 'teacher' : 'student';
+    var finalPayload = Object.assign({}, payload, {
+      _updatedAt: firebase.database.ServerValue.TIMESTAMP,
+      _updatedBy: actor
+    });
+
+    var ref = db.ref('students/' + studentId + '/lessonGoals');
+    ref.set(finalPayload)
+      .then(function(){
+        setAlert('Ders hedefleri kaydedildi.');
+        // If a teacher made the change, set a notification for the student
+        if (actor === 'teacher') {
+          db.ref('students/' + studentId + '/notification').set({
+            message: 'Öğretmeniniz ders hedeflerinizi güncelledi.',
+            timestamp: firebase.database.ServerValue.TIMESTAMP,
+            read: false
           });
-      }else{
-      }
-    }catch(_){
-    }
+        }
+        // Update the inline inputs on the student panel for consistency if the student is viewing their own page
+        if(currentStudent === studentId){
+          lessons.forEach(function(id){
+            var mainInput = document.getElementById('goal-' + id);
+            if(mainInput) mainInput.value = payload[id] > 0 ? payload[id] : "";
+          });
+          try { if (typeof updateGlobalAndProgress === 'function') updateGlobalAndProgress(); } catch(_){}
+        }
+        backFromGoalsPage();
+      })
+      .catch(function(e){
+        setAlert('Kayıt hatası: ' + e.message);
+      });
   };
 
-  // Click handler: 🎯 icon opens the page
-  document.addEventListener('click', function(e){
-    var icon = e.target.closest && e.target.closest('.goalWrap .goalIcon');
-    if(icon){ openLessonGoalsPage(); }
-  });
-
-  // Load on student entry
   window.loadLessonGoals = function(){
-    try{
-      if(typeof db === 'undefined' || typeof currentStudent === 'undefined' || !currentStudent) return;
-      db.ref('students/' + currentStudent + '/lessonGoals').get().then(function(snap){
-        if(!snap.exists()) return;
-        var data = snap.val() || {};
-        ["Turkce","Sosyal","Din","Ingilizce","Matematik","Fen"].forEach(function(id){
-          var main = document.getElementById('goal-' + id);
-          var v = Number(data[id] || 0);
-          if(main){ main.value = v > 0 ? v : ""; }
-        });
-        try { if (typeof updateGlobalAndProgress === 'function') updateGlobalAndProgress(); } catch(_){}
+    var studentId = currentGoalEditInfo.id;
+    var studentName = currentGoalEditInfo.name;
+
+    // Update the title
+    var titleEl = document.querySelector('#goalsPage .gp-title');
+    if(titleEl){
+      var baseText = '🎯 Ders Soru Sayısı Hedefleri';
+      titleEl.textContent = studentName ? `${baseText} (${toTitleCaseTR(studentName)})` : baseText;
+    }
+
+    if (!studentId) return;
+
+    db.ref('students/' + studentId + '/lessonGoals').get().then(function(snap){
+      var data = snap.exists() ? snap.val() || {} : {};
+      ["Turkce","Sosyal","Din","Ingilizce","Matematik","Fen"].forEach(function(id){
+        var inputEl = document.getElementById('lg-' + id);
+        var v = Number(data[id] || 0);
+        if(inputEl){ inputEl.value = v > 0 ? v : ""; }
       });
-    }catch(_){}
+    }).catch(function(e){
+      setAlert("Hedefler yüklenemedi: " + e.message);
+    });
   };
 
   // Ensure cursor:pointer on goal icon
@@ -3161,5 +3392,26 @@ function renderTeacherCalendar(){
   line-height: 1.3 !important;
 }
 </style>
+<!-- === Sohbet Yasaklama Modalı (Eklendi) === -->
+<div id="banModal" class="list asModal" style="display:none; max-width: 480px;">
+  <div class="modalHead">
+    <strong id="banModalTitle">Öğrenciyi Sohbetten Yasakla</strong>
+    <button class="pill modalClose" onclick="closeBanModal()">Kapat ×</button>
+  </div>
+  <div style="padding: 10px;">
+    <p id="banModalStudentName" style="font-weight: 700; margin-bottom: 10px;"></p>
+    <p>Lütfen bir yasaklama süresi seçin veya özel bir süre girin (dakika cinsinden).</p>
+    <div class="ban-options" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
+      <button class="pill" onclick="confirmBan(10)">10 Dakika</button>
+      <button class="pill" onclick="confirmBan(60)">1 Saat</button>
+      <button class="pill" onclick="confirmBan(1440)">1 Gün</button>
+      <button class="pill" onclick="confirmBan(-1)">Kalıcı</button>
+    </div>
+    <div class="custom-duration" style="display: flex; gap: 10px; align-items: center;">
+      <input type="number" id="customBanDuration" placeholder="Özel süre (dakika)" style="flex: 1;" min="1">
+      <button class="action" onclick="confirmBanWithCustomDuration()" style="max-width: 120px;">Özel Süreyi Onayla</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
