@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="tr">
 <head>
 <meta charset="utf-8"/>
@@ -460,7 +459,7 @@
     background:var(--bg); color:var(--text); border:0; border-radius:10px; padding:8px 10px;
   }
   .lessonControls input[type=number]::-webkit-outer-spin-button,
-  .lessonControls input[type=number]::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0; }
+  .lessonControls input[type=number]::-webkit-outer-spin-button{ -webkit-appearance:none; margin:0; }
   .lessonControls input[type=number]{ -moz-appearance:textfield; }
   .numBtn{
     width:34px; height:34px; display:grid; place-items:center; border:0; border-radius:10px;
@@ -943,7 +942,7 @@ button.exitSmall .label{line-height:1}
         padding: 12px;
         overflow-y: auto;
         display: flex;
-        flex-direction: column-reverse;
+        flex-direction: column;
     }
     #chatPopupMessages div {
         margin-bottom: 8px;
@@ -993,7 +992,7 @@ button.exitSmall .label{line-height:1}
 .gp-btn .icon{ width:16px; height:16px; line-height:0; display:inline-flex; }
 .gp-btn .icon svg{ width:16px; height:16px; display:block; }
 
-/* “Tablo” kutusu — satır ızgarası */
+/* "Tablo" kutusu — satır ızgarası */
 .gp-table{
   max-width: 760px; margin: 0 auto;
   background: var(--card);
@@ -1109,7 +1108,7 @@ button.exitSmall .label{line-height:1}
 <div aria-hidden="true" class="roleIcon">
 <!-- İki kişi ikonu -->
 <svg fill="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-<path d="M16 11c2.209 0 4-2.239 4-5s-1.791-5-4-5-4 2.239-4 5 1.791 5 4 5Zm-8 0c2.209 0 4-2.239 4-5S10.209 1 8 1 4 3.239 4 6s1.791 5 4 5Zm8 2c-2.761 0-5.2.937-6.64 2.378C7.409 14.855 5.132 14 3 14c-1.657 0-3 1.567-3 3.5V21h10v-2c0-1.252.467-2.393 1.256-3.33C12.466 14.646 14.066 14 16 14c3.866 0 7 2.015 7 4.5V21h-8v-1.5c0-2.485-1.79-4.5-4-4.5Z"></path>
+<path d="M16 11c2.209 0 4-2.239 4-5s-1.791-5-4-5-4 2.239-4 5 1.791 5 4 5Zm-8 11c2.209 0 4-2.239 4-5S10.209 1 8 1 4 3.239 4 6s1.791 5 4 5Zm8 2c-2.761 0-5.2.937-6.64 2.378C7.409 14.855 5.132 14 3 14c-1.657 0-3 1.567-3 3.5V21h10v-2c0-1.252.467-2.393 1.256-3.33C12.466 14.646 14.066 14 16 14c3.866 0 7 2.015 7 4.5V21h-8v-1.5c0-2.485-1.79-4.5-4-4.5Z"></path>
 </svg>
 </div>
 <div class="roleTitle">Veli Girişi</div>
@@ -1129,7 +1128,7 @@ button.exitSmall .label{line-height:1}
 </div>
 <!-- ÖĞRENCİ PANELİ -->
 <div class="container" id="studentPanel" style="display:none">
-<h3>Öğrenci Paneli</h3>
+<h3 id="studentPanelTitle">Öğrenci Paneli</h3>
 <div class="studentWelcomeBanner" id="studentWelcome" style="display:none"></div>
 <div class="pillTabs" id="studentTabs">
 <button class="pill active" id="stuTabEntryBtn" onclick="showStudentTab('entry')">Soru Girişi</button>
@@ -1139,7 +1138,7 @@ button.exitSmall .label{line-height:1}
 <div id="studentTab-entry">
 <div class="student-toolbar">
 <div style="display:flex; gap:8px; align-items:center;">
-<strong>Öğrenci Paneli</strong>
+<strong id="studentPanelToolbarTitle">Öğrenci Paneli</strong>
 <span class="chip"><span class="dot" style="background:transparent;border:1px solid var(--cardBorder)"></span>Liste v5.4</span>
 </div>
 <div style="display:flex; gap:8px;">
@@ -1436,22 +1435,22 @@ button.exitSmall .label{line-height:1}
 </div>
 
 <script>
-    // Çıkış: anasayfaya yönlendirir (src'li <script> içinde yazılan inline kod çalışmaz)
+    // Çıkış: anasayfaya yönlendirir
     function exitToHome(){
-  try {
-    if (typeof currentStudent !== 'undefined') currentStudent = null;
-    ['lNumber','lPass','rName','rNumber','rPass','rPass2'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
-    const sel=document.getElementById('rClass'); if (sel) sel.selectedIndex = 0;
-    const lf=document.getElementById('lessonForm'); if (lf) lf.reset();
-    const sr=document.getElementById('studentRecords'); if (sr) sr.innerHTML='';
-    const rc=document.getElementById('roleChoice'); if(rc) rc.style.display='none';
-    ['studentPanel','teacherStudentDetail'].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display='none'; });
-    const lp=document.getElementById('loginPanel'); if(lp) lp.style.display='block';
-    try{ var b=document.getElementById('studentWelcome'); if(b){ b.style.display='none'; b.textContent=''; } }catch(_){ }
-    try{ setStudentTargetInfo(null); }catch(_){ }
-    if (typeof showTab==='function') showTab('studentLogin');
-  } catch(e){}
-}
+      try {
+        if (typeof currentStudent !== 'undefined') currentStudent = null;
+        ['lNumber','lPass','rName','rNumber','rPass','rPass2'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+        const sel=document.getElementById('rClass'); if (sel) sel.selectedIndex = 0;
+        const lf=document.getElementById('lessonForm'); if (lf) lf.reset();
+        const sr=document.getElementById('studentRecords'); if (sr) sr.innerHTML='';
+        const rc=document.getElementById('roleChoice'); if(rc) rc.style.display='none';
+        ['studentPanel','teacherStudentDetail'].forEach(id=>{ const el=document.getElementById(id); if(el) el.style.display='none'; });
+        const lp=document.getElementById('loginPanel'); if(lp) lp.style.display='block';
+        try{ var b=document.getElementById('studentWelcome'); if(b){ b.style.display='none'; b.textContent=''; } }catch(_){ }
+        try{ setStudentTargetInfo(null); }catch(_){ }
+        if (typeof showTab==='function') showTab('studentLogin');
+      } catch(e){}
+    }
 
     /* ===== Silme ikonu (çöp tenekesi SVG) ===== */
     const TRASH_ICON = "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgd2lkdGg9IjI0IiBoZWlnaHQ9IjI0IiBmaWxsPSIjZWY0NDQ0Ij4KICA8cGF0aCBkPSJNOSAyaDZ2Mmg1djJINFY0aDVWMnptLTMgNmgxMmwtMSAxMmEyIDIgMCAwIDEtMiAySDlhMiAyIDAgMCAxLTItMkw2IDh6bTQgM3Y3aDJ2LTdoLTJ6bTQgMHY3aDJ2LTdoLTJ6Ii8+Cjwvc3ZnPg==";
@@ -1470,7 +1469,16 @@ button.exitSmall .label{line-height:1}
       appId: "1:1025155254767:web:492d53b2d6f36d0ea88e1a",
       measurementId: "G-PZMLQHZP2L"
     };
-    firebase.initializeApp(firebaseConfig);
+    
+    // Firebase başlatma hatası düzeltmesi
+    try {
+      if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+      }
+    } catch (e) {
+      console.log("Firebase zaten başlatılmış:", e);
+    }
+    
     const db = firebase.database();
 
     /* ============ Global Durum ============ */
@@ -1566,6 +1574,9 @@ function openTargetForCurrent(){
     let selectClassRenderToken = 0;
     let favRef = null;
     let classesRef = null;
+    let chatListenerActive = false;
+    let onlineUsersListener = null;
+    let notificationListener = null;
 
     /* ============ Yardımcılar ============ */
     function setAlert(msg){
@@ -1611,6 +1622,9 @@ function openTargetForCurrent(){
       if(!currentTeacherName) return false;
       const low = s=>s.trim().toLocaleLowerCase('tr-TR');
       return low(currentTeacherName) === low("Emre Demirbaş");
+    }
+    function isModerator() {
+        return currentTeacherName && currentTeacherName.trim().toLowerCase() === "uğur yaşayan";
     }
 
     /* ============ Öğrenci kayıt & giriş ============ */
@@ -1722,9 +1736,13 @@ function openTargetForCurrent(){
     }
 
     function enterAsParent(){
-      const base = (typeof PARENT_PORTAL_URL==='string' && PARENT_PORTAL_URL) ? PARENT_PORTAL_URL : "veli.html";
-      const target = currentStudent ? (base + (base.includes('?')?'&':'?') + 'num=' + encodeURIComponent(currentStudent)) : base;
-      window.location.href = target;
+      window.activeRole = 'parent';
+      document.getElementById("roleChoice").style.display='none';
+      document.getElementById("loginPanel").style.display='none';
+      document.getElementById("studentPanel").style.display='block';
+      try{ window.showStudentTab('entry'); }catch(_){}
+      try{ window.loadStudentData(); }catch(_){}
+      window.applyRoleUi();
     }
 
     function backToLogin(){
@@ -1740,7 +1758,22 @@ function openTargetForCurrent(){
       if (userId) {
           db.ref('/status/' + userId).remove();
       }
-      if(onlineUsersListener) onlineUsersListener.off();
+      
+      // Tüm dinleyicileri kapat
+      if(onlineUsersListener) {
+        onlineUsersListener.off();
+        onlineUsersListener = null;
+      }
+      
+      if(chatListenerActive) {
+        db.ref('chat').off();
+        chatListenerActive = false;
+      }
+      
+      if(notificationListener) {
+        notificationListener.off();
+        notificationListener = null;
+      }
 
       const rc=document.getElementById('roleChoice'); if(rc) rc.style.display='none';
       if(classesRef){ classesRef.off(); classesRef=null; }
@@ -1755,6 +1788,10 @@ function openTargetForCurrent(){
       document.getElementById("loginPanel").style.display="block";
       showTab("studentLogin");
       destroyWeekChart();
+      
+      // Rolü sıfırla
+      window.activeRole = 'student';
+      window.applyRoleUi();
     }
 
     /* ============ Öğrenci Paneli ============ */
@@ -1860,43 +1897,6 @@ function openTargetForCurrent(){
 
 
     /* ============ Öğretmen Giriş ============ */
-    function isModerator() {
-        return currentTeacherName && currentTeacherName.trim().toLowerCase() === "uğur yaşayan";
-    }
-
-    function saveGoalsFromEntryPage() {
-        if (!currentStudent) {
-            setAlert("Lütfen önce giriş yapın.");
-            return;
-        }
-        const payload = {};
-        const lessons = ["Turkce", "Sosyal", "Din", "Ingilizce", "Matematik", "Fen"];
-        lessons.forEach(id => {
-            const input = document.getElementById('goal-' + id);
-            let val = parseInt(input ? input.value : '0', 10);
-            if (isNaN(val) || val <= 0) val = 0; 
-            payload[id] = val;
-        });
-    
-        const ref = db.ref('students/' + currentStudent + '/lessonGoals');
-        const finalPayload = Object.assign({}, payload, {
-            _updatedAt: firebase.database.ServerValue.TIMESTAMP, 
-            _updatedBy: 'student'
-        });
-    
-        ref.set(finalPayload)
-            .then(() => {
-                setAlert('Ders hedefleri başarıyla kaydedildi.');
-                lessons.forEach(id => {
-                    const modalInput = document.getElementById('lg-' + id);
-                    if(modalInput) modalInput.value = payload[id] > 0 ? payload[id] : "";
-                });
-            })
-            .catch(e => {
-                setAlert('Hedefleri kaydederken bir hata oluştu: ' + e.message);
-            });
-    }
-    
     function teacherLogin(){
       const name=document.getElementById("tName").value.trim();
       const code=document.getElementById("tCode").value;
@@ -2195,6 +2195,21 @@ function openTargetForCurrent(){
       });
     }
 
+    const initialBadWords = ["kötü", "çirkin", "argo", "küfür", "lan", "aptal", "salak", "enay", "keriz", "damn", "hell", "bitch"];
+
+    function setupInitialBadWords() {
+        const badWordsRef = db.ref('moderation/badWords');
+        badWordsRef.get().then(snap => {
+            if (!snap.exists() || Object.keys(snap.val()).length === 0) {
+                const updates = {};
+                initialBadWords.forEach(word => {
+                    updates[word.toLowerCase()] = true;
+                });
+                badWordsRef.set(updates);
+            }
+        });
+    }
+    
     function addBadWord() {
         const input = document.getElementById('newBadWord');
         const word = input.value.trim().toLowerCase();
@@ -2213,1352 +2228,764 @@ function openTargetForCurrent(){
             loadModerationData();
         });
     }
-    
-    function deleteFlaggedMessage(key) {
-        if (!confirm(`Bu mesajı silmek istediğinizden emin misiniz?`)) return;
-        db.ref('moderation/flagged_messages/' + key).remove().then(() => {
-            loadModerationData();
-        });
-    }
 
     function loadModerationData() {
-        const badWordsList = document.getElementById('badWordsList');
-        const flaggedMessagesList = document.getElementById('flaggedMessagesList');
-        badWordsList.innerHTML = 'Yükleniyor...';
-        flaggedMessagesList.innerHTML = 'Yükleniyor...';
-
-        db.ref('moderation/badWords').get().then(snap => {
-            badWordsList.innerHTML = '';
-            if (snap.exists()) {
-                Object.keys(snap.val()).forEach(word => {
-                    const wordEl = document.createElement('div');
-                    wordEl.style.cssText = 'background: #444; padding: 5px 10px; border-radius: 5px; display: flex; align-items: center; gap: 8px;';
-                    wordEl.innerHTML = `<span>${escHTML(word)}</span><button onclick="deleteBadWord('${escHTML(word)}')" style="background:none; border:none; color: #f87171; cursor:pointer; font-weight: bold;">×</button>`;
-                    badWordsList.appendChild(wordEl);
-                });
-            } else {
-                badWordsList.innerHTML = '<div class="empty">Yasaklı kelime yok.</div>';
+        if (!isModerator()) return;
+        const badWordsRef = db.ref('moderation/badWords');
+        badWordsRef.get().then(snap => {
+            const list = document.getElementById('badWordsList');
+            if (!snap.exists()) {
+                list.innerHTML = '<div class="empty">Henüz yasaklı kelime yok.</div>';
+                return;
             }
+            const words = Object.keys(snap.val()).sort();
+            list.innerHTML = words.map(word => `
+                <div class="chip">
+                    ${escHTML(word)}
+                    <button class="delBtn" onclick="deleteBadWord('${escAttr(word)}')">×</button>
+                </div>
+            `).join('');
         });
-
-        db.ref('moderation/flagged_messages').get().then(snap => {
-            flaggedMessagesList.innerHTML = '';
-            if (snap.exists()) {
-                snap.forEach(childSnap => {
-                    const key = childSnap.key;
-                    const msg = childSnap.val();
-                    const msgEl = document.createElement('div');
-                    msgEl.className = 'studentItem';
-                    const date = new Date(msg.timestamp).toLocaleString('tr-TR');
-                    msgEl.innerHTML = `
-                        <div>
-                            <strong>${escHTML(msg.studentName)} (${escHTML(msg.studentClass)}, ${escHTML(msg.studentNum)})</strong> - <small>${date}</small>
-                            <p style="margin: 5px 0 0; padding: 5px; background: #222; border-radius: 5px;">${escHTML(msg.message)}</p>
-                        </div>
-                        <button class="delBtn" onclick="deleteFlaggedMessage('${key}')">Sil</button>
-                    `;
-                    flaggedMessagesList.appendChild(msgEl);
-                });
-            } else {
-                flaggedMessagesList.innerHTML = '<div class="empty">İncelenecek mesaj yok.</div>';
+        const flaggedRef = db.ref('flaggedMessages');
+        flaggedRef.get().then(snap => {
+            const list = document.getElementById('flaggedMessagesList');
+            if (!snap.exists()) {
+                list.innerHTML = '<div class="empty">İncelenecek mesaj yok.</div>';
+                return;
             }
+            const messages = [];
+            snap.forEach(child => {
+                const msg = child.val();
+                messages.push({
+                    id: child.key,
+                    senderName: msg.senderName,
+                    message: msg.message,
+                    timestamp: msg.timestamp
+                });
+            });
+            messages.sort((a, b) => b.timestamp - a.timestamp);
+            list.innerHTML = messages.map(msg => `
+                <div class="studentItem">
+                    <div style="flex:1">
+                        <strong>${escHTML(msg.senderName)}:</strong> ${escHTML(msg.message)}
+                        <div style="font-size:12px; opacity:.7">${new Date(msg.timestamp).toLocaleString('tr-TR')}</div>
+                    </div>
+                    <button class="editBtn" onclick="approveMessage('${escAttr(msg.id)}')">Onayla</button>
+                    <button class="delBtn" onclick="deleteMessage('${escAttr(msg.id)}')">Sil</button>
+                </div>
+            `).join('');
         });
     }
 
-    /* ============ Sekme geçişleri ============ */
-    function showTeacherSection(sec){
-      const sections = ['classes', 'favorites', 'moderation'];
-      sections.forEach(s => {
-          const el = document.getElementById(s + 'Section');
-          if(el) el.style.display = (s === sec) ? 'block' : 'none';
-      });
+    function approveMessage(msgId) {
+        db.ref('flaggedMessages/' + msgId).remove();
+        loadModerationData();
+    }
 
-      const tabs = ['tabClasses', 'tabFavorites', 'tabModeration'];
-      tabs.forEach(t => {
-          const el = document.getElementById(t);
-          if(el) el.classList.remove('active');
+    function deleteMessage(msgId) {
+        if (!confirm('Mesajı silmek istediğinizden emin misiniz?')) return;
+        db.ref('flaggedMessages/' + msgId).remove();
+        loadModerationData();
+    }
+
+    function showTeacherSection(section){
+      ["classesSection","favoritesSection","moderationSection"].forEach(id=>{
+        document.getElementById(id).style.display = (id===section+"Section") ? "block" : "none";
       });
+      document.querySelectorAll("#teacherTopTabs .pill").forEach(b=>b.classList.remove("active"));
+      document.getElementById("tab"+section.charAt(0).toUpperCase()+section.slice(1)).classList.add("active");
       
-      const activeTab = document.getElementById('tab' + sec.charAt(0).toUpperCase() + sec.slice(1));
-      if(activeTab) activeTab.classList.add('active');
-
-      if(sec === 'moderation' && isModerator()){
+      if (section === 'moderation') {
           loadModerationData();
       }
     }
 
-    /* ============ Öğrenci Detay + Haftalık ============ */
+    /* ============ Öğretmen Öğrenci Detay ============ */
     function teacherShowStudent(num){
       currentDetailNum=num;
       document.getElementById("teacherStudentDetail").style.display="block";
-      destroyWeekChart();
-      db.ref("students/"+num).get().then(snap=>{
-        if(!snap.exists()){ setAlert("Öğrenci bulunamadı."); return; }
-        const s=snap.val();
-        const prettyName = toTitleCaseTR(s.name||"");
-        document.getElementById("tsdTitle").textContent = `${prettyName} (${s.num}) – ${s.sclass}`;
-        const lessons=s.lessons||{};
-        currentDetailLessons = lessons;
-
-        const dayMap={}, totals={};
-        for(const l in lessons){
-          for(const k in lessons[l]){
-            const e=lessons[l][k]; const d=(e.time||"").split(" ")[0]||"";
-            if(!dayMap[d]) dayMap[d]={}; if(!dayMap[d][l]) dayMap[d][l]=0; dayMap[d][l]+=Number(e.count)||0;
-            if(!totals[l]) totals[l]=0; totals[l]+=Number(e.count)||0;
-          }
-        }
-        const daysBox=document.getElementById("tsdDays");
-        const dayNames=Object.keys(dayMap).sort((a,b)=> a.split('.').reverse().join('').localeCompare(b.split('.').reverse().join('')) ).reverse();
-        daysBox.innerHTML = dayNames.length ? dayNames.map(d=>`<button class="dayBtn" onclick="teacherShowStudentDay('${num}','${d}')">${d}</button>`).join("") : "<div class='empty'>Gün bulunamadı.</div>";
-    try{
-      tsdBuildCtxFromLessons(dayMap);
-      renderTeacherCalendar();
-      const dayKeys = Object.keys(dayMap||{}).sort((a,b)=> a.split('.').reverse().join('').localeCompare(b.split('.').reverse().join('')) );
-      if(dayKeys.length){
-        tsdSelectDate(dayKeys[dayKeys.length-1]);
-      }else{
-        const t = document.getElementById("tsdDayTable");
-        if(t) t.innerHTML = "<div class='empty'>Gün bulunamadı.</div>";
-      }
-    }catch(_){ /* no-op */ }
-    
-        renderTotalsTable(totals,"tsdTotals");
-        if(dayNames.length) teacherShowStudentDay(num,dayNames[0]); else document.getElementById("tsdDayTable").innerHTML="<div class='empty'>Gün seçiniz.</div>";
-
-        currentWeeks = buildWeeksFromLessons(lessons);
-        renderWeekList(currentWeeks);
-        if(currentWeeks.length){ selectWeek(currentWeeks[currentWeeks.length-1].key); } else { clearWeekArea(); }
+      document.getElementById("reportOverlay").style.display="block";
+      showReportTab('daily');
+      db.ref("students/"+num).get().then(s=>{
+        if(!s.exists()){ setAlert("Öğrenci bulunamadı."); return; }
+        const name=s.val().name||"";
+        document.getElementById("tsdTitle").textContent=`${toTitleCaseTR(name)} (${num})`;
+        db.ref("students/"+num+"/lessons").get().then(snap=>{
+          currentDetailLessons=snap.exists()? snap.val() : {};
+          prepareTeacherReports(currentDetailLessons);
+          renderTeacherCalendar();
+          showReportTab('daily');
+        });
       });
     }
-    function renderTotalsTable(totals,targetId){
-      const dersSirasi = ["Türkçe", "Sosyal Bilgiler", "Din Kültürü", "İngilizce", "Matematik", "Fen Bilimleri"];
-      let html="<table><tr><th>Ders</th><th>Toplam Soru</th></tr>";
-      dersSirasi.forEach(l => {
-        const value = totals[l] || 0;
-        html += `<tr><td>${l}</td><td>${value}</td></tr>`;
+    function closeReportModal(){
+      document.getElementById("teacherStudentDetail").style.display="none";
+      document.getElementById("reportOverlay").style.display="none";
+      currentDetailNum=null;
+    }
+
+    /* ============ Öğrenci Ders Hedefleri ============ */
+    function openLessonGoalsPage(){
+      document.getElementById("studentPanel").style.display="none";
+      document.getElementById("goalsPage").style.display="block";
+      loadLessonGoals();
+    }
+    function closeLessonGoalsPage(){
+      document.getElementById("goalsPage").style.display="none";
+      document.getElementById("studentPanel").style.display="block";
+    }
+    function loadLessonGoals(){
+      if(!currentStudent) return;
+      db.ref("students/"+currentStudent+"/goals").get().then(snap=>{
+        const map={Turkce:"Türkçe",Sosyal:"Sosyal Bilgiler",Din:"Din Kültürü",Ingilizce:"İngilizce",Matematik:"Matematik",Fen:"Fen Bilimleri"};
+        const data=snap.exists()? snap.val() : {};
+        Object.keys(map).forEach(id=>{
+          const inp=document.getElementById("lg-"+id); if(inp) inp.value= data[id] || "";
+        });
+      });
+    }
+    function saveGoalsFromEntryPage(){
+      if(!currentStudent) return;
+      const map={"Turkce":"Türkçe","Sosyal":"Sosyal Bilgiler","Din":"Din Kültürü","Ingilizce":"İngilizce","Matematik":"Matematik","Fen":"Fen Bilimleri"};
+      const goals={};
+      Object.keys(map).forEach(id=>{
+        const el=document.getElementById("goal-"+id);
+        if(el && el.value){ goals[id]=parseInt(el.value,10); }
+      });
+      db.ref("students/"+currentStudent+"/goals").set(goals).then(()=>{
+        setAlert("Hedefler kaydedildi!");
+      }).catch(e=>setAlert("Hata: "+e.message));
+    }
+    function saveLessonGoals(){
+      if(!currentStudent) return;
+      const map={Turkce:"Türkçe",Sosyal:"Sosyal Bilgiler",Din:"Din Kültürü",Ingilizce:"İngilizce",Matematik:"Matematik",Fen:"Fen Bilimleri"};
+      const goals={};
+      Object.keys(map).forEach(id=>{
+        const inp=document.getElementById("lg-"+id);
+        goals[id]=inp && inp.value ? parseInt(inp.value,10) : null;
+      });
+      db.ref("students/"+currentStudent+"/goals").set(goals).then(()=>{
+        setAlert("Hedefler kaydedildi!");
+      }).catch(e=>setAlert("Hata: "+e.message));
+    }
+    function resetGoalsInputs(){
+      const ids=["Turkce","Sosyal","Din","Ingilizce","Matematik","Fen"];
+      ids.forEach(id=>{
+        const modal=document.getElementById("lg-"+id);
+        const entry=document.getElementById("goal-"+id);
+        if(modal) modal.value="";
+        if(entry) entry.value="";
+      });
+    }
+
+    /* ============ Rapor Sekmeleri ============ */
+    function showReportTab(tab){
+      ["daily","weekly","monthly"].forEach(t=>{
+        const el=document.getElementById("repTab-"+t); if(el) el.style.display = t===tab ? "block" : "none";
+        const btn=document.getElementById("repTab"+t.charAt(0).toUpperCase()+t.slice(1)+"Btn");
+        if(btn) btn.classList.toggle("active", t===tab);
+      });
+      if(tab==="weekly"){
+        if(currentDetailNum) prepareTeacherReports(currentDetailLessons);
+        else prepareStudentReports(window._studentLessons);
+      }
+    }
+    function showStudentTab(tab){
+      ["entry","week","month"].forEach(t=>{
+        const el=document.getElementById("studentTab-"+t); if(el) el.style.display = t===tab ? "block" : "none";
+        const btn=document.getElementById("stuTab"+t.charAt(0).toUpperCase()+t.slice(1)+"Btn");
+        if(btn) btn.classList.toggle("active", t===tab);
+      });
+      if(tab==="week") prepareStudentReports(window._studentLessons);
+      if(tab==="month") prepareStudentReports(window._studentLessons);
+    }
+
+    /* ============ Yardımcı: Tarih işlemleri ============ */
+    function parseTRDateStr(str){ // "DD.MM.YYYY"
+      const [d,m,y]=String(str).split(".").map(Number);
+      if(!d||!m||!y) return new Date(NaN);
+      return new Date(y,m-1,d);
+    }
+    function formatTR(date){ // "DD.MM.YYYY"
+      if(!date || isNaN(date)) return "";
+      const d=date.getDate(), m=date.getMonth()+1, y=date.getFullYear();
+      return `${d<10?'0':''}${d}.${m<10?'0':''}${m}.${y}`;
+    }
+    function getWeekKey(date){ // Pzt–Paz haftası (ISO haftasına göre)
+      const d=new Date(date);
+      const day=d.getDay(); d.setDate(d.getDate() - (day===0?6:day-1));
+      const y=d.getFullYear();
+      const week=Math.floor((d - new Date(y,0,1)) / (7*24*60*60*1000))+1;
+      return `${y}-W${week<10?'0':''}${week}`;
+    }
+    function getMonthKey(date){ return date.getFullYear()+"-"+(date.getMonth()+1); }
+    function weekKeyToRange(key){
+      const [y,w]=key.split("-W").map(Number);
+      const jan1=new Date(y,0,1);
+      const days=(w-1)*7 - (jan1.getDay()>4 ? jan1.getDay()-1 : jan1.getDay()+6);
+      const start=new Date(jan1); start.setDate(jan1.getDate() + days);
+      const end=new Date(start); end.setDate(start.getDate()+6);
+      return {start, end};
+    }
+    function monthKeyToRange(key){
+      const [y,m]=key.split("-").map(Number);
+      return {start:new Date(y,m-1,1), end:new Date(y,m,0)};
+    }
+
+    /* ============ Takvim ============ */
+    function renderStudentCalendar(){
+      const ctx=window._calCtx; if(!ctx) return;
+      const box=document.getElementById("calendarWrap");
+      const today=new Date();
+      const firstDay=new Date(ctx.viewMonthStart.getFullYear(), ctx.viewMonthStart.getMonth(), 1);
+      const lastDay=new Date(ctx.viewMonthStart.getFullYear(), ctx.viewMonthStart.getMonth()+1, 0);
+      const startCell=new Date(firstDay); startCell.setDate(firstDay.getDate() - (firstDay.getDay()===0?6:firstDay.getDay()-1));
+      const endCell=new Date(lastDay); endCell.setDate(lastDay.getDate() + (lastDay.getDay()===0?0:7-lastDay.getDay()));
+
+      let html=`<div class="calHeader">
+        <div class="calTitle">${firstDay.toLocaleDateString("tr-TR",{month:"long",year:"numeric"})}</div>
+        <div class="calNav">
+          <button class="calBtn" onclick="calNavigate(-1)">←</button>
+          <button class="calBtnToday" onclick="calGoToday()">Bugün</button>
+          <button class="calBtn" onclick="calNavigate(1)">→</button>
+        </div>
+      </div>
+      <div class="calGrid">
+        <div class="calWd">Pzt</div><div class="calWd">Sal</div><div class="calWd">Çar</div><div class="calWd">Per</div><div class="calWd">Cum</div><div class="calWd">Cmt</div><div class="calWd">Paz</div>`;
+
+      const d=new Date(startCell);
+      while(d<=endCell){
+        const dayStr=formatTR(d);
+        const isToday=formatTR(d)===formatTR(today);
+        const isSelected=formatTR(d)===formatTR(ctx.selectedDate);
+        const hasData=ctx.hasSet.has(dayStr);
+        const isMuted=d.getMonth()!==firstDay.getMonth();
+        html+=`<div class="calCell${isMuted?" muted":""}${isToday?" today":""}${isSelected?" selected":""}" onclick="calSelectDate('${dayStr}')">
+          <span class="calDay">${d.getDate()}</span>
+          ${hasData?'<div class="calDot"></div>':''}
+        </div>`;
+        d.setDate(d.getDate()+1);
+      }
+      html+="</div>";
+      box.innerHTML=html;
+    }
+    function renderTeacherCalendar(){
+      const ctx=window._calCtx; if(!ctx) return;
+      const box=document.getElementById("tsdDays");
+      const today=new Date();
+      const firstDay=new Date(ctx.viewMonthStart.getFullYear(), ctx.viewMonthStart.getMonth(), 1);
+      const lastDay=new Date(ctx.viewMonthStart.getFullYear(), ctx.viewMonthStart.getMonth()+1, 0);
+      const startCell=new Date(firstDay); startCell.setDate(firstDay.getDate() - (firstDay.getDay()===0?6:firstDay.getDay()-1));
+      const endCell=new Date(lastDay); endCell.setDate(lastDay.getDate() + (lastDay.getDay()===0?0:7-lastDay.getDay()));
+
+      let html=`<div class="calHeader">
+        <div class="calTitle">${firstDay.toLocaleDateString("tr-TR",{month:"long",year:"numeric"})}</div>
+        <div class="calNav">
+          <button class="calBtn" onclick="calNavigate(-1)">←</button>
+          <button class="calBtnToday" onclick="calGoToday()">Bugün</button>
+          <button class="calBtn" onclick="calNavigate(1)">→</button>
+        </div>
+      </div>
+      <div class="calGrid">
+        <div class="calWd">Pzt</div><div class="calWd">Sal</div><div class="calWd">Çar</div><div class="calWd">Per</div><div class="calWd">Cum</div><div class="calWd">Cmt</div><div class="calWd">Paz</div>`;
+
+      const d=new Date(startCell);
+      while(d<=endCell){
+        const dayStr=formatTR(d);
+        const isToday=formatTR(d)===formatTR(today);
+        const isSelected=formatTR(d)===formatTR(ctx.selectedDate);
+        const hasData=ctx.hasSet.has(dayStr);
+        const isMuted=d.getMonth()!==firstDay.getMonth();
+        html+=`<div class="calCell${isMuted?" muted":""}${isToday?" today":""}${isSelected?" selected":""}" onclick="calSelectDate('${dayStr}')">
+          <span class="calDay">${d.getDate()}</span>
+          ${hasData?'<div class="calDot"></div>':''}
+        </div>`;
+        d.setDate(d.getDate()+1);
+      }
+      html+="</div>";
+      box.innerHTML=html;
+    }
+    function calNavigate(dir){
+      const ctx=window._calCtx; if(!ctx) return;
+      ctx.viewMonthStart.setMonth(ctx.viewMonthStart.getMonth()+dir);
+      if(currentDetailNum) renderTeacherCalendar();
+      else renderStudentCalendar();
+    }
+    function calGoToday(){
+      const today=new Date();
+      window._calCtx.selectedDate=today;
+      window._calCtx.viewMonthStart=new Date(today.getFullYear(), today.getMonth(), 1);
+      if(currentDetailNum) renderTeacherCalendar();
+      else renderStudentCalendar();
+      const dayStr=formatTR(today);
+      if(window._calCtx.grouped[dayStr]) showDay(dayStr);
+      else document.getElementById("stuDayTable").innerHTML="<div class='empty'>Henüz veri yok.</div>";
+    }
+    function calSelectDate(dayStr){
+      const ctx=window._calCtx; if(!ctx) return;
+      ctx.selectedDate=parseTRDateStr(dayStr);
+      if(currentDetailNum) renderTeacherCalendar();
+      else renderStudentCalendar();
+      if(ctx.grouped[dayStr]) showDay(dayStr);
+      else document.getElementById("stuDayTable").innerHTML="<div class='empty'>Henüz veri yok.</div>";
+    }
+
+    /* ============ Haftalık Rapor (Öğretmen) ============ */
+    function prepareTeacherReports(lessons){
+      if(!lessons) lessons={};
+      const weekMap={}, monthMap={};
+      for(const lesson in lessons){
+        for(const key in lessons[lesson]){
+          const e=lessons[lesson][key];
+          const dayStr=(e.time||"").split(" ")[0];
+          if(!dayStr) continue;
+          const date=parseTRDateStr(dayStr);
+          if(isNaN(date)) continue;
+          const weekKey=getWeekKey(date);
+          const monthKey=getMonthKey(date);
+          const count=Number(e.count)||0;
+          if(!weekMap[weekKey]) weekMap[weekKey]={};
+          if(!weekMap[weekKey][lesson]) weekMap[weekKey][lesson]=0;
+          weekMap[weekKey][lesson]+=count;
+          if(!monthMap[monthKey]) monthMap[monthKey]={};
+          if(!monthMap[monthKey][lesson]) monthMap[monthKey][lesson]=0;
+          monthMap[monthKey][lesson]+=count;
+        }
+      }
+      currentWeeks=Object.keys(weekMap).sort().reverse();
+      if(currentWeeks.length && !selectedWeekKey) selectedWeekKey=currentWeeks[0];
+      renderWeekList();
+      if(selectedWeekKey) renderWeekMatrix(weekMap[selectedWeekKey]||{});
+    }
+
+    function renderWeekList(){
+      const box=document.getElementById("weekList");
+      box.innerHTML="";
+      currentWeeks.forEach(wk=>{
+        const range=weekKeyToRange(wk);
+        const btn=document.createElement("button");
+        btn.className="weekBtn"+(wk===selectedWeekKey?" active":"");
+        btn.textContent=`${formatTR(range.start)} – ${formatTR(range.end)}`;
+        btn.onclick=()=>{ selectedWeekKey=wk; renderWeekMatrix((window._calCtx.weekMap||{})[wk]||{}); };
+        box.appendChild(btn);
+      });
+      const pdfBtn=document.getElementById("btnExportPDF");
+      if(pdfBtn) pdfBtn.disabled=!selectedWeekKey;
+    }
+
+    function renderWeekMatrix(weekData){
+      const box=document.getElementById("weekMatrix");
+      const lessons=["Türkçe","Sosyal Bilgiler","Din Kültürü","İngilizce","Matematik","Fen Bilimleri"];
+      let html="<table><tr><th>Ders</th><th>O Hafta Toplam</th></tr>";
+      lessons.forEach(les=>{
+        const val=weekData[les]||0;
+        html+=`<tr><td>${les}</td><td>${val}</td></tr>`;
       });
       html+="</table>";
-      document.getElementById(targetId).innerHTML=html;
-    }
-    function teacherShowStudentDay(num,day){
-      db.ref("students/"+num+"/lessons").get().then(snap=>{
-        let perLesson={};
-        if(snap.exists()){
-          const data=snap.val();
-          for(const l in data){
-            for(const k in data[l]){
-              const e=data[l][k]; const d=(e.time||"").split(" ")[0]||"";
-              if(d===day){ if(!perLesson[l]) perLesson[l]=0; perLesson[l]+= Number(e.count)||0; }
-            }
-          }
-        }
-        const dersSirasi = ["Türkçe", "Sosyal Bilgiler", "Din Kültürü", "İngilizce", "Matematik", "Fen Bilimleri"];
-        let html="<table><tr><th>Ders</th><th>O Gün Çözülen</th></tr>";
-        dersSirasi.forEach(l => {
-          const value = perLesson[l] || 0;
-          html += `<tr><td>${l}</td><td>${value}</td></tr>`;
-        });
-        html+="</table>";
-        document.getElementById("tsdDayTable").innerHTML=html;
-      });
-    }
-
-    /* ===== Haftalık çizgi grafiği + PDF ===== */
-    function parseTRDateStr(dstr){ const [dd,mm,yy]=dstr.split('.').map(x=>parseInt(x,10)); return new Date(yy, mm-1, dd); }
-    function formatTR(d){ return d.toLocaleDateString("tr-TR"); }
-    function mondayOf(date){ const d=new Date(date.getFullYear(),date.getMonth(),date.getDate()); const day=d.getDay(); const diff=(day===0?-6:1-day); d.setDate(d.getDate()+diff); d.setHours(0,0,0,0); return d; }
-    function addDays(d,n){ const x=new Date(d); x.setDate(x.getDate()+n); return x; }
-
-    
-    function stuAddMonths(d,n){ return new Date(d.getFullYear(), d.getMonth()+n, 1); }
-    function stuSameYMD(a,b){ return a.getFullYear()===b.getFullYear() && a.getMonth()===b.getMonth() && a.getDate()===b.getDate(); }
-
-    window._calCtx = { grouped:{}, selectedDate:new Date(), viewMonthStart:new Date(), hasSet:new Set() };
-
-    function renderStudentCalendar(){
-      const wrap = document.getElementById("calendarWrap");
-      if(!wrap) return;
-      const ctx = window._calCtx;
-      const monthLabel = ctx.viewMonthStart.toLocaleDateString('tr-TR', {month:'long', year:'numeric'});
-
-      let html = `
-        <div class="calHeader">
-          <div class="calTitle">${monthLabel}</div>
-          <div class="calNav">
-            <button class="calBtn" type="button" onclick="stuCalPrevMonth()">‹</button>
-            <button class="calBtnToday" type="button" id="btnToday" onclick="stuGoToday()">Bugün</button>
-            <button class="calBtn" type="button" onclick="stuCalNextMonth()">›</button>
-          </div>
-        </div>
-        <div class="calGrid">
-          ${['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'].map(d=>`<div class="calWd">${d}</div>`).join('')}
-      `;
-
-      const startGrid = mondayOf(new Date(ctx.viewMonthStart.getFullYear(), ctx.viewMonthStart.getMonth(), 1));
-      for(let i=0;i<42;i++){
-        const d = addDays(startGrid, i);
-        const inMonth = d.getMonth() === ctx.viewMonthStart.getMonth();
-        const dayStr = formatTR(d);
-        const hasData = ctx.hasSet.has(dayStr);
-        const isToday = stuSameYMD(d, new Date());
-        const isSelected = stuSameYMD(d, ctx.selectedDate);
-
-        html += `
-          <div class="calCell ${inMonth?'':'muted'} ${isToday?'today':''} ${isSelected?'selected':''}"
-               onclick="stuSelectDate('${dayStr}')">
-            <span class="calDay">${d.getDate()}</span>
-            ${hasData ? '<span class="calDot" aria-hidden="true"></span>' : ''}
-          </div>
-        `;
-      }
-      html += `</div>`;
-      wrap.innerHTML = html + `<div class='calFab'><button type='button' onclick='stuGoToday()'>Bugün</button></div>`;
-
-      (function(){
-        try{
-          const td = new Date();
-          const sameMonth = (td.getFullYear()===ctx.viewMonthStart.getFullYear()) && (td.getMonth()===ctx.viewMonthStart.getMonth());
-          const sameDay = stuSameYMD(td, ctx.selectedDate);
-          const dis = (sameMonth && sameDay);
-          const b = wrap.querySelector('#btnToday');
-          if(b){ b.disabled = dis; }
-        }catch(_){}
-      })();
-
-    }
-    function stuCalPrevMonth(){ _calCtx.viewMonthStart = stuAddMonths(_calCtx.viewMonthStart, -1); renderStudentCalendar(); }
-    function stuCalNextMonth(){ _calCtx.viewMonthStart = stuAddMonths(_calCtx.viewMonthStart,  1); renderStudentCalendar(); }
-    function stuSelectDate(dayStr){
-      const d = parseTRDateStr(dayStr);
-      if(!isNaN(d)) _calCtx.selectedDate = d;
-      renderStudentCalendar();
-      showDay(dayStr);
-    }
-    function stuGoToday(){
-      const now = new Date();
-      _calCtx.selectedDate = now;
-      _calCtx.viewMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
-      renderStudentCalendar();
-      const dayStr = formatTR(now);
-      if(_calCtx.grouped && _calCtx.grouped[dayStr]){
-        showDay(dayStr);
-      }else{
-        const el=document.getElementById("stuDayTable");
-        if(el){ el.innerHTML = "<div class='empty'>Bugün için kayıt yok.</div>"; }
-      }
-    }
-
-    (function attachSwipe(){
-      const r = () => document.getElementById('calendarWrap');
-      let tsX=null,tsY=null;
-      function start(e){ const t = e.touches ? e.touches[0] : e; tsX=t.clientX; tsY=t.clientY; }
-      function end(e){
-        if(tsX===null||tsY===null) return;
-        const t = e.changedTouches ? e.changedTouches[0] : e;
-        let dx = t.clientX - tsX, dy = t.clientY - tsY;
-        if(Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)){
-          if(dx < 0) stuCalNextMonth(); else stuCalPrevMonth();
-        }
-        tsX=tsY=null;
-      }
-      setTimeout(()=>{
-        const el = r(); if(!el) return;
-        el.addEventListener('touchstart', start, {passive:true});
-        el.addEventListener('touchend', end, {passive:true});
-      }, 0);
-    })();
-
-function buildWeeksFromLessons(lessons){
-      let minDate=null, maxDate=null;
-      for(const l in lessons){
-        for(const k in lessons[l]){
-          const e=lessons[l][k];
-          const d=parseTRDateStr((e.time||"").split(" ")[0]||"");
-          if(isNaN(d)) continue;
-          if(!minDate||d<minDate) minDate=d;
-          if(!maxDate||d>maxDate) maxDate=d;
-        }
-      }
-      if(!minDate) return [];
-      let curStart=mondayOf(minDate);
-      const lastStart=mondayOf(maxDate);
-      const out=[];
-      while(curStart<=lastStart){
-        const curEnd=addDays(curStart,6);
-        out.push({ key: curStart.toISOString().slice(0,10), start: new Date(curStart), end: curEnd, label:"" });
-        curStart=addDays(curStart,7);
-      }
-      out.forEach((w,i)=>{ w.label=`${i+1}. Hafta (${formatTR(w.start)} - ${formatTR(w.end)})`; });
-      return out;
-    }
-    function renderWeekList(weeks){
-
-const wrap = document.getElementById("weekList");
-if(!wrap){ return; }
-if(!weeks || !weeks.length){
-  wrap.innerHTML = "<span class='empty'>Hafta bulunamadı.</span>";
-  const pdfBtn = document.getElementById("btnExportPDF");
-  if(pdfBtn) pdfBtn.disabled = true;
-  return;
-}
-const sorted = weeks.slice().sort((a,b)=> b.start - a.start);
-wrap.innerHTML = [
-  '<div class="weekDropdown" id="weekDropdown">',
-    '<button type="button" class="wdToggle" id="weekToggle" aria-expanded="false">',
-      '<span class="label">Hafta Seç</span>',
-      '<span class="chev">▾</span>',
-    '</button>',
-    '<div class="wdMenu" id="weekMenu" hidden></div>',
-  '</div>'
-].join("");
-const menu = document.getElementById("weekMenu");
-const toggle = document.getElementById("weekToggle");
-menu.innerHTML = sorted.map(w=>`<button type="button" class="wdItem" data-key="${w.key}">${w.label}</button>`).join("");
-function closeMenu(){
-  if(!menu.classList.contains('open')) return;
-  menu.classList.remove('open'); menu.setAttribute('hidden','');
-  toggle.setAttribute('aria-expanded','false');
-  if(window._wkOutside){ document.removeEventListener('click', window._wkOutside); window._wkOutside = null; }
-}
-function openMenu(){
-  if(menu.classList.contains('open')) return;
-  menu.classList.add('open'); menu.removeAttribute('hidden');
-  toggle.setAttribute('aria-expanded','true');
-  window._wkOutside = function(ev){ if(!wrap.contains(ev.target)){ closeMenu(); } };
-  document.addEventListener('click', window._wkOutside);
-}
-toggle.onclick = ()=>{ (menu.classList.contains('open') ? closeMenu() : openMenu()); };
-menu.addEventListener('click', (ev)=>{
-  const btn = ev.target.closest('.wdItem');
-  if(!btn) return;
-  const key = btn.dataset.key;
-  selectWeek(key);
-  const wk = sorted.find(w=>w.key===key);
-  const lab = toggle.querySelector('.label'); if(lab && wk) lab.textContent = wk.label;
-  menu.querySelectorAll('.wdItem').forEach(x=>x.classList.toggle('active', x===btn));
-  closeMenu();
-});
-const latest = sorted[0];
-if(latest){
-  const lab = toggle.querySelector('.label'); if(lab) lab.textContent = latest.label;
-  const firstBtn = menu.querySelector('.wdItem');
-  if(firstBtn) firstBtn.classList.add('active');
-}
-
-}
-
-    function selectWeek(weekKey){
-      selectedWeekKey=weekKey;
-      document.getElementById("btnExportPDF").disabled=false;
-      drawWeek(currentDetailLessons, currentWeeks.find(w=>w.key===weekKey));
-    }
-    function clearWeekArea(){
-      destroyWeekChart();
-      document.getElementById("weekMatrix").innerHTML="";
-      const ctx=document.getElementById("weekChart").getContext('2d'); ctx.clearRect(0,0,9999,9999);
-      document.getElementById("btnExportPDF").disabled=true;
-    }
-    function aggregateWeekDetailed(lessons, week){
-      const dayLabels=["Pzt","Sal","Çar","Per","Cum","Cmt","Paz"];
-      const daily=[0,0,0,0,0,0,0];
-      const perLessonPerDay = {};
-      const allLessons = ["Türkçe", "Sosyal Bilgiler", "Din Kültürü", "İngilizce", "Matematik", "Fen Bilimleri"];
-      allLessons.forEach(l=>perLessonPerDay[l]=[0,0,0,0,0,0,0]);
-      if(!lessons) return {dayLabels,daily,perLessonPerDay};
-      for(const l in lessons){
-        for(const k in lessons[l]){
-          const e=lessons[l][k];
-          const dStr=(e.time||"").split(" ")[0]||"";
-          if(!dStr) continue;
-          const d=parseTRDateStr(dStr);
-          if(isNaN(d)) continue;
-          if(d>=week.start && d<=week.end){
-            const dow=(d.getDay()+6)%7;
-            const cnt=Number(e.count)||0;
-            daily[dow]+=cnt;
-            if(!perLessonPerDay[l]) perLessonPerDay[l]=[0,0,0,0,0,0,0];
-            perLessonPerDay[l][dow]+=cnt;
-          }
-        }
-      }
-      return {dayLabels,daily,perLessonPerDay};
-    }
-    function drawWeek(lessons, week){
-      if(!week){ clearWeekArea(); return; }
-      const {dayLabels,daily,perLessonPerDay}=aggregateWeekDetailed(lessons, week);
-
-      destroyWeekChart();
+      box.innerHTML=html;
+      if(weekChart) weekChart.destroy();
       const ctx=document.getElementById("weekChart").getContext("2d");
       weekChart=new Chart(ctx,{
-        type:"line",
-        data:{ labels:dayLabels, datasets:[{ label:`${week.label} Günlük Toplam`, data:daily, tension:0.35, pointRadius:3, borderWidth:2, fill:false }]},
-        options:{ responsive:true, maintainAspectRatio:false, scales:{ y:{ beginAtZero:true, ticks:{ precision:0 } } }, plugins:{ legend:{ labels:{ color:"#e2e8f0" } } } }
+        type:"bar",
+        data:{
+          labels:lessons,
+          datasets:[{label:"O Hafta Toplam",data:lessons.map(l=>weekData[l]||0),backgroundColor:"#3b82f6",borderColor:"#1d4ed8",borderWidth:1}]
+        },
+        options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
       });
-
-      const matDiv=document.getElementById("weekMatrix");
-      matDiv.innerHTML = buildMatrixTableHTML(perLessonPerDay, dayLabels);
-
-      prepareExportDOM(week, dayLabels, daily, perLessonPerDay);
-    }
-    function buildMatrixTableHTML(perLessonPerDay, dayLabels){
-      const dersSirasi = ["Türkçe", "Sosyal Bilgiler", "Din Kültürü", "İngilizce", "Matematik", "Fen Bilimleri"];
-      let html = `<div class="sectionTitle" style="margin:0 0 6px">Ders × Gün Matrisi</div>`;
-      html += `<table><tr><th>Ders</th>${dayLabels.map(d=>`<th>${d}</th>`).join("")}</tr>`;
-      dersSirasi.forEach(lesson=>{
-        const row=perLessonPerDay[lesson] || [0,0,0,0,0,0,0];
-        html += `<tr><td>${lesson}</td>${row.map(v=>`<td>${v}</td>`).join("")}</tr>`;
-      });
-      html += `</table>`;
-      return html;
-    }
-    function destroyWeekChart(){ if(weekChart){ weekChart.destroy(); weekChart=null; } }
-
-    /* ======= PDF EXPORT ======= */
-    function prepareExportDOM(week, dayLabels, daily, perLessonPerDay){
-      const title=document.getElementById("tsdTitle").textContent;
-      document.getElementById("exportStudent").textContent = title;
-      document.getElementById("exportRange").textContent = week.label;
-
-      const ctx=document.getElementById("exportChart").getContext("2d");
-      if(window._exportChart) { window._exportChart.destroy(); }
-      window._exportChart = new Chart(ctx,{
-        type:"line",
-        data:{ labels:dayLabels, datasets:[{ label:`${week.label} Günlük Toplam`, data:daily, tension:0.35, pointRadius:3, borderWidth:2, fill:false }]},
-        options:{ responsive:true, maintainAspectRatio:false, scales:{ y:{ beginAtZero:true, ticks:{ precision:0 } } }, plugins:{ legend:{ labels:{ color:"#e2e8f0" } } } }
-      });
-
-      document.getElementById("exportTable").innerHTML = buildMatrixTableHTML(perLessonPerDay, dayLabels);
-    }
-    async function exportSelectedWeekPDF(){
-      if(!currentDetailNum || !selectedWeekKey) return;
-      const { jsPDF } = window.jspdf;
-      const exportEl=document.getElementById("exportArea");
-      const canvas=await html2canvas(exportEl, { backgroundColor:null, scale:2 });
-      const img=canvas.toDataURL("image/png",1.0);
-      const pdf=new jsPDF({orientation:"portrait", unit:"pt", format:"a4"});
-      const pageW=pdf.internal.pageSize.getWidth();
-      const margin=18;
-      const drawW=pageW - margin*2;
-      const drawH=drawW * (canvas.height/canvas.width);
-      pdf.addImage(img,"PNG", margin, 12, drawW, drawH);
-      const safeName = (document.getElementById("tsdTitle").textContent || "Rapor").replace(/[^\wğüşöçıİĞÜŞÖÇ\s\-().]/g,"").slice(0,60);
-      pdf.save(`${safeName} - ${document.getElementById("exportRange").textContent}.pdf`);
     }
 
-    
-    let chatListenerActive = false;
-    const initialBadWords = ["kötü", "çirkin", "argo", "küfür", "lan", "aptal", "salak", "enay", "keriz", "damn", "hell", "bitch"];
-
-    function setupInitialBadWords() {
-        const badWordsRef = db.ref('moderation/badWords');
-        badWordsRef.get().then(snap => {
-            if (!snap.exists() || Object.keys(snap.val()).length === 0) {
-                const updates = {};
-                initialBadWords.forEach(word => {
-                    updates[word.toLowerCase()] = true;
-                });
-                badWordsRef.set(updates);
-            }
-        });
-    }
-    
-    // YENİ: Pop-up için Mesaj Gönderme
-    function sendPopupMessage() {
-        const chatInput = document.getElementById('chatPopupInput');
-        const message = chatInput.value.trim();
-        if (!message) return;
-    
-        const senderId = currentStudent || currentTeacherId;
-        const senderName = currentStudentName || currentTeacherName;
-
-        if (!senderId || !senderName) {
-            setAlert("Sohbet için giriş yapmalısınız.");
-            return;
-        }
-    
-        db.ref('moderation/badWords').get().then(snap => {
-            const badWords = snap.exists() ? Object.keys(snap.val()) : initialBadWords;
-            const isDirty = badWords.some(word => message.toLowerCase().includes(word));
-    
-            if (isDirty) {
-                 db.ref('students/' + currentStudent).get().then(studentSnap => {
-                    const studentData = studentSnap.val();
-                    db.ref('moderation/flagged_messages').push({
-                        studentNum: currentStudent,
-                        studentName: currentStudentName,
-                        studentClass: studentData ? studentData.sclass : 'Bilinmiyor',
-                        message: message,
-                        timestamp: firebase.database.ServerValue.TIMESTAMP
-                    });
-                     setAlert("Mesajınız uygunsuz kelimeler içerdiği için gönderilmedi ve incelenmek üzere yöneticiye iletildi.");
-                });
-            } else {
-                db.ref('chat').push({
-                    senderId: senderId,
-                    senderName: senderName,
-                    message: message,
-                    timestamp: firebase.database.ServerValue.TIMESTAMP
-                });
-            }
-            chatInput.value = '';
-        });
-    }
-    
-    // GÜNCELLENDİ: Pop-up için mesajları yükleme
-    function loadChatMessages() {
-        if (chatListenerActive) return;
-    
-        const chatMessages = document.getElementById('chatPopupMessages');
-        const chatRef = db.ref('chat').limitToLast(50);
-    
-        chatRef.on('child_added', snap => {
-            const msg = snap.val();
-            const msgDiv = document.createElement('div');
-            msgDiv.innerHTML = `<strong>${escHTML(msg.senderName)}:</strong> ${escHTML(msg.message)}`;
-            chatMessages.insertBefore(msgDiv, chatMessages.firstChild);
-        });
-        chatListenerActive = true;
-    }
-
-    /* ===== Öğrenci Sekmeleri ===== */
-    function showStudentTab(tab){
-      const tabs = ['entry','week','month']; // Sohbet sekmesi kaldırıldı
-      tabs.forEach(t=>{
-        const el = document.getElementById('studentTab-' + t);
-        if(el) el.style.display = (t===tab) ? 'block' : 'none';
-      });
-      const btns = {
-        entry: document.getElementById('stuTabEntryBtn'),
-        week:  document.getElementById('stuTabWeekBtn'),
-        month: document.getElementById('stuTabMonthBtn'),
-      };
-      Object.keys(btns).forEach(k=>{
-        if(btns[k]) btns[k].classList.toggle('active', k===tab);
-      });
-      if(tab==='week' && (!_stuWeeks || !_stuWeeks.length) && window._studentLessons){
-        prepareStudentReports(window._studentLessons);
-      }
-      if(tab==='month' && (!_stuMonths || !_stuMonths.length) && window._studentLessons){
-        prepareStudentReports(window._studentLessons);
-      }
-    }
-
+    /* ============ Haftalık Rapor (Öğrenci) ============ */
     function prepareStudentReports(lessons){
-      _stuWeeks = buildWeeksFromLessons(lessons || {});
-      renderStuWeekList(_stuWeeks);
-      if(_stuWeeks.length){
-        selectStuWeek(_stuWeeks[_stuWeeks.length-1].key);
-      }else{
-        destroyStuWeekChart();
-        const m = document.getElementById('stuWeekMatrix');
-        if(m) m.innerHTML = "<div class='empty'>Haftalık veri yok.</div>";
-      }
-
-      _stuMonths = buildMonthsFromLessons(lessons || {});
-      renderStuMonthList(_stuMonths);
-      if(_stuMonths.length){
-        selectStuMonth(_stuMonths[_stuMonths.length-1].key);
-      }else{
-        destroyStuMonthChart();
-        const mt = document.getElementById('stuMonthTotals');
-        if(mt) mt.innerHTML = "<div class='empty'>Aylık veri yok.</div>";
-        try{ const ctx = document.getElementById('stuMonthChart').getContext('2d'); ctx.clearRect(0,0,9999,9999);}catch(_){}
-      }
-    }
-
-    /* ======= Haftalık (Öğrenci) ======= */
-    function renderStuWeekList(weeks){
-      const sel = document.getElementById('stuWeekSelect');
-      if(!sel) return;
-      sel.innerHTML = '';
-      weeks.forEach((w)=>{
-        const opt = document.createElement('option');
-        opt.value = w.key;
-        opt.textContent = w.label;
-        sel.add(opt);
-      });
-      if(weeks.length){ sel.value = weeks[weeks.length-1].key; }
-    }
-    function selectStuWeek(weekKey){
-      const week = (_stuWeeks||[]).find(w=>w.key===weekKey);
-      if(!week){ destroyStuWeekChart(); const m=document.getElementById('stuWeekMatrix'); if(m) m.innerHTML=''; return; }
-      drawStuWeek(window._studentLessons, week);
-    }
-    function destroyStuWeekChart(){ if(stuWeekChart){ try{stuWeekChart.destroy();}catch(_){ } stuWeekChart=null; } }
-    function drawStuWeek(lessons, week){
-      const {dayLabels,daily,perLessonPerDay} = aggregateWeekDetailed(lessons, week);
-      destroyStuWeekChart();
-      try{
-        const ctx = document.getElementById('stuWeekChart').getContext('2d');
-        stuWeekChart = new Chart(ctx, {
-          type: 'line',
-          data: { labels: dayLabels, datasets: [ { label: `${week.label} – Günlük Toplam`, data: daily, tension: 0.35, pointRadius: 3, borderWidth: 2, fill:false } ] },
-          options: { responsive:true, maintainAspectRatio:false, scales:{ y:{ beginAtZero:true, ticks:{ precision:0 } } }, plugins:{ legend:{ labels:{ color:'#e2e8f0' } } } }
-        });
-      }catch(_){}
-      const mat = document.getElementById('stuWeekMatrix');
-      if(mat) mat.innerHTML = buildMatrixTableHTML(perLessonPerDay, dayLabels);
-    }
-
-    /* ======= Aylık (Öğrenci) ======= */
-    function buildMonthsFromLessons(lessons){
-      let minDate=null, maxDate=null;
-      for(const l in (lessons||{})){
-        for(const k in lessons[l]){
-          const e = lessons[l][k];
-          const d = parseTRDateStr((e.time||'').split(' ')[0]||'');
-          if(isNaN(d)) continue;
-          if(!minDate || d<minDate) minDate=d;
-          if(!maxDate || d>maxDate) maxDate=d;
+      if(!lessons) lessons={};
+      const weekMap={}, monthMap={};
+      for(const lesson in lessons){
+        for(const key in lessons[lesson]){
+          const e=lessons[lesson][key];
+          const dayStr=(e.time||"").split(" ")[0];
+          if(!dayStr) continue;
+          const date=parseTRDateStr(dayStr);
+          if(isNaN(date)) continue;
+          const weekKey=getWeekKey(date);
+          const monthKey=getMonthKey(date);
+          const count=Number(e.count)||0;
+          if(!weekMap[weekKey]) weekMap[weekKey]={};
+          if(!weekMap[weekKey][lesson]) weekMap[weekKey][lesson]=0;
+          weekMap[weekKey][lesson]+=count;
+          if(!monthMap[monthKey]) monthMap[monthKey]={};
+          if(!monthMap[monthKey][lesson]) monthMap[monthKey][lesson]=0;
+          monthMap[monthKey][lesson]+=count;
         }
       }
-      if(!minDate) return [];
-      const out=[];
-      let cur = new Date(minDate.getFullYear(), minDate.getMonth(), 1);
-      const end = new Date(maxDate.getFullYear(), maxDate.getMonth(), 1);
-      let idx=0;
-      while(cur <= end){
-        idx++;
-        const start = new Date(cur.getFullYear(), cur.getMonth(), 1);
-        const endOf = new Date(cur.getFullYear(), cur.getMonth()+1, 0);
-        const key = `${start.getFullYear()}-${String(start.getMonth()+1).padStart(2,'0')}`;
-        const label = start.toLocaleDateString('tr-TR', { month:'long', year:'numeric' });
-        out.push({ key, start, end: endOf, label, index: idx });
-        cur = new Date(cur.getFullYear(), cur.getMonth()+1, 1);
-      }
-      return out;
+      _stuWeeks=Object.keys(weekMap).sort().reverse();
+      _stuMonths=Object.keys(monthMap).sort().reverse();
+      renderStuWeekSelect();
+      renderStuMonthSelect();
+      if(_stuWeeks.length) selectStuWeek(_stuWeeks[0]);
+      if(_stuMonths.length) selectStuMonth(_stuMonths[0]);
     }
-    function renderStuMonthList(months){
-      const sel = document.getElementById('stuMonthSelect');
-      if(!sel) return;
-      sel.innerHTML='';
-      months.forEach(m=>{
-        const opt = document.createElement('option');
-        opt.value = m.key;
-        opt.textContent = `${m.index}. Ay (${m.label})`;
-        sel.add(opt);
+    function renderStuWeekSelect(){
+      const sel=document.getElementById("stuWeekSelect");
+      sel.innerHTML="<option value=''>Hafta Seçin</option>";
+      _stuWeeks.forEach(wk=>{
+        const range=weekKeyToRange(wk);
+        const o=document.createElement("option");
+        o.value=wk;
+        o.textContent=`${formatTR(range.start)} – ${formatTR(range.end)}`;
+        sel.appendChild(o);
       });
-      if(months.length){ sel.value = months[months.length-1].key; }
     }
-    function selectStuMonth(key){
-      const month = (_stuMonths||[]).find(m=>m.key===key);
-      if(!month){ destroyStuMonthChart(); const t=document.getElementById('stuMonthTotals'); if(t) t.innerHTML=''; return; }
-      drawStuMonth(window._studentLessons, month);
+    function renderStuMonthSelect(){
+      const sel=document.getElementById("stuMonthSelect");
+      sel.innerHTML="<option value=''>Ay Seçin</option>";
+      _stuMonths.forEach(mk=>{
+        const range=monthKeyToRange(mk);
+        const o=document.createElement("option");
+        o.value=mk;
+        o.textContent=range.start.toLocaleDateString("tr-TR",{month:"long",year:"numeric"});
+        sel.appendChild(o);
+      });
     }
-    function destroyStuMonthChart(){ if(stuMonthChart){ try{stuMonthChart.destroy();}catch(_){ } stuMonthChart=null; } }
-    function aggregateMonthDaily(lessons, month){
-      const daysIn = new Date(month.start.getFullYear(), month.start.getMonth()+1, 0).getDate();
-      const labels = Array.from({length:daysIn}, (_,i)=> String(i+1));
-      const daily = Array.from({length:daysIn}, ()=>0);
-      const totals = {"Türkçe":0,"Sosyal Bilgiler":0,"Din Kültürü":0,"İngilizce":0,"Matematik":0,"Fen Bilimleri":0};
-      for(const l in (lessons||{})){
-        for(const k in lessons[l]){
-          const e = lessons[l][k];
-          const dStr = (e.time||'').split(' ')[0]||'';
-          if(!dStr) continue;
-          const d = parseTRDateStr(dStr);
-          if(isNaN(d)) continue;
-          if(d >= month.start && d <= month.end){
-            const idx = d.getDate()-1;
-            const cnt = Number(e.count)||0;
-            daily[idx] += cnt;
-            if(typeof totals[l] === 'number') totals[l] += cnt;
-            else totals[l] = (totals[l]||0) + cnt;
-          }
-        }
-      }
-      return { labels, daily, totals };
+    function selectStuWeek(wk){
+      if(!wk) return;
+      const weekData=(window._calCtx && window._calCtx.weekMap) ? (window._calCtx.weekMap[wk]||{}) : {};
+      const lessons=["Türkçe","Sosyal Bilgiler","Din Kültürü","İngilizce","Matematik","Fen Bilimleri"];
+      const box=document.getElementById("stuWeekMatrix");
+      let html="<table><tr><th>Ders</th><th>O Hafta Toplam</th></tr>";
+      lessons.forEach(les=>{
+        const val=weekData[les]||0;
+        html+=`<tr><td>${les}</td><td>${val}</td></tr>`;
+      });
+      html+="</table>";
+      box.innerHTML=html;
+      if(stuWeekChart) stuWeekChart.destroy();
+      const ctx=document.getElementById("stuWeekChart").getContext("2d");
+      stuWeekChart=new Chart(ctx,{
+        type:"bar",
+        data:{
+          labels:lessons,
+          datasets:[{label:"O Hafta Toplam",data:lessons.map(l=>weekData[l]||0),backgroundColor:"#3b82f6",borderColor:"#1d4ed8",borderWidth:1}]
+        },
+        options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
+      });
     }
-    function drawStuMonth(lessons, month){
-      const { labels, daily, totals } = aggregateMonthDaily(lessons, month);
-      destroyStuMonthChart();
-      try{
-        const ctx = document.getElementById('stuMonthChart').getContext('2d');
-        stuMonthChart = new Chart(ctx, {
-          type: 'line',
-          data: { labels, datasets: [ { label: `${month.index}. Ay (${month.label}) – Günlük Toplam`, data: daily, tension: 0.35, pointRadius: 3, borderWidth: 2, fill:false } ] },
-          options: { responsive:true, maintainAspectRatio:false, scales:{ y:{ beginAtZero:true, ticks:{ precision:0 } } }, plugins:{ legend:{ labels:{ color:'#e2e8f0' } } } }
+    function selectStuMonth(mk){
+      if(!mk) return;
+      const monthData=(window._calCtx && window._calCtx.monthMap) ? (window._calCtx.monthMap[mk]||{}) : {};
+      const lessons=["Türkçe","Sosyal Bilgiler","Din Kültürü","İngilizce","Matematik","Fen Bilimleri"];
+      const box=document.getElementById("stuMonthTotals");
+      let html="<table><tr><th>Ders</th><th>O Ay Toplam</th></tr>";
+      lessons.forEach(les=>{
+        const val=monthData[les]||0;
+        html+=`<tr><td>${les}</td><td>${val}</td></tr>`;
+      });
+      html+="</table>";
+      box.innerHTML=html;
+      if(stuMonthChart) stuMonthChart.destroy();
+      const ctx=document.getElementById("stuMonthChart").getContext("2d");
+      stuMonthChart=new Chart(ctx,{
+        type:"bar",
+        data:{
+          labels:lessons,
+          datasets:[{label:"O Ay Toplam",data:lessons.map(l=>monthData[l]||0),backgroundColor:"#06b6d4",borderColor:"#0e7490",borderWidth:1}]
+        },
+        options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
+      });
+    }
+
+    /* ============ PDF Dışa Aktar ============ */
+    function exportSelectedWeekPDF(){
+      if(!selectedWeekKey) return;
+      const range=weekKeyToRange(selectedWeekKey);
+      const studentName=currentDetailNum ? (window._calCtx && window._calCtx.studentName) : currentStudentName;
+      const weekData=(window._calCtx && window._calCtx.weekMap) ? (window._calCtx.weekMap[selectedWeekKey]||{}) : {};
+      const lessons=["Türkçe","Sosyal Bilgiler","Din Kültürü","İngilizce","Matematik","Fen Bilimleri"];
+
+      document.getElementById("exportRange").textContent=`${formatTR(range.start)} – ${formatTR(range.end)}`;
+      document.getElementById("exportStudent").textContent=studentName||"";
+      const chartCtx=document.getElementById("exportChart").getContext("2d");
+      if(window._exportChart) window._exportChart.destroy();
+      window._exportChart=new Chart(chartCtx,{
+        type:"bar",
+        data:{
+          labels:lessons,
+          datasets:[{label:"O Hafta Toplam",data:lessons.map(l=>weekData[l]||0),backgroundColor:"#3b82f6",borderColor:"#1d4ed8",borderWidth:1}]
+        },
+        options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
+      });
+      const tableBox=document.getElementById("exportTable");
+      let html="<table><tr><th>Ders</th><th>O Hafta Toplam</th></tr>";
+      lessons.forEach(les=>{
+        const val=weekData[les]||0;
+        html+=`<tr><td>${les}</td><td>${val}</td></tr>`;
+      });
+      html+="</table>";
+      tableBox.innerHTML=html;
+
+      setTimeout(()=>{
+        html2canvas(document.getElementById("exportArea")).then(canvas=>{
+          const { jsPDF }=window.jspdf;
+          const pdf=new jsPDF("p","mm","a4");
+          const imgData=canvas.toDataURL("image/png");
+          const pdfW=pdf.internal.pageSize.getWidth();
+          const pdfH=pdf.internal.pageSize.getHeight();
+          pdf.addImage(imgData,"PNG",0,0,pdfW,pdfH);
+          pdf.save(`Haftalık_Rapor_${studentName||"Öğrenci"}_${selectedWeekKey}.pdf`);
         });
-      }catch(_){}
-      const dersSirasi = ["Türkçe", "Sosyal Bilgiler", "Din Kültürü", "İngilizce", "Matematik", "Fen Bilimleri"];
-      let html = "<table><tr><th>Ders</th><th>Toplam Soru</th></tr>";
-      dersSirasi.forEach(d=>{
-        const v = totals[d] || 0;
-        html += `<tr><td>${d}</td><td>${v}</td></tr>`;
-      });
-      html += "</table>";
-      const tgt = document.getElementById('stuMonthTotals');
-      if(tgt) tgt.innerHTML = html;
+      },500);
     }
 
-    /* ============ Kayıt sekmesi: sınıfları canlı dinle ============ */
-    db.ref("classes").on("value",snap=>{
-      const names=[]; snap.forEach(ch=>{const v=ch.val(); if(v&&v.name) names.push(v.name);});
-      const sel=document.getElementById("rClass"); const keep=sel.value;
-      sel.innerHTML="<option value=''>Sınıf Seçin</option>";
-      names.sort().forEach(n=>{const o=document.createElement("option"); o.value=n;o.text=n; sel.add(o);});
-      if(names.includes(keep)) sel.value=keep;
-    });
+    /* ============ Grafik Temizleme ============ */
+    function destroyWeekChart(){
+      if(weekChart){ weekChart.destroy(); weekChart=null; }
+      if(stuWeekChart){ stuWeekChart.destroy(); stuWeekChart=null; }
+      if(stuMonthChart){ stuMonthChart.destroy(); stuMonthChart=null; }
+    }
 
-    // YENİ: Sohbet Pop-up fonksiyonları
+    /* ============ Aylık Rapor (Öğretmen) ============ */
+    function selectTeacherMonth(mk){
+      if(!currentDetailNum || !mk) return;
+      const monthData=(window._calCtx && window._calCtx.monthMap) ? (window._calCtx.monthMap[mk]||{}) : {};
+      const lessons=["Türkçe","Sosyal Bilgiler","Din Kültürü","İngilizce","Matematik","Fen Bilimleri"];
+      const box=document.getElementById("tMonthTotals");
+      let html="<table><tr><th>Ders</th><th>O Ay Toplam</th></tr>";
+      lessons.forEach(les=>{
+        const val=monthData[les]||0;
+        html+=`<tr><td>${les}</td><td>${val}</td></tr>`;
+      });
+      html+="</table>";
+      box.innerHTML=html;
+      if(window._tMonthChart) window._tMonthChart.destroy();
+      const ctx=document.getElementById("tMonthChart").getContext("2d");
+      window._tMonthChart=new Chart(ctx,{
+        type:"bar",
+        data:{
+          labels:lessons,
+          datasets:[{label:"O Ay Toplam",data:lessons.map(l=>monthData[l]||0),backgroundColor:"#06b6d4",borderColor:"#0e7490",borderWidth:1}]
+        },
+        options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{y:{beginAtZero:true}}}
+      });
+    }
+
+    /* ============ Bildirimler ============ */
+    function showNotificationPopup(message) {
+        const overlay = document.getElementById('notificationOverlay');
+        const messageEl = document.getElementById('notificationMessage');
+        if (overlay && messageEl) {
+            messageEl.textContent = message;
+            overlay.style.display = 'flex';
+        }
+    }
+
+    function closeNotificationPopup() {
+        const overlay = document.getElementById('notificationOverlay');
+        if (overlay) {
+            overlay.style.display = 'none';
+        }
+    }
+
+    function listenForNotifications() {
+        if (!currentStudent) return;
+        
+        // Önceki dinleyiciyi kapat
+        if (notificationListener) {
+            notificationListener.off();
+        }
+        
+        const notificationRef = db.ref('students/' + currentStudent + '/notification');
+        notificationListener = notificationRef;
+        
+        notificationRef.on('value', snap => {
+            if (snap.exists() && snap.val() && !snap.val().read) {
+                const notification = snap.val();
+                showNotificationPopup(notification.message);
+                // Bildirimi okundu olarak işaretle
+                snap.ref.update({ read: true });
+            }
+        });
+    }
+
+    /* ============ Sohbet Sistemi ============ */
+    function setupPresence() {
+        const userId = currentStudent || currentTeacherId;
+        if (!userId) return;
+        
+        const userStatusRef = db.ref('/status/' + userId);
+        const userInfo = {
+            name: currentStudent ? currentStudentName : currentTeacherName,
+            role: currentStudent ? 'student' : 'teacher',
+            lastOnline: firebase.database.ServerValue.TIMESTAMP
+        };
+        
+        userStatusRef.set(userInfo);
+        
+        // Kullanıcı çıkış yaptığında çevrimdışı yap
+        window.addEventListener('beforeunload', () => {
+            userStatusRef.remove();
+        });
+    }
+
+    function listenForOnlineUsers() {
+        if (onlineUsersListener) {
+            onlineUsersListener.off();
+        }
+        
+        const ref = db.ref('/status');
+        onlineUsersListener = ref;
+        
+        ref.on('value', snap => {
+            const users = [];
+            if (snap.exists()) {
+                snap.forEach(child => {
+                    const user = child.val();
+                    users.push(user);
+                });
+            }
+            
+            const onlineEl = document.getElementById('chatPopupOnlineUsers');
+            if (onlineEl) {
+                const userNames = users.map(u => u.name).filter(Boolean);
+                onlineEl.innerHTML = `<strong>Çevrimiçi:</strong> ${userNames.length ? userNames.join(', ') : 'Kimse yok'}`;
+            }
+        });
+    }
+
     function openChatPopup() {
         document.getElementById('chatPopup').style.display = 'flex';
         loadChatMessages();
+        listenForOnlineUsers();
     }
+
     function closeChatPopup() {
         document.getElementById('chatPopup').style.display = 'none';
     }
 
-    // YENİ: Çevrimiçi kullanıcıları takip etme (Presence)
-    let onlineUsersListener = null;
-    function setupPresence() {
-        const userId = currentStudent || currentTeacherId;
-        const userName = currentStudentName || currentTeacherName;
-        if (!userId || !userName) return;
-
-        const userStatusRef = db.ref('/status/' + userId);
-        userStatusRef.onDisconnect().remove();
-        userStatusRef.set({ name: userName });
-        listenForOnlineUsers();
+    function loadChatMessages() {
+        if (chatListenerActive) return;
+        
+        const chatMessages = document.getElementById('chatPopupMessages');
+        const chatRef = db.ref('chat').limitToLast(50);
+        
+        chatRef.on('child_added', snap => {
+            const msg = snap.val();
+            const msgDiv = document.createElement('div');
+            msgDiv.innerHTML = `<strong>${escHTML(msg.senderName)}:</strong> ${escHTML(msg.message)}`;
+            chatMessages.appendChild(msgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        });
+        
+        chatListenerActive = true;
     }
-    function listenForOnlineUsers() {
-        if(onlineUsersListener) onlineUsersListener.off();
-        const ref = db.ref('/status');
-        onlineUsersListener = ref;
-        ref.on('value', snap => {
-            const onlineUsersList = document.getElementById('chatPopupOnlineUsers');
-            if(!onlineUsersList) return;
-            let users = [];
-            if(snap.exists()){
-                snap.forEach(childSnap => {
-                    users.push(escHTML(childSnap.val().name));
+
+    function sendPopupMessage() {
+        const input = document.getElementById('chatPopupInput');
+        const message = input.value.trim();
+        
+        if (!message) return;
+        
+        const senderName = currentStudent ? currentStudentName : currentTeacherName;
+        const senderId = currentStudent || currentTeacherId;
+        
+        if (!senderName || !senderId) {
+            setAlert('Mesaj göndermek için giriş yapmalısınız.');
+            return;
+        }
+
+        // Yasaklı kelime kontrolü
+        db.ref('moderation/badWords').get().then(snap => {
+            const badWords = snap.exists() ? Object.keys(snap.val()) : [];
+            const hasBadWord = badWords.some(word => 
+                message.toLowerCase().includes(word.toLowerCase())
+            );
+
+            if (hasBadWord && !isModerator()) {
+                // Yasaklı kelime içeriyorsa, moderatöre bildir
+                db.ref('flaggedMessages').push({
+                    senderName: senderName,
+                    message: message,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                });
+                setAlert('Mesajınız yasaklı kelime içerdiği için moderatöre bildirildi.');
+                input.value = '';
+            } else {
+                // Mesajı gönder
+                db.ref('chat').push({
+                    senderName: senderName,
+                    senderId: senderId,
+                    message: message,
+                    timestamp: firebase.database.ServerValue.TIMESTAMP
+                }).then(() => {
+                    input.value = '';
+                    input.focus();
                 });
             }
-            if(users.length > 0) {
-                 onlineUsersList.innerHTML = `<strong>Çevrimiçi (${users.length}):</strong> ${users.join(', ')}`;
-            } else {
-                 onlineUsersList.innerHTML = '<strong>Çevrimiçi:</strong> Kimse yok.';
-            }
         });
     }
-  </script>
-<script>
-    function getGoalFor(id){
-      const el = document.getElementById('goal-' + id);
-      let g = parseInt(el && el.value ? el.value : '0', 10);
-      if(isNaN(g) || g <= 0) g = 0;
-      return g;
-    }
-    function updateRowPct(id, pct){
-      const badge = document.querySelector(`[data-pct-for="${id}"]`);
-      if(!badge) return;
-      badge.textContent = pct + "%";
-      badge.classList.remove('zero','low');
-      if(pct === 0) badge.classList.add('zero');
-      else if(pct < 50) badge.classList.add('low');
-    }
-    function updateGlobalAndProgress(){
-      const ids = ["Turkce","Sosyal","Din","Ingilizce","Matematik","Fen"];
-      let sum = 0;
-      ids.forEach(id => {
-        const inp = document.getElementById(id);
-        if(!inp) return;
-        let val = parseInt(inp.value || "0", 10);
-        if(isNaN(val) || val < 0){ val = 0; inp.value = 0; }
-        sum += val;
-        const goal = getGoalFor(id);
-        const pct = goal > 0 ? Math.max(0, Math.min(100, Math.round((val/goal) * 100))) : 0;
-        const bar = document.querySelector(`.progressBar[data-bar-for="${id}"]`);
-        if(bar){ bar.style.width = pct + "%"; }
-        updateRowPct(id, pct);
-      });
-      const badge = document.getElementById("globalTotal");
-      if(badge) badge.textContent = sum;
-    }
 
-    document.addEventListener('click', function(e){
-      const btn = e.target.closest('.numBtn');
-      if(!btn) return;
-      const id = btn.getAttribute('data-target');
-      const step = parseInt(btn.getAttribute('data-step') || '1', 10);
-      const inp = document.getElementById(id);
-      if(!inp) return;
-      const cur = parseInt(inp.value || '0', 10);
-      let nv = isNaN(cur) ? 0 : cur;
-      nv = nv + step;
-      if(nv < 0) nv = 0;
-      inp.value = nv;
-      try { inp.dispatchEvent(new Event('input', { bubbles:true })); } catch(_) {}
-      updateGlobalAndProgress();
-    });
+    /* ============ Veli Paneli İşlevleri ============ */
+    window.activeRole = 'student';
 
-    document.addEventListener('input', function(e){
-      if(e.target && e.target.matches('#Turkce, #Sosyal, #Din, #Ingilizce, #Matematik, #Fen, #goal-Turkce, #goal-Sosyal, #goal-Din, #goal-Ingilizce, #goal-Matematik, #goal-Fen')){
-        updateGlobalAndProgress();
-      }
-    });
-
-    (function(){
-      const denseKey = 'lesson-density-enabled';
-      function setDense(enabled){
-        const list = document.querySelector('.lessonList');
-        if(!list) return;
-        if(enabled){ list.classList.add('dense'); }
-        else{ list.classList.remove('dense'); }
-        try { localStorage.setItem(denseKey, enabled ? '1' : '0'); } catch(_) {}
-      }
-      const savedDense = (function(){ try { return localStorage.getItem(denseKey) !== '0'; } catch(_) { return true; } })(); // default on
-      setDense(savedDense);
-      document.getElementById('densityToggleBtn')?.addEventListener('click', function(){
-        const list = document.querySelector('.lessonList');
-        const enabled = !list?.classList.contains('dense');
-        setDense(enabled);
-      });
-    })();
-
-    document.addEventListener('DOMContentLoaded', updateGlobalAndProgress);
-  </script>
-<script>
-(function(){
-  function showPassError(show){
-    var err = document.getElementById('passMismatchError');
-    var btn = document.getElementById('registerBtn');
-    if (err){ err.style.display = show ? 'block' : 'none'; }
-    if (btn){ btn.disabled = !!show; btn.style.opacity = show ? '0.6' : ''; btn.style.cursor = show ? 'not-allowed' : ''; }
-  }
-  function checkPassMatch(){
-    var p1 = document.getElementById('rPass');
-    var p2 = document.getElementById('rPass2');
-    if (!p1 || !p2) return;
-    if (p2.value.length === 0){ showPassError(false); return; }
-    if (p1.value !== p2.value){ showPassError(true); }
-    else { showPassError(false); }
-  }
-  document.addEventListener('DOMContentLoaded', function(){
-    var p1 = document.getElementById('rPass');
-    var p2 = document.getElementById('rPass2');
-    if (p1) p1.addEventListener('input', checkPassMatch);
-    if (p2) p2.addEventListener('input', checkPassMatch);
-
-    var regForm = document.getElementById('registerForm');
-    if (regForm){
-      regForm.addEventListener('submit', function(ev){
-        var p1 = document.getElementById('rPass');
-        var p2 = document.getElementById('rPass2');
-        if (p1 && p2 && p1.value !== p2.value){
-          ev.preventDefault();
-          checkPassMatch();
-          try{ p2.focus(); }catch(_){}
+    window.applyRoleUi = function() {
+        const role = window.activeRole;
+        const isParent = role === 'parent';
+        
+        // Giriş butonunu gizle/göster
+        const loginBtn = document.querySelector('#studentPanel button[onclick="studentLogin()"]');
+        if (loginBtn) loginBtn.style.display = isParent ? 'none' : 'block';
+        
+        // Soru giriş formunu gizle/göster
+        const lessonForm = document.getElementById('lessonForm');
+        if (lessonForm) lessonForm.style.display = isParent ? 'none' : 'block';
+        
+        // Başlık güncelle
+        const panelTitle = document.getElementById('studentPanelTitle');
+        if (panelTitle) {
+            panelTitle.textContent = isParent ? 'Veli Paneli' : 'Öğrenci Paneli';
         }
-      });
-    }
-
-    var btn = document.getElementById('registerBtn');
-    if (btn){
-      btn.addEventListener('click', function(ev){
-        var p1 = document.getElementById('rPass');
-        var p2 = document.getElementById('rPass2');
-        if (p1 && p2 && p1.value !== p2.value){
-          ev.preventDefault();
-          checkPassMatch();
-          try{ p2.focus(); }catch(_){}
-          return false;
+        
+        // Toolbar başlığını güncelle
+        const toolbarTitle = document.getElementById('studentPanelToolbarTitle');
+        if (toolbarTitle) {
+            toolbarTitle.textContent = isParent ? 'Veli Paneli' : 'Öğrenci Paneli';
         }
-      });
-    }
-  });
-})();
-</script>
-<script>
-function openReportModal(){
-  var ov = document.getElementById('reportOverlay');
-  var box = document.getElementById('teacherStudentDetail');
-  if(ov) ov.style.display='block';
-  if(box){ box.style.display='block'; showReportTab('daily'); }
-}
-function closeReportModal(){
-  try{ destroyWeekChart(); }catch(_){}
-  try{ destroyTeacherMonthChart(); }catch(_){}
-  var ov = document.getElementById('reportOverlay');
-  var box = document.getElementById('teacherStudentDetail');
-  if(box) box.style.display='none';
-  if(ov) ov.style.display='none';
-}
-
-function showReportTab(tab){
-  var tabs = ['daily','weekly','monthly'];
-  tabs.forEach(function(t){
-    var el = document.getElementById('repTab-' + t);
-    if(el) el.classList.toggle('active', t===tab);
-    var btn = document.getElementById('repTab' + (t.charAt(0).toUpperCase()+t.slice(1)) + 'Btn');
-    if(btn) btn.classList.toggle('active', t===tab);
-  });
-  if(tab==='monthly'){
-    if(window.currentDetailLessons){
-      buildTeacherMonths(window.currentDetailLessons);
-    }
-  }
-}
-
-if(typeof teacherShowStudent === 'function'){
-  const _origTeacherShowStudent = teacherShowStudent;
-  teacherShowStudent = function(num){
-    _origTeacherShowStudent(num);
-    openReportModal();
-  };
-}
-
-var tMonthChart = null;
-var _tMonths = [];
-function destroyTeacherMonthChart(){ if(tMonthChart){ try{tMonthChart.destroy();}catch(_){ } tMonthChart=null; } }
-
-function buildTeacherMonths(lessons){
-  _tMonths = buildMonthsFromLessons(lessons||{});
-  var sel = document.getElementById('tMonthSelect');
-  if(!sel) return;
-  sel.innerHTML = '';
-  _tMonths.forEach(function(m){
-    var opt = document.createElement('option');
-    opt.value = m.key; opt.textContent = m.label;
-    sel.add(opt);
-  });
-  if(_tMonths.length){
-    sel.value = _tMonths[_tMonths.length-1].key;
-    selectTeacherMonth(sel.value);
-  }else{
-    destroyTeacherMonthChart();
-    var mt = document.getElementById('tMonthTotals');
-    if(mt) mt.innerHTML = "<div class='empty'>Aylık veri yok.</div>";
-    try{ var ctx=document.getElementById('tMonthChart').getContext('2d'); ctx.clearRect(0,0,9999,9999);}catch(_){}
-  }
-}
-
-function selectTeacherMonth(key){
-  var m = (_tMonths||[]).find(function(x){return x.key===key;});
-  if(!m){ destroyTeacherMonthChart(); var mt=document.getElementById('tMonthTotals'); if(mt) mt.innerHTML=''; return; }
-  drawTeacherMonth(window.currentDetailLessons||{}, m);
-}
-
-function drawTeacherMonth(lessons, month){
-  var res = aggregateMonthDaily(lessons, month);
-  var labels = res.labels, daily = res.daily, totals = res.totals;
-  destroyTeacherMonthChart();
-  try{
-    var ctx = document.getElementById('tMonthChart').getContext('2d');
-    tMonthChart = new Chart(ctx, {
-      type:'line',
-      data:{ labels:labels, datasets:[ { label: month.label + ' — Günlük Toplam', data: daily, tension:0.35, pointRadius:3, borderWidth:2, fill:false } ] },
-      options:{ responsive:true, maintainAspectRatio:false, scales:{ x:{ ticks:{ color:'#cbd5e1' }, grid:{ color:'rgba(148,163,184,.15)'} }, y:{ beginAtZero:true, ticks:{ color:'#cbd5e1' }, grid:{ color:'rgba(148,163,184,.12)'} } }, plugins:{ legend:{ labels:{ color:'#e2e8f0' } } } }
-    });
-  }catch(_){}
-  var order = ["Türkçe","Sosyal Bilgiler","Din Kültürü","İngilizce","Matematik","Fen Bilimleri"];
-  var html = "<table><tr><th>Ders</th><th>Toplam Soru</th></tr>";
-  order.forEach(function(d){ var v = totals[d]||0; html += "<tr><td>"+d+"</td><td>"+v+"</td></tr>"; });
-  html += "</table>";
-  var mt = document.getElementById('tMonthTotals'); if(mt) mt.innerHTML = html;
-}
-
-
-window._tsdCalCtx = { grouped:{}, selectedDate:new Date(), viewMonthStart:new Date(), hasSet:new Set() };
-
-function tsdBuildCtxFromLessons(dayMap){
-  const keys = Object.keys(dayMap || {}).map(parseTRDateStr).filter(d=>!isNaN(d));
-  const latest = keys.length ? keys.sort((a,b)=>a-b)[keys.length-1] : new Date();
-  window._tsdCalCtx = {
-    grouped: dayMap || {},
-    selectedDate: latest,
-    viewMonthStart: new Date(latest.getFullYear(), latest.getMonth(), 1),
-    hasSet: new Set(Object.keys(dayMap||{}))
-  };
-}
-
-function tsdChangeMonth(delta){
-  const ctx = window._tsdCalCtx;
-  ctx.viewMonthStart = stuAddMonths(ctx.viewMonthStart, delta);
-  renderTeacherCalendar();
-}
-function tsdGotoToday(){
-  const ctx = window._tsdCalCtx;
-  const today = new Date();
-  ctx.viewMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-  tsdSelectDate(formatTR(today));
-}
-function tsdSelectDate(dayStr){
-  const ctx = window._tsdCalCtx;
-  const d = parseTRDateStr(dayStr);
-  if(isNaN(d)) return;
-  ctx.selectedDate = d;
-  try{
-    if (typeof currentDetailNum !== 'undefined' && currentDetailNum){
-      teacherShowStudentDay(currentDetailNum, dayStr);
-    }
-  }catch(_){}
-  renderTeacherCalendar();
-}
-
-function renderTeacherCalendar(){
-  const wrapBox = document.getElementById("tsdDays");
-  if(!wrapBox) return;
-  const ctx = window._tsdCalCtx;
-  const monthLabel = ctx.viewMonthStart.toLocaleDateString('tr-TR', { month: 'long', year: 'numeric' });
-  const startGrid = (function(){
-    const first = new Date(ctx.viewMonthStart.getFullYear(), ctx.viewMonthStart.getMonth(), 1);
-    const day = first.getDay(); 
-    const shift = (day === 0 ? 6 : day-1); 
-    const s = new Date(first);
-    s.setDate(first.getDate() - shift);
-    return s;
-  })();
-
-  let html = `
-    <div class="calendarWrap">
-      <div class="calHeader">
-        <div class="calNav">
-          <button type="button" class="calBtn" onclick="tsdChangeMonth(-1)">‹</button>
-        </div>
-        <div class="calTitle">${monthLabel.charAt(0).toUpperCase()+monthLabel.slice(1)}</div>
-        <div class="calNav">
-          <button type="button" class="calBtn" onclick="tsdChangeMonth(1)">›</button>
-          <button type="button" id="btnToday" class="calBtnToday" onclick="tsdGotoToday()">Bugün</button>
-        </div>
-      </div>
-      <div class="calGrid" role="grid" aria-label="Ay görünümü">
-        ${['Pzt','Sal','Çar','Per','Cum','Cmt','Paz'].map(w=>`<div class="calWd">${w}</div>`).join('')}
-  `;
-
-  for(let i=0;i<42;i++){
-    const d = addDays(startGrid, i);
-    const inMonth = d.getMonth() === ctx.viewMonthStart.getMonth();
-    const dayStr = formatTR(d);
-    const hasData = ctx.hasSet.has(dayStr);
-    const isToday = stuSameYMD(d, new Date());
-    const isSelected = stuSameYMD(d, ctx.selectedDate);
-    html += `
-      <div class="calCell ${inMonth?'':'muted'} ${isToday?'today':''} ${isSelected?'selected':''}"
-           onclick="tsdSelectDate('${dayStr}')">
-        <span class="calDay">${d.getDate()}</span>
-        ${hasData ? '<span class="calDot" aria-hidden="true"></span>' : ''}
-      </div>
-    `;
-  }
-  html += `</div></div>`;
-  wrapBox.innerHTML = html;
-}
-</script>
-<!-- Hedef Soru Modalı -->
-<div class="list asModal" id="targetModal" style="display:none; max-width:420px">
-<div class="modalHead">
-<div class="modalTabs">
-<strong>🎯 Öğrenci Hedefi</strong>
-</div>
-<button class="pill modalClose" onclick="closeTargetModal()">Kapat ×</button>
-</div>
-<div style="display:flex; flex-direction:column; gap:10px; padding:8px">
-<div id="targetStudentName" style="font-weight:700"></div>
-<label>Günlük hedef soru sayısı:</label>
-<input id="targetInput" inputmode="numeric" min="0" placeholder="örn. 100" step="1" type="number"/>
-<button class="action" onclick="saveTarget()" type="button">Kaydet</button>
-</div>
-</div></div>
-<!-- === Goals Full Page (Student/Teacher) — MODERN === -->
-<div id="goalsPage" style="display:none">
-<div class="gp-header">
-<div class="gp-left">
-<button class="pill gp-btn gp-back" onclick="backFromGoalsPage()" title="Öğrenci Paneline Dön" type="button">
-<span aria-hidden="true" class="icon">
-<svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24"><path d="M15 18l-6-6 6-6"></path><path d="M21 12H9"></path></svg>
-</span>
-        Geri
-      </button>
-<div class="gp-title">🎯 Ders Soru sayısı Hedefleri</div>
-</div>
-<div class="gp-actions">
-<button class="pill gp-btn gp-clear" onclick="resetGoalsInputs()" type="button">
-<span aria-hidden="true" class="icon">
-<svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24"><path d="M3 20l1-5 11-11 3 3L7 18l-4 2z"></path><path d="M14 6l4 4"></path></svg>
-</span>
-        Temizle
-      </button>
-<button class="action gp-btn" onclick="saveLessonGoals()" type="button">
-<span aria-hidden="true" class="icon">
-<svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24"><path d="M20 6L9 17l-5-5"></path></svg>
-</span>
-        Kaydet
-      </button>
-</div>
-</div>
-<div class="gp-table">
-<div class="gp-row">
-<label class="gp-label turkce"><span class="dot"></span>Türkçe</label>
-<input class="gp-input" id="lg-Turkce" inputmode="numeric" min="1" placeholder="örn. 50" type="number"/>
-</div>
-<div class="gp-row">
-<label class="gp-label sosyal"><span class="dot"></span>Sosyal Bilgiler</label>
-<input class="gp-input" id="lg-Sosyal" inputmode="numeric" min="1" placeholder="örn. 50" type="number"/>
-</div>
-<div class="gp-row">
-<label class="gp-label din"><span class="dot"></span>Din Kültürü</label>
-<input class="gp-input" id="lg-Din" inputmode="numeric" min="1" placeholder="örn. 50" type="number"/>
-</div>
-<div class="gp-row">
-<label class="gp-label ing"><span class="dot"></span>İngilizce</label>
-<input class="gp-input" id="lg-Ingilizce" inputmode="numeric" min="1" placeholder="örn. 50" type="number"/>
-</div>
-<div class="gp-row">
-<label class="gp-label matematik"><span class="dot"></span>Matematik</label>
-<input class="gp-input" id="lg-Matematik" inputmode="numeric" min="1" placeholder="örn. 50" type="number"/>
-</div>
-<div class="gp-row">
-<label class="gp-label fen"><span class="dot"></span>Fen Bilimleri</label>
-<input class="gp-input" id="lg-Fen" inputmode="numeric" min="1" placeholder="örn. 50" type="number"/>
-</div>
-</div>
-<p class="gp-note">Not: Kaydet ile eski hedefler silinir, girilen son hedefler saklanır.</p>
-</div>
-<script>
-(function(){
-  window._MAIN_PANELS = (window._MAIN_PANELS || ['teacherPanel','studentPanel','loginPanel','goalsPage']);
-
-  function showMainPanel(id){
-    (window._MAIN_PANELS || []).forEach(function(pid){
-      var el = document.getElementById(pid);
-      if(el){ el.style.display = (pid === id) ? 'block' : 'none'; }
-    });
-  }
-  window.openLessonGoalsPage = function(){
-    try{
-      ["Turkce","Sosyal","Din","Ingilizce","Matematik","Fen"].forEach(function(id){
-        var main = document.getElementById('goal-' + id);
-        var modal = document.getElementById('lg-' + id);
-        if(modal){ modal.value = main && main.value ? main.value : ""; }
-      });
-    }catch(_){}
-    showMainPanel('goalsPage');
-  };
-  window.backFromGoalsPage = function(){ showMainPanel('teacherPanel'); };
-  window.resetGoalsInputs = function(){
-    ["Turkce","Sosyal","Din","Ingilizce","Matematik","Fen"].forEach(function(id){
-      var modal = document.getElementById('lg-' + id);
-      if(modal) modal.value = "";
-    });
-  };
-
-  window.showNotificationPopup = function(message) {
-    const overlay = document.getElementById('notificationOverlay');
-    if (!overlay) return;
-    document.getElementById('notificationMessage').textContent = message;
-    overlay.style.display = 'flex';
-  }
-
-  window.closeNotificationPopup = function() {
-    const overlay = document.getElementById('notificationOverlay');
-    if (overlay) overlay.style.display = 'none';
-  }
-
-  let notificationListener = null;
-  function listenForNotifications() {
-      if (!currentStudent) return;
-      if (notificationListener) {
-          notificationListener.off(); 
-      }
-      const notificationRef = db.ref('students/' + currentStudent + '/notification');
-      notificationListener = notificationRef;
-      notificationRef.on('value', snap => {
-          if (snap.exists() && snap.val() && !snap.val().read) {
-              const notification = snap.val();
-              showNotificationPopup(notification.message);
-              snap.ref.update({ read: true });
-          }
-      });
-  }
-
-  window.saveLessonGoals = function(goBack){
-    goBack = false; var payload = {};
-    const lessons = ["Turkce","Sosyal","Din","Ingilizce","Matematik","Fen"];
-    lessons.forEach(function(id){
-      var v = parseInt((document.getElementById('lg-' + id)?.value || "0"), 10);
-      if(isNaN(v) || v <= 0) v = 0;
-      payload[id] = v;
-      var main = document.getElementById('goal-' + id);
-      if(main){ main.value = v > 0 ? v : ""; }
-    });
-    try { if (typeof updateGlobalAndProgress === 'function') updateGlobalAndProgress(); } catch(_){}
-
-    try{
-      if(typeof db !== 'undefined' && typeof currentStudent !== 'undefined' && currentStudent){
-        var ref = db.ref('students/' + currentStudent + '/lessonGoals');
-        var actor = (currentTeacherId) ? 'teacher' : 'student';
-        var studentIdForNotification = currentStudent;
-
-        ref.set(Object.assign({}, payload, {_updatedAt: firebase.database.ServerValue.TIMESTAMP, _updatedBy: actor}))
-          .then(function(){
-            setAlert('Hedef soru sayısı kaydedildi.');
-            if (actor === 'teacher') {
-              const notificationRef = db.ref('students/' + studentIdForNotification + '/notification');
-              notificationRef.set({
-                message: 'Öğretmeniniz, ders hedeflerinizi güncelledi.',
-                timestamp: firebase.database.ServerValue.TIMESTAMP,
-                read: false 
-              });
-            }
-          })
-          .catch(function(e){
-            setAlert('Kayıt hatası: ' + e.message);
-          });
-      }
-    }catch(e){}
-  };
-
-  document.addEventListener('click', function(e){
-    var icon = e.target.closest && e.target.closest('.goalWrap .goalIcon');
-    if(icon){ openLessonGoalsPage(); }
-  });
-
-  window.loadLessonGoals = function(){
-    try{
-      if(typeof db === 'undefined' || typeof currentStudent === 'undefined' || !currentStudent) return;
-      db.ref('students/' + currentStudent + '/lessonGoals').get().then(function(snap){
-        if(!snap.exists()) return;
-        var data = snap.val() || {};
-        ["Turkce","Sosyal","Din","Ingilizce","Matematik","Fen"].forEach(function(id){
-          var main = document.getElementById('goal-' + id);
-          var v = Number(data[id] || 0);
-          if(main){ main.value = v > 0 ? v : ""; }
-        });
-        try { if (typeof updateGlobalAndProgress === 'function') updateGlobalAndProgress(); } catch(_){}
-      });
-    }catch(_){}
-  };
-
-  try{
-    var styleAdded=false;
-    if(!styleAdded){
-      var s=document.createElement('style');
-      s.textContent='.goalIcon{cursor:pointer;}';
-      document.head.appendChild(s);
-      styleAdded=true;
-    }
-  }catch(_){}
-})();
-</script>
-<style>
-#goalsPage .gp-header .gp-btn{
-  min-height: 40px;
-  min-width: 120px;
-  padding: 8px 14px;
-  border-radius: 12px;
-  font-weight: 900;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-#goalsPage .gp-header .gp-btn .icon{ width:16px; height:16px; }
-
-#goalsPage .gp-header .gp-back{
-  background: linear-gradient(180deg,#ef4444,#dc2626) !important;
-  color:#fff !important;
-  border:1px solid #7f1d1d;
-  box-shadow:0 6px 16px rgba(239,68,68,.25), inset 0 1px 0 rgba(255,255,255,.08);
-}
-
-#goalsPage .gp-header .gp-clear{
-  background: linear-gradient(180deg,#10b981,#059669) !important;
-  color:#fff !important;
-  border:1px solid #065f46;
-  box-shadow:0 6px 16px rgba(16,185,129,.25), inset 0 1px 0 rgba(255,255,255,.08);
-}
-</style>
-<style>
-#goalsPage .gp-header{ position: relative; }
-#goalsPage .gp-header .gp-title{
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  text-align: center;
-  font-weight: 800;
-}
-</style><style>
-#goalsPage .gp-header .gp-title{
-  position: static !important;
-  left: auto !important;
-  transform: none !important;
-  text-align: left !important;
-  font-size: 1.5rem !important; 
-  line-height: 1.3 !important;
-}
-</style>
-<style>
-body[data-role="parent"] #studentTab-entry #lessonForm { display:none !important; }
-body[data-role="parent"] #studentTab-entry .totalBar { display:none !important; }
-body[data-role="parent"] #studentTab-entry .addBtn { display:none !important; }
-body[data-role="parent"] #studentTab-entry .student-toolbar { margin-bottom: 8px; }
-</style>
-<script>
-(function(){
-  window.activeRole = window.activeRole || 'student';
-
-  function setBodyRoleAttr(){
-    try{ document.body.setAttribute('data-role', (window.activeRole==='parent'?'parent':'student')); }catch(_){}
-  }
-
-  window.applyRoleUi = (function(prev){
-    return function(){
-      try{
-        var isParent = (window.activeRole === 'parent');
-        var title = document.getElementById('studentPanelTitle');
-        var barTitle = document.getElementById('studentPanelToolbarTitle');
-        if(title) title.textContent = isParent ? 'Veli Paneli' : 'Öğrenci Paneli';
-        if(barTitle) barTitle.textContent = isParent ? 'Veli Paneli' : 'Öğrenci Paneli';
-        var entryBtn = document.getElementById('stuTabEntryBtn');
-        if(entryBtn){
-          entryBtn.textContent = isParent ? 'Günlük Rapor' : 'Soru Girişi';
+        
+        // Hoşgeldin mesajını güncelle
+        const welcomeBanner = document.getElementById('studentWelcome');
+        if (welcomeBanner) {
+            const name = currentStudentName || '';
+            welcomeBanner.textContent = isParent ? 
+                `${toTitleCaseTR(name)} öğrencisinin velisi olarak giriş yaptınız.` :
+                `Sayfana hoş geldin ${toTitleCaseTR(name)}.`;
         }
-        setBodyRoleAttr();
-      }catch(_){}
-      try{ if(typeof prev === 'function') prev(); }catch(_){}
     };
-  })(window.applyRoleUi);
 
-  try{
-    var h3 = document.querySelector('#studentPanel h3');
-    if(h3 && !h3.id && h3.textContent.trim().toUpperCase().includes('ÖĞRENCİ')){ h3.id = 'studentPanelTitle'; }
-    var strong = document.querySelector('#studentTab-entry .student-toolbar strong');
-    if(strong && !strong.id && strong.textContent.trim().toUpperCase().includes('ÖĞRENCİ')){ strong.id = 'studentPanelToolbarTitle'; }
-  }catch(_){}
+    // Sayfa yüklendiğinde UI'ı ayarla
+    document.addEventListener('DOMContentLoaded', function() {
+        window.applyRoleUi();
+    });
 
-  if (typeof window.enterAsStudent === 'function'){
-    var __orig_enterAsStudent = window.enterAsStudent;
-    window.enterAsStudent = function(){
-      window.activeRole = 'student';
-      __orig_enterAsStudent();
-      window.applyRoleUi();
-    };
-  }
+    /* ============ İlk Yükleme ============ */
+    document.addEventListener("DOMContentLoaded",function(){
+      showTab("register");
+    });
 
-  window.enterAsParent = function(){
-    window.activeRole = 'parent';
-    var rc = document.getElementById('roleChoice'); if(rc) rc.style.display='none';
-    var lp = document.getElementById('loginPanel'); if(lp) lp.style.display='none';
-    var sp = document.getElementById('studentPanel'); if(sp) sp.style.display='block';
-    try{ window.showStudentTab('entry'); }catch(_){}
-    try{ window.loadStudentData(); }catch(_){}
-    window.applyRoleUi();
-  };
-
-  if (typeof window.logout === 'function'){
-    var __orig_logout = window.logout;
-    window.logout = function(){
-      __orig_logout();
-      window.activeRole = 'student';
-      window.applyRoleUi();
-    };
-  }
-
-  setBodyRoleAttr();
-  window.applyRoleUi();
-})();
+    // Şifre eşleşme kontrolü
+    document.getElementById('rPass2').addEventListener('input', function() {
+        const pass1 = document.getElementById('rPass').value;
+        const pass2 = this.value;
+        const error = document.getElementById('passMismatchError');
+        const registerBtn = document.getElementById('registerBtn');
+        
+        if (pass1 !== pass2) {
+            error.style.display = 'block';
+            registerBtn.disabled = true;
+            registerBtn.style.opacity = '0.6';
+        } else {
+            error.style.display = 'none';
+            registerBtn.disabled = false;
+            registerBtn.style.opacity = '1';
+        }
+    });
 </script>
 </body>
 </html>
