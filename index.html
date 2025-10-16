@@ -1047,7 +1047,7 @@ button.exitSmall .label{line-height:1}
 </style>
 <body>
 <!-- === YENİ: Bildirim Pop-up === -->
-<div id="notificationOverlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 10000; display: flex; align-items: center; justify-content: center;">
+<div id="notificationOverlay" style="position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 10000; display: none; align-items: center; justify-content: center;">
     <div style="background: var(--panel); padding: 20px 24px; border-radius: 12px; max-width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,.3);">
         <h3 style="margin-top: 0; color: var(--accent1);">Bildirim</h3>
         <p id="notificationMessage" style="margin: 8px 0 16px; line-height: 1.5;"></p>
@@ -3365,7 +3365,7 @@ function renderTeacherCalendar(){
       const notificationRef = db.ref('students/' + currentStudent + '/notification');
       notificationListener = notificationRef;
       notificationRef.on('value', snap => {
-          if (snap.exists() && snap.val() && !snap.val().read) {
+          if (snap.exists() && snap.val() && !snap.val().read && snap.val().message) {
               const notification = snap.val();
               showNotificationPopup(notification.message);
               snap.ref.update({ read: true });
