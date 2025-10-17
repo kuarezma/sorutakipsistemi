@@ -2738,8 +2738,20 @@
             const endStr = `${end.getDate()} ${monthNames[end.getMonth()]} ${end.getFullYear()}`;
             const rangeStr = `${startStr} - ${endStr}`;
             
-            let fullHtml = "";
             const dersSirasi = (lessonScope === 'single' && singleLesson) ? [singleLesson] : ["Türkçe", "Sosyal Bilgiler", "Din Kültürü", "İngilizce", "Matematik", "Fen Bilimleri"];
+            
+            let fullHtml = "<table><thead><tr><th>Öğrenci</th>";
+            dersSirasi.forEach(lesson => {
+                fullHtml += `<th>${escHTML(lesson)}</th>`;
+            });
+            if (lessonScope === 'all') {
+                fullHtml += `<th>TOPLAM</th>`;
+            }
+            fullHtml += "</tr></thead><tbody>";
+
+            const classTotals = {};
+            dersSirasi.forEach(l => classTotals[l] = 0);
+            let grandTotal = 0;
 
             lessonSnaps.forEach((lessonSnap, index) => {
                 const student = students[index];
@@ -2747,26 +2759,35 @@
                 const { weekMap } = processLessonData(lessons);
                 const weekData = weekMap[selectedWeekKey] || {};
                 
-                const separatorStyle = index > 0 ? 'margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;' : 'margin-top: 20px;';
-
-                fullHtml += `<div style="page-break-inside: avoid;">
-                                <h2 style="${separatorStyle}">${toTitleCaseTR(student.name)} (${student.num})</h2>
-                                <div class="exportCard" style="margin-bottom:10px;">
-                                    <div>
-                                        <table>
-                                            <thead><tr><th>Ders</th><th>Haftalık Toplam</th></tr></thead>
-                                            <tbody>`;
+                fullHtml += `<tr><td>${toTitleCaseTR(student.name)} (${student.num})</td>`;
+                
                 let studentTotal = 0;
                 dersSirasi.forEach(lesson => {
                     const total = weekData[lesson] || 0;
                     studentTotal += total;
-                    fullHtml += `<tr><td>${escHTML(lesson)}</td><td>${total}</td></tr>`;
+                    classTotals[lesson] += total;
+                    fullHtml += `<td>${total}</td>`;
                 });
+
                 if (lessonScope === 'all') {
-                    fullHtml += `<tr style="font-weight:bold;"><td>TOPLAM</td><td>${studentTotal}</td></tr>`;
+                    fullHtml += `<td><strong>${studentTotal}</strong></td>`;
+                    grandTotal += studentTotal;
                 }
-                fullHtml += `           </tbody></table></div></div></div>`;
+                fullHtml += `</tr>`;
             });
+            
+            fullHtml += `</tbody>`;
+
+            if (students.length > 1 && lessonScope === 'all') {
+                fullHtml += `<tfoot><tr style="font-weight:bold; border-top: 2px solid #ccc;"><td>Sınıf Toplamı</td>`;
+                dersSirasi.forEach(lesson => {
+                    fullHtml += `<td>${classTotals[lesson]}</td>`;
+                });
+                fullHtml += `<td>${grandTotal}</td>`;
+                fullHtml += `</tr></tfoot>`;
+            }
+
+            fullHtml += `</table>`;
             
             const exportContentDiv = document.getElementById("exportTable");
             exportContentDiv.innerHTML = fullHtml;
@@ -2812,9 +2833,11 @@
             setAlert("Sınıf raporu oluşturulurken bir hata oluştu.");
         } finally {
             // Cleanup
+            const elem = document.getElementById("exportArea");
             elem.classList.remove('light-theme');
             document.getElementById("exportTitle").textContent = "Haftalık Gelişim Raporu";
             document.getElementById("exportTable").innerHTML = "";
+            document.getElementById("exportStudent").textContent = "";
         }
     }
     /* ============ Hedef Yönetimi ============ */
